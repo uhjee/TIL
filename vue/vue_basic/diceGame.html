@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <p>{{ checkWinnerMsg }}</p>
+    <p>첫 번째 주사위: {{diceNumFirst}}</p>
+    <p>두 번째 주사위: {{diceNumSecond}}</p>
+    <button type="button" v-on:click="throwDice">던지기</button>
+    <!-- v-on:click은 @click과 같다 -->
+    <!-- <button type="button" @click="throwDice">던지기</button> -->
+
+  </div>
+
+  <script type="text/javascript">
+    var data = {
+      message: '',
+      diceNumFirst: 0,
+      diceNumSecond: 0
+    };
+
+
+    var vm = new Vue({
+      el: "#app",
+      data: data,
+      methods: {
+        throwDice: function () {
+          this.diceNumFirst = Math.floor(Math.random() * 6) + 1;
+          this.diceNumSecond = Math.floor(Math.random() * 6) + 1;
+        }
+      },
+      computed: {
+        checkWinnerMsg: function () {
+          if (this.diceNumFirst > this.diceNumSecond) {
+            this.message = "첫 번째 주사위 승리!"
+          } else if (this.diceNumFirst < this.diceNumSecond) {
+            this.message = "두 번째 주사위 승리!"
+          } else if ((this.diceNumFirst != 0 && this.diceNumSecond != 0) &&
+            this.diceNumFirst == this.diceNumSecond) {
+            this.message = "비겼습니다. 다시 던져주세요."
+          } else {
+            this.message = "주사위를 던져주세요."
+          }
+          return this.message;
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

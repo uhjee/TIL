@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        #list {
+            width: 600px;
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+
+        #list td,
+        #list th {
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        #list>thead>tr {
+            color: white;
+            background-color: salmon;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 여러가지 유틸리티 기능을 제공하는 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore.js"></script>
+    <!-- ajax 기능을 제공하는 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/2.0.3/fetch.js"></script>
+</head>
+
+<body>
+    <div id="example">
+        <p>
+            이름:
+            <input type="text" v-model="name" placeholder="두자 이상 입력하세요">
+        </p>
+        <table id="list">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>이름</th>
+                    <th>전화번호</th>
+                    <th>주소</th>
+                </tr>
+            </thead>
+            <tbody id="contacts">
+                <tr v-for="contact in contactlist" :key="contact.no">
+                    <td>{{contact.no}}</td>
+                    <td>{{contact.name}}</td>
+                    <td>{{contact.tel}}</td>
+                    <td>{{contact.address}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div v-show="isProcessing === 'true'"> 조 회 중 . . . </div>
+    </div>
+
+
+
+    <script type="text/javascript">
+        var vm = new Vue({
+            el: '#example',
+            data() {
+                return {
+                    name: '',
+                    isProcessing: false,
+                    contactlist: []
+                }
+            },
+            // name 속성의 변화를 감지하여 함수 호출
+            watch: {
+                name: function (val) {
+                    if (val.length >= 2) {
+                        this.fetchContacts();
+                    } else {
+                        this.contactlist = [];
+                    }
+                }
+            },
+            methods: {
+                // underscore 라이브러리의 메소드, 300ms 이 지나도록 연속적인 호출이 일어나지 않으면, 실제 API를 요청하도록 작성
+                fetchContacts: _.debounce(function () {
+                    this.contactlist = [];
+                    this.isProcessing = true;
+                    var url = "http://sample.bmaster.kro.kr/contacts/search/" + this.name;
+                    var vm = this;
+                    // fetch()의 리턴값은 promise 객체
+                    fetch(url)
+                        .then(function (response) {
+                            return response.json();
+                        }).then(function (json) {
+                            vm.contactlist = json;
+                            vm.isProcessing = false;
+                        }).catch(function (exception) {
+                            console.log('parsing failed', exception);
+                            vm.contactlist = [];
+                            vm.isProcessing = false;
+                        })
+                }, 300)
+            },
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        >.unit {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 20px;
+        }
+
+        table {
+            border-spacing: 0px;
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 2px solid salmon;
+            padding: 10px 20px;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        th {
+            border: 2px solid white;
+            background-color: tomato;
+            color: white;
+
+        }
+    </style>
+
+</head>
+
+<body>
+    <div id="app">
+        <div class="unit">
+            <table>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>name</th>
+                        <th>Tel.</th>
+                        <th>Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item, index) in contacts" :key="item.no">
+                        <td> {{ item.no }}</td>
+                        <td> {{ item.name }}</td>
+                        <td> {{ item.tel }}</td>
+                        <td> {{ item.address }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        var model = {
+
+            "pageno": 1,
+            "pagesize": 10,
+            "totalcount": 100,
+            "contacts": [{
+                    "no": 100,
+                    "name": "설현",
+                    "tel": "010-3456-8299",
+                    "address": "서울"
+                }
+
+                ,
+                {
+                    "no": 99,
+                    "name": "혜리",
+                    "tel": "010-3456-8298",
+                    "address": "서울"
+                }
+
+                ,
+                {
+                    "no": 98,
+                    "name": "하니",
+                    "tel": "010-3456-8297",
+                    "address": "경기"
+                }
+
+                ,
+                {
+                    "no": 97,
+                    "name": "성소",
+                    "tel": "010-3456-8296",
+                    "address": "제주"
+                }
+
+                ,
+                {
+                    "no": 96,
+                    "name": "지아",
+                    "tel": "010-3456-8295",
+                    "address": "서울"
+                }
+
+                ,
+                {
+                    "no": 95,
+                    "name": "정연",
+                    "tel": "010-3456-8294",
+                    "address": "강원"
+                }
+
+                ,
+                {
+                    "no": 94,
+                    "name": "쯔위",
+                    "tel": "010-3456-8293",
+                    "address": "경기"
+                }
+
+                ,
+                {
+                    "no": 93,
+                    "name": "사나",
+                    "tel": "010-3456-8292",
+                    "address": "서울"
+                }
+
+                ,
+                {
+                    "no": 92,
+                    "name": "모모",
+                    "tel": "010-3456-8291",
+                    "address": "충남"
+                }
+
+                ,
+                {
+                    "no": 91,
+                    "name": "소진",
+                    "tel": "010-3456-8290",
+                    "address": "서울"
+                }
+
+            ]
+        };
+
+        let vm3 = new Vue({
+            el: '#app',
+            data: model
+        });
+    </script>
+</body>
+
+</html>

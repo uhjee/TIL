@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <p>{{firstName}}</p>
+    <p>{{LastName}}</p>
+    <p>{{fullName}}</p>
+  </div>
+
+
+  <script type="text/javascript">
+    var data = (function () {
+      var storage = {
+        firstName: "소룡",
+        LastName: "이",
+
+      };
+      return storage;
+    })();
+
+    var vm = new Vue({
+      el: "#app",
+      data: data,
+      computed: {
+        fullName: {
+          //getter -- 내부적으로 생성되어 있다.
+          // vm.fullName 으로 호출
+          get: function () {
+            return this.firstName + ' ' + this.LastName;
+          },
+          //setter -- 필요에 의해 생성하여 사용해야 한다.
+          // vm.fullName = "주 윤발" 로 세팅
+          set: function (newValue) {
+            var names = newValue.split(' ');
+            this.firstName = names[0];
+            this.LastName = names[names.length - 1];
+          }
+        }
+      }
+    })
+  </script>
+</body>
+
+</html>

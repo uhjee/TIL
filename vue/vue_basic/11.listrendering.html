@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        .unit {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 20px;
+        }
+
+        table {
+            border-spacing: 0px;
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+
+        th,
+        td {
+            border: 2px solid salmon;
+            padding: 10px 20px;
+            font-size: 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: lemonchiffon;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- 01. Object의 value로 반복문 돌리기 -->
+        <div class="unit">
+            <ul id="v-for-object" class="demo">
+                <!-- <li v-for="value in object"> -->
+                <!-- key에 대한 인자도 제공 가능 - 순서주의!!!!! -->
+                <!-- 첫 번째 인자가 value, 두 번째 인자가 key -->
+                <!-- 세 번째 인자가 index -->
+                <li v-for="(value, name, index) in object">
+                    {{index}} - {{name}} : {{value}}
+                </li>
+            </ul>
+        </div>
+
+        <!-- 02. key를 통해 각 항목을 식별할 수 있는 ID 부여 -->
+        <!-- v-for를 사용할 때면 언제나 넣어주는 것이 좋다. -->
+        <!-- key는 Primitive Type만 가능하다  -->
+        <div class="unit">
+            <div v-for="item in items" v-bind:key="item.id">
+                {{item.msg}}
+            </div>
+        </div>
+
+        <!-- 03. 컴포넌트에 v-for 사용 가능 -->
+        <div class="unit">
+            <my-compo v-for="n in 3" :key="n"></my-compo>
+        </div>
+
+
+        <!-- 04.filter()를 사용하여 홀수만 필터링 -->
+        <div class="unit">
+            <ul>
+                <li v-for="n in evenNumbers">{{n}}</li>
+            </ul>
+        </div>
+
+        <!-- 05. toDoList 예제 -->
+        <div class="unit">
+            <h1>TodoList by 지행</h1>
+            <div id="todo-list-example">
+                <!-- 이벤트 수식어 .prevent : 제출 페이지가 페이지를 다시 로드하지 않는다. -->
+                <form v-on:submit.prevent="addNewTodo">
+                    <label for="new-todo">Add a todo</label>
+                    <!-- ref로 등록해놓으면 아래 methods에서 Vue.$refs에서 해당 element로 접근 가능 -->
+                    <input v-model="newTodoText" id="newtodo" placeholder="E.g. Feed the cat" ref="newtodo">
+                    <button>Add</button>
+                </form>
+                <ul>
+                    <!-- 뒤에 v-bind:title 은 잘 모르겠습니다... 해당하는 Object가 없는데도 오류가 안난다. 지워도 안난다. -->
+                    <!-- v-on:remove 부분도 모르겠다.... 아마 나중에 done으로 바뀔 때 data의 배열 건드리는 것 같다-->
+                    <li class="todo-item" v-for="(todo, index) in todos" v-bind:key="todo.id" v-bind:title="todo.title"
+                        v-on:remove="todos.splice(index, 1)">{{index}}. {{todo}}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 공식 홈페이지에 써있는 ToDoList 방법 -->
+    <div id="app2">
+        <div class="unit">
+            <h1>TodoList 답안</h1>
+            <div id="todo-list-example">
+                <form v-on:submit.prevent="addNewTodo">
+                    <label for="new-todo">Add a todo</label>
+                    <input v-model="newTodoText" id="new-todo" placeholder="E.g. Feed the cat">
+                    <button>Add</button>
+                </form>
+                <ul>
+                    <li is="todo-item" v-for="(todo, index) in todos" v-bind:key="todo.id" v-bind:title="todo.title"
+                        v-on:remove="todos.splice(index, 1)"></li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+
+
+    <script>
+        // 전역 컴포넌트 등록
+        Vue.component("my-compo", {
+            template: "<p>Hi, im Component</p>"
+
+        });
+
+        let vm = new Vue({
+            el: " #app",
+            data() {
+                return {
+                    // 01. Object의 value로 반복문 돌리기 
+                    object: {
+                        title: 'How to do lists in Vue',
+                        author: 'Jane Doe',
+                        publishedAt: '2016-04-10'
+                    },
+                    items: [{
+                            id: '1',
+                            msg: 'hi'
+                        },
+                        {
+                            id: '2',
+                            msg: 'hello'
+                        }
+                    ],
+                    newTodoText: '',
+                    todos: [],
+                    numbers: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+                }
+            },
+            methods: {
+                addNewTodo() {
+                    if (this.newTodoText == '' || this.newTodoText == null) {
+                        alert('아무 값도 입력 안했어요')
+                        this.$refs.newtodo.focus()
+                        return;
+                    }
+                    this.todos.push(this.newTodoText);
+                    this.newTodoText = ''
+                }
+            },
+            computed: {
+                evenNumbers: function () {
+                    // numbers array 안에 있는 argument들을 num로 받아서 callback 실행
+                    return this.numbers.filter(function (num) {
+                        return num % 2 === 1
+                    })
+                }
+            }
+        })
+
+        // Vue.component('todo-item', {
+        //     template: '\
+        //         <li>\
+        //         {{ title }}\
+        //         <button v-on:click="$emit(\'remove\')">Remove</button>\
+        //         </li>\
+        //     ',
+        //     props: ['title']
+        // })
+        var todoItem = {
+            template: '\
+                <li>\
+                {{ title }}\
+                <button v-on:click="$emit(\'remove\')">Remove</button>\
+                </li>\
+            ',
+            props: ['title']
+        }
+
+
+        let vm2 = new Vue({
+            el: '#app2',
+            data: {
+                newTodoText: '',
+                todos: [{
+                        id: 1,
+                        title: '설거지를 하여라',
+                    },
+                    {
+                        id: 2,
+                        title: '세수를 하여라',
+                    },
+                    {
+                        id: 3,
+                        title: '빨래를 하여라',
+                    }
+                ],
+                nextTodoId: 4
+            },
+            methods: {
+                addNewTodo: function () {
+                    this.todos.push({
+                        id: this.nextTodoId++,
+                        title: this.newTodoText
+                    })
+                    this.newTodoText = ''
+                }
+            },
+            components: {
+                'todo-item': todoItem
+            }
+        });
+    </script>
+</body>
+
+</html>

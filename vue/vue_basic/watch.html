@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    watch test
+    <div id="demo">{{fullName}}</div>
+    <br><br>
+
+    computed test
+    <div id="demo2">{{fullName}}</div>
+    <br><br>
+
+    watch 속성 test
+    <div id="watch-example">
+        <p>
+            yes/no 질문을 물어보세요:
+            <input type="text" v-model="question">
+        </p>
+        <p>{{answer}}</p>
+    </div>
+
+
+
+    <!-- 이미 Ajax 라이브러리의 풍부한 생태계와 범용 유틸리티 메소드 컬렉션이 있기 때문에, -->
+    <!-- Vue 코어는 다시 만들지 않아 작게 유지됩니다. -->
+    <!-- 이것은 이미 익숙한 것을 선택할 수 있는 자유를 줍니다. -->
+    <script src="https://unpkg.com/axios@0.12.0/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/lodash@4.13.1/lodash.min.js"></script>
+    <script type="text/javascript">
+        var vm1 = new Vue({
+            el: '#demo',
+            data: {
+                firstName: "Fpo",
+                lastName: "bar",
+                fullName: 'Foo Bar'
+            },
+            // watch : 명령형 프로그래밍..
+            watch: {
+                firstName: function (val) {
+                    this.fullName = val + ' ' + this.lastName
+                },
+                lastName: function (val) {
+                    this.fullName = this.firstName + ' ' + val
+                }
+            }
+        })
+
+        var vm2 = new Vue({
+            el: '#demo2',
+            data: {
+                firstName: 'Foo',
+                lastName: 'Bar'
+            },
+            // computed : 선언형 프로그래밍
+            computed: {
+                fullName: function () {
+                    return this.firstName + ' ' + this.lastName
+                }
+            }
+        })
+
+        var watchExampleVm = new Vue({
+            el: '#watch-example',
+            data: {
+                // v-model 로 element와 바인딩되어 있다.
+                question: '',
+                answer: '질문을 하기 전까지는 답할 수 없어요.'
+            },
+            watch: {
+                // question 이 변경될 때 마다 이 기능이 실행된다.
+                // data에서 question를 바라보고 있다.
+                question: function (newQuestion) {
+                    this.answer = '입력을 기다리는 중이에요.';
+                    this.debouncedGetAnswer();
+                }
+            },
+            created: function () {
+                // _.debounce 는 lodash 가 제공하는 기능으로
+                // 시간이 많이 소요되는 작업을 실행할 수 있는 빈도를 제한한다.
+                // 이 경우, 우리는 yesno.wtf / api 에 액세스 하는 빈도를 제한하고,
+                //     사용자가 ajax요청을 하기 전에 타이핑을 완전히 마칠 때까지 기다리길 바란다.
+                this.debouncedGetAnswer = _.debounce(this.getAnswer, 500);
+            },
+            methods: {
+                getAnswer: function () {
+                    if (this.question.indexOf('?') === -1) {
+                        this.answer = "질문에는 일반적으로 물음표가 포함됩니다. ;-"
+                        return
+                    }
+                    this.answer = '생각중 . . .';
+                    console.log(this);
+                    // 아래에서  this == 생성되는 Vue 
+                    var vm = this
+                    axios.get('https://yesno.wtf/api')
+                        .then(function (response) {
+                            vm.answer = _.capitalize(response.data.answer)
+                        })
+                        .catch(function (error) {
+                            vm.answer = '에러! API 요청에 오류가 있습니다.' + error
+                        })
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

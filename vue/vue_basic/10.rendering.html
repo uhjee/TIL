@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        .unit {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- v-if 디렉티브는 조건에 따라 블록을 렌더링하기 위해 사용 -->
+    <div id="app">
+
+        <!-- v-if 사용 -->
+        <h1 v-if="awesome">Vue is awesome!</h1>
+        <h1 v-else>Oh.. No!</h1>
+
+        <!-- <template> 사용해서 조건부 그룹으로 묶어주기 -->
+        <button @click="clickView" @mouseenter="mouseonView" @mouseout="mouseoutView">template 버튼</button>
+        <template v-if="ok">
+            <div :style="styleObject">
+                <h1>template Block</h1>
+                <p>template로 묶었어요</p>
+                <p>{{msg1}}</p>
+            </div>
+        </template>
+        <br><br><br>
+
+        <!-- v-else-if //  v-else  -->
+        <div v-if="type === 'A'">
+            You can see me! AAAAAAA
+        </div>
+        <div v-else-if="type === 'B'">
+            You can see me ! BBBBBBBBB:
+        </div>
+        <div v-else>
+            You cant see me...CCCCCCC
+        </div>
+        <br><br><br>
+
+        <!-- v-if 의 key 속성 사용 -->
+        <div class="unit">
+            <template v-if="loginType === 'username'">
+                <label for="">사용자 이름</label>
+                <input key="username-input" type="text" placeholder="ex)허지행">
+            </template>
+            <template v-else>
+                <label for="">이메일</label>
+                <input key="email-input" type="text" placeholder="ex)oooo@ooo.com">
+            </template>
+            <br>
+            <button @click="changeInput">유형 변경</button>
+        </div>
+
+
+
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    msg1: '마우스를 올리셨네요',
+                    awesome: true,
+                    ok: false,
+                    styleObject: {
+                        border: '1px solid black',
+                        color: 'red',
+                        fontSize: '20px'
+                    },
+                    type: 'A',
+                    loginType: 'username'
+                }
+            },
+            methods: {
+                clickView() {
+                    this.msg1 = 'Click event 발생!'
+                },
+                mouseonView() {
+                    this.ok = !this.ok;
+                },
+                mouseoutView() {
+                    this.ok = !this.ok;
+                },
+                changeInput() {
+                    if (this.loginType === 'username') {
+                        this.loginType = 'email';
+                    } else {
+                        this.loginType = 'username'
+                    }
+                }
+            },
+
+        })
+    </script>
+</body>
+
+</html>

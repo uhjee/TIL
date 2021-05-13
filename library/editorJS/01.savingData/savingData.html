@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <!-- CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+
+    <!-- CDN for Header -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+
+    <!-- CDN for List -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+
+    <!-- CDN for List -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@2.3.1/dist/bundle.min.js"></script>
+
+    <!-- CDN for Embed Tool -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.4.0/dist/bundle.min.js"></script>
+
+    <!-- CDN for Simple Image Tool -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script>
+  </head>
+  <body>
+    <div id="editorjs"></div>
+    <button id="btn-save">SaVe</button>
+
+    <script src="./index.js"></script>
+    <script>
+      let saveButton = document.getElementById("btn-save");
+      saveButton.addEventListener("click", saveData);
+    </script>
+  </body>
+</html>

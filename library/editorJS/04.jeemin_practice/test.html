@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <!-- CDN 추가 -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+
+    <!-- CDN for Header -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script>
+
+    <!-- CDN for List -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script>
+
+    <!-- CDN for List -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@2.3.1/dist/bundle.min.js"></script>
+
+    <!-- CDN for Embed Tool -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.4.0/dist/bundle.min.js"></script>
+
+    <!-- CDN for axios -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  </head>
+  <body>
+    <div id="editorjs" style="margin-top: 100px"></div>
+    <button id="save-button">Save!</button>
+    <script src="./index.js"></script>
+    <script>
+      const saveButton = document.getElementById("save-button");
+      saveButton.addEventListener("click", () => {
+        editor.save().then((data) => {
+          fetch(data);
+        });
+      });
+
+      function fetch(data) {
+        let param = {
+          blocks: data.blocks,
+          time: data.time,
+        };
+
+        axios
+          .post("http://127.0.0.1:8080/axios/insert-test", param)
+          .then((response) => {
+            console.log(response);
+          });
+      }
+    </script>
+  </body>
+</html>

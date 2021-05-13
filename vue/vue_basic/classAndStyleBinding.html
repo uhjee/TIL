@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <title></title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+  <!-- active class의 존재 여부가 데이터 속성 isActive의 참 속성에 의해 결정되는 것 의미 -->
+  <div id="app">
+    <div class="static" v-bind:class="{active: isActive, 'text-danger' : hasError}">
+      static
+    </div>
+    <div class="static" v-bind:class="classObject">
+      classObject
+    </div>
+    <div class="static" v-bind:class="classObject1">
+      classObject1
+    </div>
+    <div class="static" v-bind:class="[activeClass, errorClass]">
+      classObject2
+    </div>
+    <div class="static" v-bind:class="[isActive ? activeClass : '', errorClass]">
+      <!-- 삼항연산자를 통해 class 할당 -->
+    </div>
+
+
+    <my-compo class="baz boo classObject"></my-compo>
+    <!-- <my-component class="baz boo"></my-component> -->
+  </div>
+
+  <!--  Inline Style Biding -->
+  <div id="app2">
+    <div :style="styleObject">
+      <p>인라인 스타일 바인딩</p>
+    </div>
+
+    <!-- 배열 형태로 2개 이상의 스타일 적용 -->
+    <div :style="[styleObject, styleObject2]">
+      <p>배열로 인라인 스타일 바인딩</p>
+    </div>
+  </div>
+
+  <script>
+    // 컴포넌트의 생성 및 전역 등록
+    Vue.component("my-compo", {
+      template: "<p>Hi</p>"
+
+    });
+    // Vue.component("my-component", {
+    //   template: "<div>사용자 정의 컴포넌트 입니다!</div>",
+    // });
+
+    var vm = new Vue({
+      el: "#app",
+      data: {
+        // 아래의 boolean으로 element에 class를 동적으로 붙였다 뗐다 할 수 있다.
+        isActive: true,
+        hasError: false,
+        classObject: {
+          isActive: true,
+          hasErroe: false,
+        },
+        activeClass: "active",
+        errorClass: "text-danger",
+      },
+      // 연산 결과로도 class의 동적 적용이 가능하다
+      computed: {
+        classObject1: function () {
+          return {
+            active: this.isActive && !this.hasError,
+            "text-danger": this.hasError && this.hasError.type === "fatal",
+          };
+        },
+      }
+    });
+
+
+    // Inline Style Binding
+    var vm2 = new Vue({
+      el: "#app2",
+      data: {
+
+        // css 처럼 보이지만 css가 아니다. JS object의 property로 속성 지정
+        styleObject: {
+          color: 'red',
+          fontSize: '50px'
+
+        },
+        styleObject2: {
+          background: 'blue'
+
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>

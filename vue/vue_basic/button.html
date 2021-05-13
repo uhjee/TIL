@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title></title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+
+  <div id="app">
+    <div v-if="like"> 버튼 눌림 </div>
+    <button v-else type="button" @click="onClickBtn">button</button>
+    <!-- <button v-else type="button" v-on:click="onClickBtn">button</button> -->
+    <br /><br /><br />
+
+    <div>v-bind 단방향: 사용자의 상호작용으로 Data에 영향을 주지 못한다</div>
+    <input type="text" :value="message">
+
+    <br /><br /><br />
+    <p>원본 메세지: "{{ message }}"</p>
+    <p>역순 메세지: "{{ reverseMessage }}"</p>
+
+    <input type="text" v-model="message" v-on:keyup.enter="onEnter" v-on:blur="onBlur">
+    <p v-if="keyupEvent">keyUp 이벤트 동작하였습니다.</p>
+  </div>
+
+
+  <script type="text/javascript">
+    var data = {
+      like: false,
+      message: "지금은 " + new Date() + "입니다.",
+      keyupEvent: false
+    };
+
+    var app = new Vue({
+      el: "#app",
+      data: data,
+      methods: {
+        onClickBtn: function () {
+          this.like = true;
+        },
+        onEnter: function () {
+          this.keyupEvent = true;
+        },
+        onBlur: function () {
+          this.keyupEvent = false;
+        }
+      },
+      // 인스턴스 라이프사이클 훅
+      //created: 인스턴스가 생성된 후 호출 -- mounted, updated, destroyed
+      created: function () {
+        console.log("app 실행 like is " + this.like)
+      },
+      computed: {
+        reverseMessage: function () {
+          return this.message.split('').reverse().join('')
+        }
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <style>
+        .dropdown ul {
+            display: none;
+            list-style: none;
+            margin: 0;
+            border: 1px solid black;
+            padding: 10px;
+            width: 200px;
+        }
+
+        .dropdown.on ul {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- data를 attribute에 연결하려면 ':'을 붙이고 안에 data 변수만 선언 -->
+        <!-- ': ':: v-bind 똑같다 ... @ v-on:   개념 -->
+        <!-- es6에 추가된 complete String 기능... ${} 사용 가능.. -->
+        <img :id="'thumbnail_${id}'" :src="image" alt="">
+
+        <!-- 배열로 넣어줘도 attribte 관리가 된다 -->
+        <div :style="[style, fontStyle]">
+            테스트용
+        </div>
+        <!-- class 설정 해주기 -->
+        <div :class="[dropdown, toggle]">
+            class 테스트용(dropdown)
+            <ul>
+                <li>메뉴1</li>
+                <li>메뉴2</li>
+            </ul>
+        </div>
+
+    </div>
+    <script>
+        let app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    id: 1,
+                    image: 'https://cdn.pixabay.com/photo/2019/10/26/06/02/bokeh-4578758__340.jpg',
+                    // json 형태로 넣어도 attribute 적용이 된다. 관리가 더 용이함
+                    style: {
+                        background: 'red'
+                    },
+                    fontStyle: {
+                        // 중간에 '-'가 들어가는 attribute는 single quotition으로 묶어준다
+                        'font-size': '90px',
+                        // 혹은 '-' 다음 글자를 Camel Case로 적어주면 적용 된다.
+                        fontFamily: 'dotum'
+                    },
+                    // class 설정
+                    dropdown: {
+                        // boolean으로 class 적용 유무를 정해준다
+                        dropdown: true
+                    },
+                    // class 들을 묶을 수 있다
+                    toggle: {
+                        on: false
+                    }
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

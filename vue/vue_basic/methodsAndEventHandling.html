@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <style>
+        .dropdown ul {
+            display: none;
+            list-style: none;
+            margin: 0;
+            border: 1px solid black;
+            padding: 10px;
+            width: 200px;
+        }
+
+        .dropdown.on ul {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- v-on:[이벤트명]="[호출 함수]" -->
+        <!-- <button type="button" v-on:click="add">더하기</button> -->
+        <!-- @ 로도 사용 가능 -->
+        <button type="button" @click="add">더하기</button>
+        <p>{{counter}}</p>
+
+        <!-- event 객체의 keycode == 13 비교식으로 엔터키를 잡지 않아도 된다 -->
+        <input type="text" @keyup.enter="keyUp" />
+        <!-- <input type="text" @keyup="keyUp" /> -->
+        <br><br>
+        <button type="button" @click="btnClick">toggle</button>
+        <div :class="[dropdown, toggle]">
+            <ul>
+                <li>메뉴1</li>
+                <li>메뉴2</li>
+                <li>메뉴3</li>
+            </ul>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script>
+        let app = new Vue({
+            el: "#app",
+            data() {
+                return {
+                    counter: 0,
+                    dropdown: {
+                        // boolean으로 class 적용 유무를 정해준다
+                        dropdown: true
+                    },
+                    // class 들을 묶을 수 있다
+                    toggle: {
+                        on: false
+                    }
+                };
+            },
+            methods: {
+                // 메소드 선언에는 화살표 함수 사용 x
+                add: function () {
+                    this.counter++;
+                    console.log(this.counter);
+                },
+                keyUp(e) {
+                    //   v-on:keyup.enter = "[호출함수]" 로 Enter validation check 편하게 할 수 있다
+                    // if (e.keyCode !== 13) {
+                    //   console.log("엔터키 아님");
+                    //   return;
+                    // }
+                    console.log("엔터키 눌림");
+                },
+                btnClick() {
+                    // boolean 계속 값을 바꿔주는 식..on and Off.. 이걸 몰라서 그렇게 어렵게 짰었다니....
+                    this.toggle.on = !this.toggle.on;
+                }
+            },
+        });
+    </script>
+</body>
+
+</html>

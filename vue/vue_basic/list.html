@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <ul style="list-style: none;">
+            <!-- li를 template으로 묶어준다 -->
+            <!-- 그 후에 v-for를 통해 반복문 사용. items 라는 json array에서 item을 뽑아서 사용 -->
+            <!-- 이후에 무한스크롤도 이렇게 구현... -->
+            <template v-for="item in items">
+                <li>
+                    <img :src="item.image" alt="">
+                </li>
+                <li>
+                    {{item.title}}
+                </li>
+            </template>
+        </ul>
+    </div>
+    <script>
+        // Vue instance를 변수에 담으면 Vue Object에 접근이 가능해진다. 바람직하진 않아.
+        let app = new Vue({
+            el: '#app',
+            data() {
+                return {
+                    items: [{
+                            id: 1,
+                            image: "https://cdn.pixabay.com/photo/2016/04/25/18/07/halcyon-1352522_960_720.jpg",
+                            title: '컴퓨터'
+                        },
+                        {
+                            id: 2,
+                            image: 'https://cdn.pixabay.com/photo/2016/04/25/18/07/halcyon-1352522_960_720.jpg',
+                            title: '해변'
+                        },
+                        {
+                            id: 3,
+                            image: 'https://cdn.pixabay.com/photo/2016/04/25/18/07/halcyon-1352522_960_720.jpg',
+                            title: '거북이'
+                        },
+                        {
+                            id: 4,
+                            image: 'https://cdn.pixabay.com/photo/2016/04/25/18/07/halcyon-1352522_960_720.jpg',
+                            title: 'brand new'
+                        }
+                    ]
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

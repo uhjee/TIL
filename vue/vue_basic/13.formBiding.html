@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <title></title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <style>
+    .unit {
+      border: 1px solid rgb(173, 169, 169);
+      padding: 10px;
+      margin: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- v-model 은 모든 form 엘리먼트의 초기 value 와 checked 그리고 selected  -->
+  <!-- 속성을 무시한다. -->
+
+  <!-- 문자열  -->
+  <div id="app">
+    <div class="unit">
+      <input v-model="message" placeholder="여기를 수정해봐" type="text" />
+      <p>메세지 : {{message}}</p>
+    </div>
+
+    <div class="unit">
+      <!-- 여러줄을 가지는 메세지 -->
+      <span>여러 줄을 가지는 메세지: </span>
+      <p>{{message }}</p>
+      <br />
+      <textarea v-model="message" placeholder="여러줄을 입력해봐" rows="8" cols="80"></textarea><br /><br />
+    </div>
+
+    <div class="unit">
+      <!-- 체크 박스 :: 하나의 체크박스는 단일 boolean 값을 가진다. -->
+      <input type="checkbox" id="checkbox" v-model="checked.box1" />
+      <label for="checkbox">{{checked.box1}}</label>
+      <br>
+      <input type="checkbox" id="checkbox" v-model="checked.box2" />
+      <label for="checkbox">{{checked.box2}}</label>
+    </div>
+
+    <!-- 여러가지 checkbox 는 배열로 바인딩 -->
+    <!-- 각각에 value 할당 -->
+    <div class="unit">
+      <input type="checkbox" id="jack" value="jack" v-model="checkedNames" />
+      <label for="jack">jack</label>
+      <input type="checkbox" id="havard" value="havard" v-model="checkedNames" />
+      <label for="checkbox">havard</label>
+      <input type="checkbox" id="michel" value="michel" v-model="checkedNames" />
+      <label for="michel">michel</label>
+      <input type="checkbox" id="rihana" value="rihana" v-model="checkedNames" />
+      <label for="rihana">rihana</label>
+      <div>
+        <p>체크한 이름: {{checkedNames}}</p>
+      </div>
+    </div>
+
+    <!-- 라디오 타입  -->
+    <div class="unit">
+      <input type="radio" id="one" value="One" v-model="picked" />
+      <label for="one">One</label>
+      <br />
+      <input type="radio" id="two" value="Two" v-model="picked" />
+      <label for="two">Two</label>
+      <br />
+      <span>선택: {{picked}}</span>
+    </div>
+
+    <!-- 셀렉트   -->
+    <div class="unit">
+      <select v-model="selected">
+        <option disabled value="">Please select One</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+      </select>
+      <span>선택함: {{selected}}</span>
+    </div>
+
+    <!-- 다중 셀렉트 ( 배열 바인딩) -->
+    <div class="unit">
+      <select v-model="multiSelected" multiple>
+        <option>A</option>
+        <option>B</option>
+        <option>C</option>
+      </select>
+      <br>
+      <span>Selected: {{multiSelected}}</span>
+    </div>
+
+    <!-- v-for을 사용하여 동적인 옵션 렌더링 -->
+    <div class="unit">
+      <h3>v-for을 사용하여 동적인 옵션 렌더링</h3>
+      <select v-model="vForSelected">
+        <!-- v-bind에 value 는 option 엘레먼트의 value attribute이다 .. -->
+        <option v-for="option in options" v-bind:value="option.value">
+          {{ option.text }}
+        </option>
+      </select>
+      <span>Selected: {{ vForSelected}}</span>
+    </div>
+
+  </div>
+  <script type="text/javascript">
+    let vm = new Vue({
+      el: "#app",
+      data: {
+        message: "",
+        checked: {
+          box1: false,
+          box2: true,
+        },
+        checkedNames: [],
+        picked: [],
+        selected: '',
+        multiSelected: [],
+        vForSelected: 'A',
+        options: [{
+            text: 'One',
+            value: 'A'
+          },
+          {
+            text: 'Two',
+            value: 'B'
+          },
+          {
+            text: 'Three',
+            value: 'C'
+          },
+
+        ]
+      },
+    });
+  </script>
+</body>
+
+</html>

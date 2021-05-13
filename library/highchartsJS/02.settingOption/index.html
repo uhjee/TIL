@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <style>
+        div {
+            width: 80%;
+            height: 600px;
+            margin: 50px 0;
+            padding: 30px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="c"></div>
+
+    <div id="container1"></div>
+    <div id="container2"></div>
+
+    <script>
+        // Global Options
+        Highcharts.setOptions({
+            chart: {
+                backgroundColor: {
+                    linearGradient: [0, 0, 500, 500],
+                    stops: [
+                        [0, 'rgb(255,255,255)'],
+                        [1, 'rgb(240, 240, 255)']
+                    ]
+                },
+                // div의 두께 - 가장 바깥
+                borderWidth: 1,
+                // plot 챠트가 그려지는 곳
+                plotBackgroundColor: 'rgba(255, 255, 255, .9)',
+                plotShadow: true,
+                plotBorderWidth: 1
+            }
+        })
+
+        // options Object
+        let options = {
+            chart: {
+                // 여기 가서 달라 붙어라(getElementById)
+                renderTo: 'c',
+                type: 'bar'
+            },
+            title: {
+                text: 'Fruit Consumption'
+            },
+            xAxis: {
+                title: {
+                    text: 'Fruit eaten'
+                }
+            },
+            series: [{
+                    name: 'Jane',
+                    data: [1, 0, 4],
+                },
+                {
+                    name: 'john',
+                    data: [5, 7, 3]
+                }
+            ]
+        }
+        let chart = Highcharts.chart(options);
+
+
+
+        let chart1 = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container1'
+            },
+
+            xAxis: {
+                type: 'datetime'
+            },
+
+            series: [{
+                data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
+                pointStart: Date.UTC(2010, 0, 1),
+                pointInterval: 3600 * 100 // one Hour
+            }]
+        });
+
+        let chart2 = new Highcharts.Chart({
+            chart: {
+                renderTo: 'container2',
+                type: 'column'
+            },
+
+            xAxis: {
+                type: 'datetime'
+            },
+
+            series: [{
+                data: [29.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4],
+                pointStart: Date.UTC(2010, 0, 1),
+                pointInterval: 3600 * 100 // one Hour
+            }]
+        });
+    </script>
+</body>
+
+</html>
