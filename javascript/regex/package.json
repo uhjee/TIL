@@ -1,0 +1,12 @@
+{
+  "name": "regex",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "exec": "node src"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
