@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- 결과 출력에 사용되는 mocha css -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.2.0/mocha.css" />
+    <!-- Mocha: 핵심 테스트 프레임워크로, describe, it과 같은 테스팅 함수와 테스트 실행 관련 주요 함수를 제공-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mocha/3.2.0/mocha.js"></script>
+    <script>
+      mocha.setup('bdd') // 기본 셋업
+    </script>
+    <!-- chai:  다양한 assertion을 제공해 주는 라이브러리 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chai/3.5.0/chai.js"></script>
+    <script>
+      // chai의 다양한 기능 중, assert를 전역에 선언
+      let assert = chai.assert
+    </script>
+  </head>
+
+  <body>
+    <!-- 테스트 결과를 id가 "mocha"인 요소에 출력-->
+    <div id="mocha"></div>
+
+    <script>
+      // 실제 테스트할 함수
+      function pow(x, n) {
+        let result = 1
+        for (let index = 0; index < n; index++) {
+          result *= x
+        }
+        return result
+      }
+    </script>
+
+    <!-- 테스트(describe, it...)가 있는 스크립트 -->
+    <script src="./src/test.js"></script>
+
+    <!-- 테스트를 실행 -->
+    <script>
+      mocha.run()
+    </script>
+  </body>
+</html>
