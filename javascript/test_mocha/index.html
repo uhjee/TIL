@@ -23,16 +23,22 @@
     <script>
       // 실제 테스트할 함수
       function pow(x, n) {
+        if (n < 0) return NaN
+        if (Math.round(n) !== n) return NaN
         let result = 1
         for (let index = 0; index < n; index++) {
           result *= x
         }
         return result
       }
+
+      function add(a, b) {
+        return a + b
+      }
     </script>
 
     <!-- 테스트(describe, it...)가 있는 스크립트 -->
-    <script src="./src/test.js"></script>
+    <script type="" src="./test/test.js"></script>
 
     <!-- 테스트를 실행 -->
     <script>
