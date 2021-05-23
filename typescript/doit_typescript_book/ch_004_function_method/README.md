@@ -118,6 +118,8 @@ function fn(arg1: string, arg?: number): void {}
 
 아래와 같이 함수 시그니처에도 `?` 를 붙인다.
 
+함수 호출 시 인자를 전달하지 않으면, **undefined**로 고정
+
 ```typescript
 type OptionalArgFunc = (arg1: string, arg?: number) => void
 ```
@@ -191,4 +193,270 @@ const 함수_이름 = (arg1: type, arg2: type[, ...]) : 반환타입 => { ... }
   - typescript에서는 관습적으로 표현식 문에 세미콜론을 붙이지 않는다.
 
 
+
+## 04-4. 일등 함수 
+
+### 콜백 함수 callback function
+
+- first-class function 기능을 제공하는 언어에서 함수는 '함수 표현식' 이라는 일종의 데이터
+- 따라서 함수 자체를 변수에 담을 수 있고, 매개변수로 받을 수도 있고, 반환값으로 사용할 수 있다.
+- 이 때, 매개변수 형태로 동작하는 함수를 **콜백 함수(callback function)**라고 부른다.
+
+```javascript
+const f = (callback: () => void): void => callback()
+```
+
+#### 예제
+
+```typescript
+export const init = (cb: () => void ): void => {
+  console.log('1. default initialization finished.')
+  callback()
+  console.log('3. all initialization finished.')
+}
+```
+
+
+
+```typescript
+// 함수 평가(호출)
+import { init } from './init'
+init(() => console.log('2. custom initialization finished.')) // 익명 함수로 cb 함수 전달하며 호출
+```
+
+
+
+```typescript
+// 실행결과
+// 1. default initialization finished.
+// 2. custom initialization finished.
+// 3. all initialization finished.
+```
+
+
+
+### 중첩 함수 nested function
+
+- 함수 안에서 또 다른 함수를 중첩해서 구현
+
+  ```typescript
+  const calc = (value: number, cd: (number) => void): void => {
+    // 중첩 함수 구현
+    let add = (a, b) => a + b
+    function multiply(a, b) {return a * b}
+    
+    let result = multiply(add(1, 2), value)
+    // cb 평가(호출)
+    cb(result)
+  }
+  
+  calc(30, (result: number) => console.log(`result is ${result}`)) // result is 90
+  ```
+
+  
+
+### 고차 함수 high-order function
+
+- 또 다른 함수를 **반환**하는 함수
+- 함수형 프로그래밍에서 함수 또한 하나의 값이므로, 반환값이 될 수 있다.
+
+```typescript
+type NumberToNumberFunc = (arg: number) => number;
+
+const add = (a: number): NumberToNumberFunc => {
+  // NumberToNumberFunc 타입의 함수 반환하는 중첩함수
+  const _add: NumberToNumberFunc = (b: number): number => {
+    // number 타입 반환
+    return a + b; // 클로저: 비공개변수 a를 갖는 환경
+  };
+  return _add;
+};
+
+add(1)(5) // 6
+```
+
+
+
+```typescript
+const multiply = (a: number) => (b: number) => (c: number) => a * b * c;
+
+const result = multiply(1)(2)(3);
+console.log(result);
+```
+
+
+
+## 04-5. 함수 구현 기법
+
+es6 등에서 사용가능한 문법은 typescript에서도 그대로 사용 가능
+
+### 매개변수 기본값 지정
+
+- 함수 호출 시, 인자(arg)를 전달하지 않더라도, 매개변수(param)에 어떤 값을 설정하고 싶다면, 매개변수의 기본값을 지정할 수 있다.
+
+```typescript
+(매개변수: 타입 = 매개변수_기본값)
+```
+
+#### 예제
+
+```typescript
+// 매개변수 기본값
+export type Person1 = { name: string; age: number };
+
+export const makePerson = (name: string, age: number = 10): Person1 => {
+  const person = { name: name, age: age };
+  return person;
+};
+
+console.log(makePerson('jeejeejee', 30));	// { name: 'jeejeejee', age: 30 }
+console.log(makePerson('jeejeejee'));			//{ name: 'jeejeejee', age: 10 } -- default
+```
+
+
+
+### 객체 리터럴 프로퍼티 단축 구문
+
+- 변수(매개변수) 명과 생성하려는 객체의 property 명이 같다면, 생략 가능
+
+```typescript
+export const makePerson = (name: string, age: number = 10): Person1 => {
+  const person = { name, age };
+  return person;
+};
+```
+
+
+
+### 객체 리턴 시 구문
+
+- 함수 리터럴의 중괄호와 객체 리터럴의 중괄호가 겹쳐 헷갈리므로, 괄호로 묶어준다.
+
+```typescript
+export const makePerson = (name: string, age: number = 10): Person1 => ({ name, age });
+```
+
+
+
+### 매개변수에 비구조화 할당문 사용
+
+```typescript
+export type Person1 = { name: string; age: number };
+
+// arguments 비구조화 할당문 사용
+const printPerson = ({ name, age }: Person1): void => 
+	console.log(`name: ${name}, age: ${age}`);
+
+printPerson({ name: 'ayoung', age: 19 });
+```
+
+
+
+### 색인 가능 타입 indexable type
+
+- `{ [key]: value }`  형태의 타입을 색인 가능 타입이라 칭함
+
+- 다음과 같은 형태로 key, value 타입 명시
+
+  ```typescript
+  type KeyType = {
+    [key: string]: string
+  }
+  ```
+
+  
+
+예제
+
+```typescript
+// 색인 가능 타입 indexable type 지정
+export type KeyValueType = {
+  [key: string]: string;
+};
+
+export const makeObject = (key: string, value: string): KeyValueType => ({ [key]: value });
+
+console.log(makeObject('name', 'jeechan'));	 // { name: 'jeechan' }
+console.log(makeObject('firstNmae', 'kim')); // { firstNmae: 'kim' }
+
+```
+
+
+
+## 04-6. 클래스 메소드
+
+### function 함수와 this 키워드
+
+- `function`으로 만드는 함수는 `Function` 클래스의 인스턴스
+- arrow function은 자신의 this를 바인딩하지 않는다.
+
+### 클래스 메소드
+
+```typescript
+export class B {
+  constructor(public value: number = 1) {}
+  method(): void {
+    console.log(`value: ${this.value}`);
+  }
+}
+```
+
+```typescript
+const b = new B(5);
+b.method();	// 5
+```
+
+
+
+### 정적 메소드 static method
+
+```typescript
+export class C {
+  constructor(public name: string) {}
+  static whoRu(): string {
+    return `I'm class C`;
+  }
+}
+
+const c1 = new C('jee');
+const c2 = new C('yeo');
+
+console.log(c1);
+console.log(c2);
+console.log(C.whoRu());
+
+```
+
+
+
+### 메소드 체인 method chain
+
+- 메소드가 항상 this를 반환하게 한다.
+
+  ```typescript
+  export class Calculator {
+    constructor(public value: number = 0) {}
+    add(value: number) {
+      this.value += value;
+      return this; // method chain을 위한 자기 자신 반환
+    }
+    multiply(value: number) {
+      this.value *= value;
+      return this;	// method chain을 위한 자기 자신 반환
+    }
+  }
+  ```
+
+  ```typescript
+  
+  const cal: Calculator = new Calculator();
+  console.log(cal.add(3));		// 3
+  console.log(cal.multiply(2));	// 6
+  console.log(cal.add(4).multiply(10)); 	// 100
+  
+  console.log(cal.value);	// 100
+  
+  ```
+
+  
 
