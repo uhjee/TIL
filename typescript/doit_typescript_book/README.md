@@ -6,5 +6,7 @@
 
 - [ch_004. 함수와 메소드](./ch_004_function_method/README.md#ch_004)
 
+- [타입 시스템 from FE 초격차 강의](./etc/type_system.md#type_system)
+
 // 함수 100 page 까지 했다.
 

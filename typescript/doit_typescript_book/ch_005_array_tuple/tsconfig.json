@@ -9,6 +9,8 @@
     "sourceMap": true, // 트랜스파일 디렉토리에 ".js.map" 파일 생성. 디버깅 용
     "downlevelIteration": true, // Generator 동작을 위한 플래그
     "noImplicitAny": false, // type을 지정하지 않으면 any 타입으로 간주하는 지 여부
+    "strictNullChecks": true, // 모든 타입에 null 과 undefined 를 포함하지 않는다.
+    "noImplicitReturns": true, //함수가 값을 리턴하지 않으면 컴파일 에러 발생
     "paths": { "*": ["node_modules/*"] } // module -import 시 참조할 경로, 외부 패키지인 경우도 포함시키기 위해 node_modules 포함
   },
   "include": ["src/**/*"]

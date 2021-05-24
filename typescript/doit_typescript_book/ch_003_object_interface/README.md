@@ -397,6 +397,4 @@ console.log((<{ name: string }>obj1).name); // 형변환
   let name2 = (obj5 as INameable).name; // 타입 단언 2
   ```
 
-  
-
-# 
+   
