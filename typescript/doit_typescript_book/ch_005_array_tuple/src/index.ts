@@ -72,12 +72,40 @@ const myIdentity3: GenericIdentityFn = identity3;
 
 console.log(myIdentity3('hi'));
 
+// let numbers: number[] = range(1, 9 + 1);
+// console.log(numbers);
+
+// ! 선언적 프로그래밍
+
+// 1~ 100 더하기
+// 명령형
+let sum = 0;
+for (let i = 0; i < 100; i++) {
+  sum += i + 1;
+}
+console.log(sum);
+
+// 선언형
 // range 함수 구현
 // - 재귀함수 방식으로 동작
 // - from 에서 to 까지의 구성된 배열 생성
 export const range = (from: number, to: number): number[] => (from < to ? [from, ...range(from + 1, to)] : []);
 
-let numbers: number[] = range(1, 9 + 1);
-console.log(numbers);
+// fold: 접기
+//    - T[] 배열 데이터를 가공해 하나의 T 타입 값으로 생성  cf. reduce..??
+export const fold = <T>(array: T[], callback: (result: T, val: T) => T, initValue: T) => {
+  let result: T = initValue;
 
-//
+  for (let i = 0; i < array.length; ++i) {
+    const value = array[i];
+    result = callback(result, value);
+  }
+  return result;
+};
+
+// 입력 데이터 생성
+let numbers: number[] = range(1, 100 + 1);
+
+// 입력 데이터 가공
+let result = fold(numbers, (result, val) => result + val, 0);
+console.log(result);

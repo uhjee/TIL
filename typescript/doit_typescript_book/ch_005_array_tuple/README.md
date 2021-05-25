@@ -112,3 +112,62 @@ console.log(
   - 가장 일반적인 방법
   - 컴파일러가 인수로 해당 타입을 판단한다.
 
+
+
+## 05-2. 선언형 프로그래밍과 배열
+
+### 선언형 프로그래밍 declarative programming
+
+- 명령형 프로그래밍 (imperative programming) 과 비교되지만, 동등하게 비교할 대상이 아님
+
+### 1 ~ 100 합 구하기
+
+#### 명령형 프로그래밍
+
+- 시스템 자원의 효율 최우선
+
+```typescript
+// 명령형
+let sum = 0;
+for (let i = 0; i < 100; i++) {
+  sum += i + 1;
+}
+console.log(sum);	// 5050
+
+```
+
+
+
+#### 선언형 프로그래밍
+
+- **범용적**으로 구현된 함수의 **재사용**
+- `데이터 생성` 과 `데이터 가공`을 분리
+
+```typescript
+
+// 선언형
+// range 함수 구현
+export const range = (from: number, to: number): number[] => (from < to ? [from, ...range(from + 1, to)] : []);
+
+// fold: 접기
+//    - T[] 배열 데이터를 가공해 하나의 T 타입 값으로 생성  cf. reduce..??
+export const fold = <T>(array: T[], callback: (result: T, val: T) => T, initValue: T) => {
+  let result: T = initValue;
+
+  for (let i = 0; i < array.length; ++i) {
+    const value = array[i];
+    result = callback(result, value);
+  }
+  return result;
+};
+
+// 입력 데이터 생성
+let numbers: number[] = range(1, 100 + 1);
+
+// 입력 데이터 가공
+let result = fold(numbers, (result, val) => result + val, 0);
+console.log(result);	// 5050
+
+
+```
+
