@@ -81,7 +81,11 @@ let sup6: Animal = sub6;
 // sub6 = sup6;  // 타입 에러 발생
 ```
 
-## 1. 우항의 type이 같거나 sub type 인 경우, 할당이 가능 ⇒ 공병
+## 1. 우항의 type이 같거나 sub type 인 경우, 할당이 가능 ⇒ 공변성
+
+#### **공변성(Convariance)**
+
+- 일반적인 sup - sub type 관계, super 타입은 sub 타입을 담을 수 있다.
 
 ```tsx
 // ! 01. 우항의 type이 같거나, subtype 인 경우, 할당 가능 => 공변
@@ -101,7 +105,15 @@ let sub9: Array<{ a: string; b: number }> = [
 let sup9: { a: string; b: number | string }[] = sub9;
 ```
 
-## 2. 함수의 매개변수 타입만 같거나, super type인 경우, 할당이 가능 ⇒ 반병
+
+
+## 2. 함수의 매개변수 타입만 같거나, super type인 경우, 할당이 가능 ⇒ 반공변성
+
+#### **반공변성(Contravariance)**
+
+- 함수의 매개변수 타입에 있어서는 일반적인 sup-sub type 관계가 반대로 적용된다.
+- 즉 함수의 매개변수 타입은 자신과 같거나 더 추상적인 함수의 매개변수 타입(sup type)을 받을 수 있다.
+- 반환값은 자신과 같거나, 더 구체적인 타입만 수용한다.
 
 ```tsx
 // ! 02. 함수의 ( 매개변수의 타입이 같거나, supertype인 경우 ) 할당이 가능 => 반병
@@ -129,7 +141,8 @@ tellMe(function wToW(w: Whale): Whale {
 tellMe(function aToW(a: Animal): Whale {
   return new Whale();
 });
-// 3. Whale => Whale 에다가 KilleWhale => Whle을 할당하는 경우 -> strictFunctionTypes 옵션이 true인 경우 에러
+// 3. Whale => Whale 에다가 KilleWhale => Whle을 할당하는 경우 
+//    -> !! strictFunctionTypes 옵션이 true인 경우 에러 !!
 tellMe(function kToW(k: killerWhale): Whale {
   return new Whale();
 });
