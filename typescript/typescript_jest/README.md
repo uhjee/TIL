@@ -25,7 +25,7 @@ npm trends에서 test lib.들을 비교해보니, jest가 mocha 보다 많이 �
 1. ts-jest config 초기화
 
    ```powershell
-   ts-jest config:init
+   npx ts-jest config:init
    ```
 
    - 초기 설정 그대 로 일단 사용.. 각종 option 공부 필요
@@ -61,12 +61,12 @@ npm trends에서 test lib.들을 비교해보니, jest가 mocha 보다 많이 �
 
   ```ts
   import { sum, range } from '../src/index';
-
+  
   test('[sum] 1 + 2 to equal 3?', () => {
     // toBe() : primitive type을 비교할 때 사용
     expect(sum(1, 2)).toBe(3);
   });
-
+  
   test('[range] from 1 to 5 equal [1,2,3,4,5]?', () => {
     // toStrictEqual() : 같은 타입, 같은 구조의 object를 비교할 때 사용
     expect(range(1, 5 + 1)).toStrictEqual([1, 2, 3, 4, 5]);
