@@ -4,6 +4,10 @@
 //   expect(sum(1, 2)).toBe(3);
 // });
 
+/**
+ * 공변, 반공변
+ */
+
 describe('strictFunctionTypes', () => {
   test('test strict function types rules', () => {
     type A = { a: string };

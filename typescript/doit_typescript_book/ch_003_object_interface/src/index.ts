@@ -113,7 +113,7 @@ console.log(ruru);
 // }
 
 class Book {
-  static initValue = 1000;
+  public static initValue = 1000;
   constructor(public title: string, public author: string) {}
 }
 
@@ -159,3 +159,55 @@ let name1 = (<INameable>obj5).name; // 타입 단언 1
 let name2 = (obj5 as INameable).name; // 타입 단언 2
 
 console.log(name1, name2);
+
+// getter, setter
+class Person7 {
+  constructor(private _name: string, public readonly age: number) {}
+
+  public get name(): string {
+    return this._name + ' of getter';
+  }
+
+  public set name(v: string) {
+    this._name = v;
+  }
+}
+
+let person7: Person7 = new Person7('jake', 29);
+console.log(person7);
+console.log(person7.name);
+
+person7.name = 'dong';
+
+console.log(person7);
+console.log(person7.name);
+
+// class 내부의 this
+class Person8 {
+  private name: string = 'default name';
+  private age: number = 10;
+
+  public speak(this: Person8) {
+    console.log(this);
+
+    console.log(`내 이름은 ${this.name}이구요, 나이는 ${this.age}입니다`);
+  }
+}
+
+let person8: Person8 = new Person8();
+
+person8.speak();
+
+// indexable interface,  class
+interface iPerson10 {
+  [index: string]: string | number;
+}
+
+class Person10 implements iPerson10 {
+  [index: string]: string;
+}
+
+let person10 = new Person10();
+
+person10.name = 'jeem';
+console.log(person10.name);

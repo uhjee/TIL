@@ -77,77 +77,86 @@
   u = 1 // type error 발생
   ```
 
+
+
+
+## 03-2 객체, 인터페이스
+
+- object 는 interface 와 class의 상위 타입
+
+- object 타입은 primitive를 제외하고 모든 object 타입 및 하위 타입을 담을 수 있다.
+
+  ```typescript
+  let o: object = {}
+  o = {name: 'jee', age:5 }
+  o = {height: 180, weight: 70} // 하지만, object 타입은 object의 property 타입 까지 정해두진 못함
+  ```
+
+- **인터페이스 선언문**
+
+  ```typescript
+  interface 인터페이스이름 {
+      prop이름[?]: prop타입[, ...]
+  }
+  ```
+
+  ```typescript
+  // interface 선언
+  interface iPerson {
+      name: string
+      age: number
+      height?: number // * optional prop
+  }
+  ```
+
+  인터페이스 인스턴스 생성
+
+  ```typescript
+  let good1: iPerson = {name: 'jack', age: 35}
+  let good2: iPerson = {name: 'shellby', age: 42}
+  let good3: iPerson = {name: 'mark', age: 12, height: 159} // optional property
+  
+  let bad1: iPerson = {name: 'loopy'} // age 미존재
+  let bad2: iPerson = {name: 'blonde', age: 20, weight: 79}  // 'weight' prop 정의 x
+  ```
+
   
 
-  ## 03-2 객체, 인터페이스
+- **익명 인터페이스 anonymous interface**
 
-  - object 는 interface 와 class의 상위 타입
-
-  - object 타입은 primitive를 제외하고 모든 object 타입 및 하위 타입을 담을 수 있다.
+  - `interface` 키워드로 선언하지 않고, 사용부에서 익명으로 선언
 
     ```typescript
-    let o: object = {}
-    o = {name: 'jee', age:5 }
-    o = {height: 180, weight: 70} // 하지만, object 타입은 object의 property 타입 까지 정해두진 못함
-    ```
-
-  - **인터페이스 선언문**
-
-    ```typescript
-    interface 인터페이스이름 {
-        prop이름[?]: prop타입[, ...]
-    }
-    ```
-
-    ```typescript
-    // interface 선언
-    interface iPerson {
+    let ai: {
         name: string
         age: number
-        height?: number // * optional prop
+        etc?: boolean
+    } = { name: 'Jee', age: 50 }
+    ```
+
+  - 주로 함수를 구현할 때, 아래와 같이 **object 타입의 인자를 정의**할 때 사용
+
+    ```typescript
+    function printMe( me: {name: string, age: number, etc?: boolean} ) {
+        console.log(
+        	me.etc ? 
+            	`${me.name} ${me.age} ${me.etc} ` :
+            	`${me.name} ${me.age}`
+        )
     }
     ```
 
-    인터페이스 인스턴스 생성
-
-    ```typescript
-    let good1: iPerson = {name: 'jack', age: 35}
-    let good2: iPerson = {name: 'shellby', age: 42}
-    let good3: iPerson = {name: 'mark', age: 12, height: 159} // optional property
     
-    let bad1: iPerson = {name: 'loopy'} // age 미존재
-    let bad2: iPerson = {name: 'blonde', age: 20, weight: 79}  // 'weight' prop 정의 x
-    ```
-
-    
-
-  - **익명 인터페이스 anonymous interface**
-
-    - `interface` 키워드로 선언하지 않고, 사용부에서 익명으로 선언
-
-      ```typescript
-      let ai: {
-          name: string
-          age: number
-          etc?: boolean
-      } = { name: 'Jee', age: 50 }
-      ```
-
-    - 주로 함수를 구현할 때, 아래와 같이 **object 타입의 인자를 정의**할 때 사용
-
-      ```typescript
-      function printMe( me: {name: string, age: number, etc?: boolean} ) {
-          console.log(
-          	me.etc ? 
-              	`${me.name} ${me.age} ${me.etc} ` :
-              	`${me.name} ${me.age}`
-          )
-      }
-      ```
-
-      
 
 ## 03-2 객체와 클래스
+
+### typescript 에서 클래스의 의미
+
+- javascript 의 class는 ES6부터 사용
+- class 이전에는 Function을 통해 사용
+- 기존 oop와 같이 class 도 type 중 하나
+- class 이름은 보통 대문자로 사용
+- 클래스 내부에서의 this는 js와 같이 생성되는 인스턴스를 가리킴
 
 ### 클래스 선언문
 
@@ -175,6 +184,8 @@ jack.age = 30;
 ### 접근 제한자 access modifier
 
 - 생략할 경우, `public` default
+- private : java에서와 같이 클래스 내부에서만 접근 가능
+- protected : 클래스 내부 그리고 상속받은 클래스에서만 접근 가능
 
 ### 생성자 메소드 constructor
 
@@ -187,7 +198,7 @@ class Person1 {
 const joy = new Person1('joy', 31);
 ```
 
-- 접근제어자를 붙여줄 경우, 프로터피로 직접 선언 및 할당을 하지 않아도 된다. () javscript와 같이 `this.프로퍼티 = 매개변수` 를 적어주지 않아도 된다. )
+- 접근제어자를 붙여줄 경우, 프로터피로 직접 선언 및 할당을 하지 않아도 된다. ( javscript와 같이 `this.프로퍼티 = 매개변수` 를 적어주지 않아도 된다. )
 
 - 사실 아래처럼 펼쳐진 class 선언문을 위와 같이 함축한 것
 
@@ -201,6 +212,16 @@ const joy = new Person1('joy', 31);
     }
   }
   ```
+
+#### 초기화 initialization
+
+- 클래스의 property 값의 초기화는 아래 두가지 경우로만 세팅 가능
+
+  1. property의 선언부에서 바로 할당
+  2. constructor(){} 생성자 함수 내부에서 할당
+
+
+
 
 ### 인터페이스 구현 interface implements
 
@@ -251,6 +272,8 @@ class 서브클래스 extentds 수퍼클래스 {
 }
 ```
 
+
+
 ```typescript
 // 추상 클래스 정의
 abstract class Abstractperson5 {
@@ -294,6 +317,31 @@ const book1 = new Book('javascript_dev', 'zeroxho');
 console.log(book1);
 console.log(Book.initValue);  // 클래스이름. 으로 접근, 인스턴스 변수명 x
 ```
+
+
+
+## indexable property, index signatures in class
+
+- 동적으로 property를 생성하기 위해 사용
+
+```typescript
+interface iPerson10 {
+  [index: string]: string | number; // indexable notation
+}
+
+class Person10 implements iPerson10 {
+  [index: string]: string;
+}
+
+let person10 = new Person10();
+
+person10.name = 'jeem';	// person10에는 없는 prop이지만, 할당 가능
+console.log(person10.name);
+```
+
+
+
+
 
 ### 비구조화 할당 destructuring
 
