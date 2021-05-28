@@ -253,6 +253,42 @@ let phil = new Person3('phil', 70, 29);
 
 
 
+### 인터페이스의 상속(확장) extending interface
+
+- 인터페이스 간 상속 가능 (다중 상속도 가능)
+- 따라서 재사용성 높은 컴포넌트로 쪼갤 수 있다.
+
+```typescript
+// extending interface
+interface iAnimal15 {
+  name: string
+}
+
+interface iAnimal16 {
+  age: number
+}
+
+interface iPerson15 extends iAnimal15, iAnimal16 {
+  country: string
+}
+
+let person15 = {} as iPerson15
+person15.name = 'jee'
+person15.age = 16
+person15.country = 'Korea'
+
+console.log(person15)
+
+```
+
+
+
+
+
+
+
+
+
 ### 추상 클래스 abstract class
 
 ```typescript
@@ -296,7 +332,9 @@ console.log(ruru);
 
 ### static 속성
 
-- 모든 인스턴스가 공유하는 속성
+- 클래스는 생성될 때, 내부적으로 스태틱 속성과 인스턴스 속성으로 분류되어 생성된다고 생각하면 편하다.
+
+- 스태틱 속성은 모든 인스턴스가 공유하는 속성
 
 ```typescript
 class 클래스이름 {
@@ -316,6 +354,33 @@ class Book {
 const book1 = new Book('javascript_dev', 'zeroxho');
 console.log(book1);
 console.log(Book.initValue);  // 클래스이름. 으로 접근, 인스턴스 변수명 x
+```
+
+```typescript
+
+interface iAnimal {
+  name: string
+  legs?: number
+  move(distance: number): void
+}
+
+class Bird implements iAnimal {
+  constructor(public name: string) {}
+  move(distance: number) {
+    console.log(`${distance} 만큼 날았다.`)
+  }
+  // static mehtod 생성
+  static isBird = (animal: iAnimal): boolean => {
+    return animal instanceof Bird
+  }
+}
+
+let bird1: Bird = new Bird('bird1')
+
+// static method 호출...
+console.log(Bird.isBird(bird1))	// true
+console.log(Bird.isBird({ name: 'jeeha', move(num: number) {} })) // false
+
 ```
 
 
@@ -338,6 +403,44 @@ let person10 = new Person10();
 person10.name = 'jeem';	// person10에는 없는 prop이지만, 할당 가능
 console.log(person10.name);
 ```
+
+
+
+## readonly property 
+
+- 일부 property들은 객체가 처음 생성될 때(초기화 시)에만 값이 할당되어야 한다. 이러한 경우 readonly 유용
+- 재할당 시, 린트 에러 발생
+
+```typescript
+
+interface iReadonly {
+  readonly name: string
+  readonly country: string
+}
+
+// 생성 시 초기값 할당
+let readonly1: iReadonly = {
+  name: 'jee',
+  country: 'Korea',
+}
+
+readonly1.name = 'jee1' // 에러 발생, cannot assign to 'name' because it is 'read-only' property
+
+```
+
+## readonlyArray
+
+- 모든 변경 메소드가 제거된 `Array<T>`
+- `const`와의 차이점
+  - 변수에 사용된다면 `const`, 프로퍼티에 사용된다면 `readonly`
+
+```typescript
+let readonlyArr: ReadonlyArray<number> = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+readonlyArr.push(4) // 에러 발생, readonlyArr 는 push 라는 property를 갖고 있지 않다.
+```
+
+
 
 
 
@@ -431,6 +534,24 @@ console.log((<{ name: string }>obj1).name); // 형변환
   (인스턴스명 as 타입)	// 타입 단언 방법 2
   ```
 
+  
+    ```typescript
+   interface iPerson11 {
+     name: string
+     age?: number
+   }
+   
+   // 타입 단언 1
+   let person1 = <iPerson11>{}
+   person1.name = 'jeeee'
+   
+   // 타입 단언 2
+   let person2 = {} as iPerson11
+   person1.name = 'jeee'
+    ```
+  
+  
+  
   ```typescript
   interface INameable {
     name: string;
@@ -441,8 +562,8 @@ console.log((<{ name: string }>obj1).name); // 형변환
   };
   
   let name1 = (<INameable>obj5).name; // 타입 단언 1
-  
   let name2 = (obj5 as INameable).name; // 타입 단언 2
   ```
-
+  
    
+
