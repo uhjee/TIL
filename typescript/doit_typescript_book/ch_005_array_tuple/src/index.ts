@@ -77,7 +77,6 @@ console.log(myIdentity3('hi'));
 
 // ! 선언적 프로그래밍
 
-// 1~ 100 더하기
 // 명령형
 let sum = 0;
 for (let i = 0; i < 100; i++) {
@@ -85,13 +84,13 @@ for (let i = 0; i < 100; i++) {
 }
 console.log(sum);
 
-// 선언형
-// range 함수 구현
+// ? 선언형
+// ? range 함수 구현
 // - 재귀함수 방식으로 동작
 // - from 에서 to 까지의 구성된 배열 생성
 export const range = (from: number, to: number): number[] => (from < to ? [from, ...range(from + 1, to)] : []);
 
-// fold: 접기
+// ? fold: 접기
 //    - T[] 배열 데이터를 가공해 하나의 T 타입 값으로 생성  cf. reduce..??
 export const fold = <T>(array: T[], callback: (result: T, val: T) => T, initValue: T) => {
   let result: T = initValue;
@@ -102,10 +101,55 @@ export const fold = <T>(array: T[], callback: (result: T, val: T) => T, initValu
   }
   return result;
 };
+// 1~ 100 더하기
 
 // 입력 데이터 생성
 let numbers: number[] = range(1, 100 + 1);
 
 // 입력 데이터 가공
 let result = fold(numbers, (result, val) => result + val, 0);
-console.log(result);
+console.log('1 ~ 100 sum', result);
+
+// 1~100 까지의 홀수의 합 구하기
+// ? filter
+export const filter = <T>(array: T[], callback: (value: T, index?: number) => boolean): T[] => {
+  let result: T[] = [];
+  for (let index: number = 0; index < array.length; ++index) {
+    const value = array[index];
+    if (callback(value, index)) result = [...result, value];
+  }
+  return result;
+};
+
+let numbers1: number[] = range(1, 100 + 1);
+// filter 함수의 콜백으로 predicate helper function 으로 사용되는 함수
+const isOdd = (n: number): boolean => n % 2 !== 0;
+
+let oddResult = fold(filter(numbers1, isOdd), (result, val) => result + val, 0);
+console.log(oddResult);
+
+// 1 ~ 100 짝수
+const isEven = (n: number): boolean => n % 2 === 0;
+let evenResult = fold(filter(numbers1, isEven), (result, val) => result + val, 0);
+console.log(evenResult);
+
+// 제곱 더하기
+// ? map
+export const map = <T, Q>(array: T[], callback: (value: T, index?: number) => Q): Q[] => {
+  let result: Q[] = [];
+  for (let index = 0; index < array.length; ++index) {
+    const value = array[index];
+    result = [...result, callback(value, index)];
+  }
+  return result;
+};
+
+// 1^2 + ... 100^2 더한 값 구하기
+let numbers2 = range(1, 100 + 1);
+
+let squaredResult = fold(
+  map(numbers2, (val) => val * val),
+  (result, val) => result + val,
+  0,
+);
+console.log(squaredResult);

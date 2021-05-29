@@ -111,8 +111,10 @@ console.log(
 - typescript의 **타입 추론**을 통해 생략
   - 가장 일반적인 방법
   - 컴파일러가 인수로 해당 타입을 판단한다.
+  
+  
 
-
+---
 
 ## 05-2. 선언형 프로그래밍과 배열
 
@@ -143,13 +145,19 @@ console.log(sum);	// 5050
 - **범용적**으로 구현된 함수의 **재사용**
 - `데이터 생성` 과 `데이터 가공`을 분리
 
+### range 함수
+
 ```typescript
-
-// 선언형
-// range 함수 구현
+// ? range 함수 구현
 export const range = (from: number, to: number): number[] => (from < to ? [from, ...range(from + 1, to)] : []);
+```
 
-// fold: 접기
+
+
+### fold 함수
+
+```typescript
+// ? fold: 접기
 //    - T[] 배열 데이터를 가공해 하나의 T 타입 값으로 생성  cf. reduce..??
 export const fold = <T>(array: T[], callback: (result: T, val: T) => T, initValue: T) => {
   let result: T = initValue;
@@ -160,14 +168,86 @@ export const fold = <T>(array: T[], callback: (result: T, val: T) => T, initValu
   }
   return result;
 };
+```
 
+
+
+### filter 함수
+
+```typescript
+// ? filter
+export const filter = <T>(array: T[], callback: (value: T, index?: number) => boolean): T[] => {
+  let result: T[] = [];
+  for (let index: number = 0; index < array.length; ++index) {
+    const value = array[index];
+    if (callback(value, index)) result = [...result, value];
+  }
+  return result;
+};
+```
+
+
+
+### map 함수
+
+- map 의 callback  함수는 입력받은 타입 `T` 와 리턴하는 타입 `Q` 가 서로 다를 수도 있다는 것을 고려해야 함
+
+```typescript
+// ? map
+export const map = <T, Q>(array: T[], callback: (value: T, index?: number) => Q): Q[] => {
+  let result: Q[] = [];
+  for (let index = 0; index < array.length; ++index) {
+    const value = array[index];
+    result = [...result, callback(value, index)];
+  }
+  return result;
+};
+```
+
+
+
+1 ~ 100 더하기
+
+```typescript
+
+// 1 ~ 100 더하기
 // 입력 데이터 생성
 let numbers: number[] = range(1, 100 + 1);
 
 // 입력 데이터 가공
 let result = fold(numbers, (result, val) => result + val, 0);
 console.log(result);	// 5050
+```
 
 
+
+1 ~ 100 홀수만 더하기
+
+``` typescript
+// 입력 데이터 생성
+let numbers1: number[] = range(1, 100 + 1);
+
+// filter 함수의 콜백으로 predicate helper function 으로 사용되는 함수
+const isOdd = (n: number): boolean => n % 2 != 0;
+
+// 입력 데이터 가공
+let result1 = fold(filter(numbers1, isOdd), (result, val) => result + val, 0);
+console.log(result1); // 2500
+```
+
+
+
+1^2 + ... + 100^2 더하기
+
+```typescript
+// 1^2 + ... 100^2 더한 값 구하기
+let numbers2 = range(1, 100 + 1);
+
+let squaredResult = fold(
+  map(numbers2, (val) => val * val),
+  (result, val) => result + val,
+  0,
+);
+console.log(squaredResult); // 338350
 ```
 
