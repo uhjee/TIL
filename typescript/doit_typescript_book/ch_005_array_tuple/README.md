@@ -251,3 +251,29 @@ let squaredResult = fold(
 console.log(squaredResult); // 338350
 ```
 
+
+
+## 05-3. 배열의 map, reduce, filter
+
+유인동 선생님의 함수형 프로그래밍을 다시 보자
+
+그리고 typescript를 알게되니, 함수 시그니처를 읽을 수 있게 되어서 편한 것 같다.
+
+filter
+
+```typescript
+filter(callback: (value: T, index?: number): boolean): T[]
+```
+
+map
+
+```typescript
+map(callback: (value: T, index?: number): Q) Q[]
+```
+
+reduce
+
+```typescript
+reduce(callback: (result: T, value: T), initialValue: T): T
+```
+
