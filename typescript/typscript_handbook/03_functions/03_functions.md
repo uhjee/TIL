@@ -21,3 +21,31 @@ const add: numberFunc = (a: number, b: number) => a + b
 
 ```
 
+
+
+## 선택적 매개변수와 기본 매개변수
+
+#### 선택적 매개변수
+
+```typescript
+// 선택적 매개변수
+const introduce = (name: string, age?: number): void => {
+  console.log(`이름은 ${name} 이고, 나이는 ${age} 이다`)
+}
+
+introduce('jee') // 정상 동작 , age는 undefined로 출력
+introduce('jee', 30) // 정상 동작
+```
+
+#### 기본 매개변수
+
+```typescript
+// 기본 매개변수
+const introduce1 = (name: string, age: number = 100): void => {
+  console.log(`이름은 ${name} 이고, 나이는 ${age} 이다`)
+}
+
+introduce1('jee', 40) // 정상 동작, age 40 출력
+introduce1('jee')	// 에러 발생 x, age는 100으로 출력
+```
+

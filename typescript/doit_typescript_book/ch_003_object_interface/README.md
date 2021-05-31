@@ -183,7 +183,11 @@ jack.age = 30;
 
 ### 접근 제한자 access modifier
 
-- 생략할 경우, `public` default
+클래스 내부의 모든 곳(프로퍼티, 생성자, 메소드)에서 세팅이 가능하다.
+
+javascript에서 private한 변수의 접두어로 `_`을 붙여 사용하던 관습이 남아있다.
+
+- default: `public` 
 - private : java에서와 같이 클래스 내부에서만 접근 가능
 - protected : 클래스 내부 그리고 상속받은 클래스에서만 접근 가능
 
@@ -285,10 +289,6 @@ console.log(person15)
 
 
 
-
-
-
-
 ### 추상 클래스 abstract class
 
 ```typescript
@@ -381,6 +381,30 @@ let bird1: Bird = new Bird('bird1')
 console.log(Bird.isBird(bird1))	// true
 console.log(Bird.isBird({ name: 'jeeha', move(num: number) {} })) // false
 
+```
+
+
+
+#### static 을 활용한 singleton pattern
+
+```typescript
+class SingleTon {
+  private static instance: SingleTon | null = null
+
+  public static getInstance(): SingleTon {
+    if (SingleTon.instance === null) {
+      SingleTon.instance = new SingleTon()
+    }
+    return SingleTon.instance
+  }
+
+  private constructor() {}
+}
+
+const singleA: SingleTon = SingleTon.getInstance()
+const singleB: SingleTon = SingleTon.getInstance()
+
+console.log(singleA === singleB)  // true
 ```
 
 

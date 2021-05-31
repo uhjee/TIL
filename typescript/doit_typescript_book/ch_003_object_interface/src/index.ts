@@ -291,3 +291,22 @@ person15.age = 16
 person15.country = 'Korea'
 
 console.log(person15)
+
+// static을 활용한 singleton pattern
+class SingleTon {
+  private static instance: SingleTon | null = null
+
+  public static getInstance(): SingleTon {
+    if (SingleTon.instance === null) {
+      SingleTon.instance = new SingleTon()
+    }
+    return SingleTon.instance
+  }
+
+  private constructor() {}
+}
+
+const singleA: SingleTon = SingleTon.getInstance()
+const singleB: SingleTon = SingleTon.getInstance()
+
+console.log(singleA === singleB) // true
