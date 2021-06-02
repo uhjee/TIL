@@ -153,3 +153,13 @@ let squaredResult = fold(
   0,
 );
 console.log(squaredResult);
+
+//? 순수함수와 readonly
+const addLength: (a: readonly number[], b: number[]) => number = (a: readonly number[], b: number[]): number => {
+  return a.length + b.length;
+};
+
+let arr5 = [1, 2, 3, 4, 5];
+let arr6 = [1, 2, 3];
+
+console.log(addLength(arr5, arr6));
