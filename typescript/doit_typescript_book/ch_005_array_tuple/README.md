@@ -310,7 +310,13 @@ reduce(callback: (result: T, value: T), initialValue: T): T
 > - **변수**에 사용된다면 const
 > -  **property**나 **매개변수**에 사용한다면 readonly
 
+### 얉은 복사
+
+- 원본의 주소값(참조)만 복사
+
 ### 깊은 복사
+
+- 원본이 갖는 주소값의 데이터 참조값을 복사
 
 - spread syntax를 활용한 깊은 복사
 
@@ -321,3 +327,25 @@ reduce(callback: (result: T, value: T), initialValue: T): T
 
   
 
+### 배열의 sort 메소드를 순수함수로 구현
+
+```typescript
+// sort 함수 - 순수함수로 구현
+// - 원본 데이터에 대한 변형 X
+export const pureSort = <T>(arr: readonly T[]): T[] => {
+  let deepCopied = [...arr]; // spread syntax를 통한 깊은 복사
+  return deepCopied.sort();
+};
+```
+
+
+
+### 가변 인수 함수와 순수 함수 
+
+- **가변 인수(variadic arguments)**
+
+  - 호출할 때, 전달하는 인수의 개수를 제한하지 않는 것
+
+- parameter 나머지 연산자를 통해 가능
+
+  

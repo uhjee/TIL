@@ -163,3 +163,27 @@ let arr5 = [1, 2, 3, 4, 5];
 let arr6 = [1, 2, 3];
 
 console.log(addLength(arr5, arr6));
+
+// sort 함수 - 순수함수로 구현
+// - 원본 데이터에 대한 변형 X
+export const pureSort = <T>(arr: readonly T[]): T[] => {
+  let deepCopied = [...arr]; // spread syntax를 통한 깊은 복사
+  return deepCopied.sort();
+};
+
+let arr7 = [7, 9, 1, 2, 6, 2, 7, 5, 8];
+
+const arr8 = pureSort(arr7);
+console.log(arr8);
+
+// 가변 인수 함수 - mergeArray
+// parameter rest syntax
+export const mergeArray = <T>(...arrs: readonly T[][]): T[] => {
+  let result: T[] = [];
+  for (let i = 0; i < arrs.length; i++) {
+    const array: T[] = arrs[i];
+
+    result = [...result, ...array]; // spread syntax
+  }
+  return result;
+};
