@@ -349,3 +349,46 @@ export const pureSort = <T>(arr: readonly T[]): T[] => {
 - parameter 나머지 연산자를 통해 가능
 
   
+
+
+
+## 05-5 튜플 이해하기 tuple
+
+any[]으로 튜플처럼 사용할 수 있으나, typescript 기본의 타입 시스템을 무시는 것이므로, tuple 사용
+
+```typescript
+let tuple: any[] = [true, 'string', 4];   // x
+
+let realTuple: [boolean, string, number] = [true, 'string', 4]; // o
+```
+
+
+
+### 별칭 사용 alias
+
+-  try/catch/finnaly의 예외 처리 구문에서 사용하고자..
+
+- 또 아래와 같은 예외처리는 불순 함수를 순수함수로 바꿔주는 전형적인 코드 설계 방식이라고 한다...
+
+```typescript
+export type ResultType = [boolean, string];
+```
+
+```typescript
+import { ResultType } from './';
+
+export const doSomething = (): ResultType => {
+  try {
+    throw new Error('some error occurs...');
+  } catch (e) {
+    return [false, e.message];
+  }
+};
+```
+
+- tuple도 물리적으로는 배열이기 때문에, 배열의 인덱스 연산자, 또는 비구조화 할당문을 사용할 수 있다.
+
+```typescript
+const [result, errorMessage] = doSomething();
+```
+

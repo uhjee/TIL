@@ -187,3 +187,32 @@ export const mergeArray = <T>(...arrs: readonly T[][]): T[] => {
   }
   return result;
 };
+
+/**
+ * tuple
+ *
+ */
+let tuple: any[] = [true, 'string', 4];
+// any[] 형태는 타입스크립트의 타입 기능을 무력화 시킴
+
+let realTuple: [boolean, string, number] = [true, 'string', 4];
+
+// 별칭 사용
+// try/catch/finnaly의 예외 처리 구문에서 사용하고자..
+// 또 아래와 같은 예외처리는 불순 함수를 순수함수로 바꿔주는 전형적인 코드 설계 방식이라고 한다...
+export type ResultType = [boolean, string];
+
+// import { ResultType } from '.';
+
+export const doSomething = (): ResultType => {
+  try {
+    throw new Error('some error occurs...');
+  } catch (e) {
+    return [false, e.message];
+  }
+};
+
+// 튜플도 물리적으로는 배열, 인덱스 연산자 또는 비구조화 할당문을 적용할 수 있다.
+// import {doSomething} from ''
+
+const [result1, errorMessage] = doSomething();
