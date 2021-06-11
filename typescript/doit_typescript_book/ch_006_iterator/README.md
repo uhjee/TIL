@@ -127,6 +127,8 @@ for (let value of iterator1) {
 
 ### Iterable<T> 와 Iterator<T> 인터페이스
 
+typescript에서 제공하는 제네릭 인터페이스
+
 #### Iterable<T>
 
 ```typescript
@@ -167,4 +169,149 @@ export class StringIterable implements Iterable<string> {
 ```
 
 
+
+
+
+## 06-2 generator 생성기 이해하기
+
+### generator 선언 및 구현
+
+#### function* 키워드
+
+- 키워드이기 때문에, 화살표 함수 등으로 generator를 만들 수 없다.
+- `generator`는 `iterator`를 제공하는 `itrable`로서 동작한다.
+
+#### yield 키워드
+
+- 생성기 함수 안에서 yield문 사용 가능
+- 연산자로 동작하며 다음 두 가지 기능을 한다
+  1. iterator를 자동으로 생성
+  2. iterable 역할 수행
+
+```typescript
+export function* generator() {
+  console.log('generator started...');
+  let value = 1;
+  while (value < 4) {
+    yield value++;
+  }
+  console.log('generator finished ...');
+}
+```
+
+generator  호출
+
+```typescript
+import {generator} from './'
+
+for(let value of generator()){
+  console.log(value); 
+}
+```
+
+실행 결과
+
+```tex
+generator started...
+1
+2
+3
+generator finished ...
+```
+
+
+
+### yield 반환값
+
+- yield 연산자는 값을 반환한다.
+- 
+
+
+
+### semi-coroutine
+
+- 싱글 스레드인 자바스크립트가 멀티 스레드처럼 동작하기 위한 기능
+  - `setInterval()` 을 호출하는 부분이 메인 스레드
+  - `setInterval()`의 콜백함수가 작업 스레드
+- 생성기도 이와 같은 원리로 동작
+- 생성기는 자동으로 반복 실행되지 않으므로 세미(semi) 코루틴
+
+예제_ setInterval()
+
+```typescript
+// Semi-coroutine: 단일 스레드인 js가 다중 스레드와 같이 동작하는 것처러 보이는 기능
+//   - 생성기도 이와 같은 semi-coroutine 방식으로 동작
+const period = 1000;
+let count = 0;
+console.log('program started ...');
+
+const interval = setInterval(() => {
+  if (count === 5) {
+    clearInterval(interval);
+    console.log('program finished ...');
+  } else {
+    console.log(`interval ${count++}`);
+  }
+}, period);
+
+```
+
+
+
+### range Generator 구현
+
+구현
+
+```typescript
+export function* rangeGenerator(from: number, to: number) {
+  let value = from;
+  while (value < to) {
+    yield value++;
+  }
+}
+```
+
+
+
+사용
+
+```typescript
+// while 패턴으로 동작하는 generator
+let iterator = rangeGenerator(1, 3 + 1);
+
+while (1) {
+  const { value, done } = iterator.next();
+  if (done) break;
+  console.log(value); // 1, 2, 3
+}
+
+// for ... of 형태로 동작하는  generator
+for (let value of rangeGenerator(4, 6 + 1)) {
+  console.log(value); // 4, 5, 6
+}
+```
+
+
+
+### IterableUsingGenerator
+
+- [Symbol.iterator] 를 function*으로 구현
+
+```typescript
+// iterable의 메소드로 동작하는 generator 구현
+export class IterableUsingGenerator<T> implements Iterable<T> {
+  constructor(private values: T[], private currentIndex: number = 0) {}
+
+  [Symbol.iterator] = function* () {
+    while (this.currentIndex < this.values.length) {
+      yield this.values[this.currentIndex++]; // yield : 1.iterator 생성, iterable 역할 수행
+    }
+  };
+}
+```
+
+### yield*
+
+- yield: 단순히 값을 대상으로 동작하지만
+- yield*: 다른 generator나 배열을 대상으로 동작
 
