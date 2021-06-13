@@ -126,6 +126,8 @@ readFile('./package.json', (err: Error, buffer: Buffer) => {
 
 ES5에 정식 기능으로 추가
 
+비동기 요청을 보낸 후, 응답이 올 미래에 호출될 약속( resolve 와 reject )
+
 ### Promise class
 
 js에서 프로미스는 `Promise`라는 이름의 class이다. 따라서 `new` 키워드로 Promise 객체를 만들어야 한다.
@@ -288,5 +290,133 @@ race(프로미스_객체_배열: Promise[]): Promise<가장_먼저_해소된_객
 
 
 
-007-3. async / await 구문
+# 007-3. async / await 구문
+
+### await 키워드
+
+```typescript
+let value = await Promise객체_또는_값\
+```
+
+- 피연산자(operand) 의 값을 반환해준다.
+- 만약 피연산자가 **Promise** 객체라면, `then` 메소드를 호출해 얻은 값을 반환해준다.
+
+### async 함수 수정자 Modifier
+
+- await 키워드는 항상 async 라는 함수 수정자가 있는 함수의 body에서만 사용될 수 있다.
+
+```typescript
+const test1 = async () => {  // 화살표 함수
+  await Promise 객체 또는 값
+}
+
+async function test2() {  // function 키워드 함수 선언식
+  await Promise 객체 또는 값
+}
+```
+
+
+
+### async 함수의 두 가지 성질
+
+1. 일반 함수처럼 사용할 수 있다.
+2. Promise 객체로 사용할 수 있다.
+
+
+
+구현
+
+```typescript
+// 구현
+const test1 = async () => {
+  let value = await 1;
+  console.log(value);
+  value = await Promise.resolve(1);
+  console.log(value);
+}
+```
+
+
+
+일반함수로 사용
+
+```typescript
+// 사용
+test1(1);
+```
+
+
+
+Promise 객체로 사용
+
+```typescript
+test1()
+	.then(() => test2())
+```
+
+
+
+### async 함수의 반환 값의 의미
+
+async 함수는 값을 반환할 수 있다. 
+
+이때 반환값은 Promise 형태로 변환되므로 then 메소드를 호출해 async 함수의 반환값을 얻어야 한다.
+
+```typescript
+// 구현
+const asyncReturn = async () => [1, 2, 3];
+
+// 사용
+asyncReturn()
+	.then((value) => {	// then 메소드의 파라미터로 전달
+  	console.log(value);	// [1, 2, 3]
+})
+```
+
+
+
+### async 함수의 예외 처리
+
+```typescript
+// 구현
+const asyncException = async() => {
+  throw new Error('error'); // error
+}
+
+// 사용
+asyncException() // 예외 발생
+```
+
+```typescript
+// 구현
+const awaitReject = async() => {
+  await Promise.reject(new Error('error')) // reject
+}
+
+//사용
+awaitReject() // 예외 발생 - 비정상 종료
+```
+
+
+
+위와 같은 상황에 예외로 인해 프로그램이 비정상적으로 멈추게 된다.
+
+이를 막기 위해서는  catch메소드에서 예외가 처리되도록 해야한다.
+
+```typescript
+// 프로미스 객체 사용
+asyncExeption()
+	.catch((error) => {
+  	console.log('error: ', error.message);
+})
+```
+
+
+
+
+
+```typescript
+
+
+```
 
