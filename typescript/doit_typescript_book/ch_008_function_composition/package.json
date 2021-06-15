@@ -1,0 +1,15 @@
+{
+  "name": "ch_008_function_composition",
+  "version": "1.0.0",
+  "description": "ch.008 함수 조합의 원리와 응용",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^15.12.2",
+    "ts-node": "^10.0.0"
+  }
+}
