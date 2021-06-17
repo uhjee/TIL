@@ -1,0 +1,23 @@
+http://eslint.org/docs/rules/no-console, 8
+http://eslint.org/docs/rules/no-underscore-dangle, 1
+http://eslint.org/docs/rules/comma-dangle, 1
+http://eslint.org/docs/rules/no-trailing-spaces, 3
+http://eslint.org/docs/rules/indent, 2
+http://eslint.org/docs/rules/no-tabs, 1
+http://eslint.org/docs/rules/max-len, 3
+http://eslint.org/docs/rules/no-return-assign, 1
+http://eslint.org/docs/rules/no-unused-vars, 8
+http://eslint.org/docs/rules/global-require, 2
+https://google.com/#q=import%2Fno-dynamic-require, 2
+http://eslint.org/docs/rules/comma-spacing, 1
+http://eslint.org/docs/rules/no-useless-return, 5
+http://eslint.org/docs/rules/template-curly-spacing, 1
+https://google.com/#q=import%2Fextensions, 3
+https://google.com/#q=import%2Fno-extraneous-dependencies, 3
+https://google.com/#q=vue%2Fno-dupe-keys, 1
+https://google.com/#q=vue%2Fvalid-template-root, 1
+https://google.com/#q=vue%2Fvalid-v-else, 1
+-- Count: 19 
+-- totalTime: 7 mins, 24.88 secs
+ 
+-- totalCount: 48 

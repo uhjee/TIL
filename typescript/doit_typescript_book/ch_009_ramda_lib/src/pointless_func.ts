@@ -6,13 +6,13 @@ import { range, pipe, tap } from 'ramda'
 //   tap((n) => console.log(n)),
 // )
 
-// type assertion 타입 단언 사용 
+// type assertion 타입 단언 사용
 //  - 반환값의 타입을 any -> T[]  변경
 export const dump = <T>(array: T[]): T[] =>
   pipe(
     //
     tap((n) => console.log(n)),
-  )(array) as T[]
+  )(array) as T[] // 반환값 자체가 T[] 로 명시(명시적 형변환 느낌)
 
 // 마지막 파라미터 받음
 dump(range(1, 100 + 1))

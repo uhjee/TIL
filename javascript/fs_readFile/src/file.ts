@@ -1,5 +1,6 @@
 import { readFile, createWriteStream } from 'fs'
 
+const changeLine: string = '\n'
 /**
  * 비동기로 파일을 읽는다.
  *
@@ -24,7 +25,7 @@ export const readFilePromise = (fileName: string): Promise<string> =>
  *
  * @return  {void}              [return description]
  */
-export const exportFile = (filename: string, arr: any[], totalCount: number, type: string): void => {
+export const exportFile = (filename: string, arr: any[], type: string, printProp?: { totalCount?: number; totalTime?: string }): void => {
   const file = createWriteStream(filename)
   file.on('error', function (err) {
     console.error(err)
@@ -32,15 +33,21 @@ export const exportFile = (filename: string, arr: any[], totalCount: number, typ
   arr.forEach((v) => {
     // let value = null
     if (type === 'array') {
-      const value = v.join(', ') + '\n'
+      const value = v.join(', ') + changeLine
       file.write(value)
     } else {
       // value = v.split('/').pop() + '\n'
-      const value = v + '\n'
+      const value = v + changeLine
       file.write(value)
     }
   })
-  file.write(`-- Count: ${arr.length}\n`)
-  file.write(`-- Total count: ${totalCount}`)
+  file.write(`-- Count: ${arr.length} ${changeLine}`)
+  if (printProp !== null && printProp !== undefined) {
+    let cnt = 0
+    for (let key of Object.keys(printProp)) {
+      file.write(`-- ${key}: ${printProp[key]} ${cnt === Object.keys(printProp).length ? '' : changeLine}`)
+      cnt += 1
+    }
+  }
   file.end()
 }

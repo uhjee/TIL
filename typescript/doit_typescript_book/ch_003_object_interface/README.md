@@ -549,7 +549,13 @@ console.log((<{ name: string }>obj1).name); // 형변환
 
 ### 타입 단언 type assertion
 
+참고[_타입단언 설명](https://hyunseob.github.io/2017/12/12/typescript-type-inteference-and-type-assertion/)
+
 - javascript 의 타입 변환 구문과 구별하기 위해 **단언**이라는 용어 사용
+
+> '타입단언'은 '타입 캐스팅'이 아니다.
+
+- 타입 단언은 런타임에 영향을 미치지 않지만, 타입 캐스팅은 컴파일 타임과 런타임 모두 타입을 변경시키는 영향을 미친다.
 
 - 두 가지 형태로 사용이 가능하다. 내용은 동일
 
