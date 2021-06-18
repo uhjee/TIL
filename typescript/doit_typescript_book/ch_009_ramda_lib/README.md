@@ -127,3 +127,27 @@ console.log(sum(1, 2, 3, 4))// 10
 console.log(currySum(1)(2)(3)(4)) // 10
 ```
 
+
+
+## 09-3. 배열에 담긴 수 다루기
+
+### 선언형 프로그래밍 declarative programming
+
+- 보통 함수형은 선언형으로 코드 작성
+
+- 선언형 프로그래밍에서는 단순 데이터 값보다 배열 형태를 주로 사용
+
+  ```typescript
+  import * as R from 'ramda'
+  
+  // ! 기존 명령형 코드 - '값' 으로 데이터를 다룸
+  const value = 1
+  const newValue: number = R.inc(value)
+  console.log(newValue)
+  
+  // ! 선언형 - '배열'로 데이터를 다룸
+  const newArray: number[] = R.pipe(R.map(R.inc))([value])
+  console.log(newArray)
+  ```
+
+  
