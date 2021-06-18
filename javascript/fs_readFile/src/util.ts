@@ -12,6 +12,6 @@ export const getTotalTime = (content: string): string => {
   // const totalTime = 'General output time took 7 mins, 52.45 secs'
   const parsedTotalTimeArr: string[] = totalTime.split(' ')
 
-  console.log(parsedTotalTimeArr.slice(4).join(' '))
+  // console.log(parsedTotalTimeArr.slice(4).join(' '))
   return parsedTotalTimeArr.slice(4).join(' ')
 }

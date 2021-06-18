@@ -1,0 +1,41 @@
+.box {
+  background-color: #333;
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  padding: 15px;
+  transition: 1.2s;
+}
+.header {
+  background-color: #888;
+}
+.header__text {
+  color: #333;
+  text-align: center;
+}
+.content {
+  background-color: #777;
+}
+.content__text {
+  color: #222;
+  padding: 30px;
+}
+
+/* 미디어 기능(특성)에 따른  쿼리 조건 변화 */
+@media only screen and (min-width: 1000px) and (max-width: 1399px) {
+  .box {
+    background-color: springgreen;
+  }
+}
+@media only screen and (min-width: 800px) and (max-width: 999px) {
+  .box {
+    background-color: steelblue;
+  }
+}
+@media only screen and (max-width: 799px) {
+  .box {
+    background-color: crimson;
+    flex-direction: column;
+  }
+}

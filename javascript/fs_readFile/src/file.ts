@@ -1,6 +1,8 @@
 import { readFile, createWriteStream } from 'fs'
 
 const changeLine: string = '\n'
+const changeDoubleLine = changeLine + changeLine
+
 /**
  * 비동기로 파일을 읽는다.
  *
@@ -41,11 +43,15 @@ export const exportFile = (filename: string, arr: any[], type: string, printProp
       file.write(value)
     }
   })
-  file.write(`-- Count: ${arr.length} ${changeLine}`)
+  file.write(changeDoubleLine)
+  file.write(`-- Count: ${arr.length} ${changeDoubleLine}`)
   if (printProp !== null && printProp !== undefined) {
     let cnt = 0
     for (let key of Object.keys(printProp)) {
-      file.write(`-- ${key}: ${printProp[key]} ${cnt === Object.keys(printProp).length ? '' : changeLine}`)
+      // file.write(`-- ${key}: ${printProp[key]} ${cnt === Object.keys(printProp).length ? '' : changeLine}`)
+      console.log(printProp[key])
+
+      file.write(`-- ${key}: ${printProp[key]}`)
       cnt += 1
     }
   }
