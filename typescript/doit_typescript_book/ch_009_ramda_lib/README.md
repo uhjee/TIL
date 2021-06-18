@@ -127,3 +127,26 @@ console.log(sum(1, 2, 3, 4))// 10
 console.log(currySum(1)(2)(3)(4)) // 10
 ```
 
+
+
+### 순수함수 pure function
+
+람다 라이브러리는 순수함수를 고려해 설계되었다.]
+
+따라서 항상 파라미터의 상태를 변화시키지 않고, 새로운 값을 반환한다.(외부 데이터에 영향 x)
+
+예제
+
+```typescript
+import { pipe, map, add } from 'ramda';
+
+const originArray: number[] = [1, 2, 3];
+const resultArray = pipe(
+  //
+  map(add(1)),
+)(originArray);
+
+console.log(originArray); // [ 1, 2, 3 ] 파라미터에 영향 x
+console.log(resultArray); // [ 2, 3, 4 ]
+```
+
