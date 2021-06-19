@@ -173,4 +173,421 @@ console.log(resultArray); // [ 2, 3, 4 ]
   console.log(newArray)
   ```
 
+- tap으로 디버깅
+
+  - pipe 안에서는 console.log를 직접  호출할 수 없다.
+
+  ```typescript
+  import * as R from 'ramda'
   
+  // ! tap() 사용 - 로직 앞 뒤로 콘솔찍기
+  const numbers: number[] = R.range(1, 9 + 1)
+  
+  // incNumbers라는 1차함수 만들기
+  const incNumbers: Function = R.pipe(
+    //
+    R.tap((a) => console.log(`before inc: ${a}`)),
+    R.map(R.inc),
+    R.tap((a) => console.log(`after inc:  ${a}`)),
+  )
+  
+  incNumbers(numbers)
+  ```
+
+  
+
+### 사칙 연산 함수
+
+```typescript
+import * as R from 'ramda';
+
+R.add(a: number)(b: number); // a + b
+R.subtract(a: number)(b: number); // a - b
+R.multiply(a: number)(b: number); // a * b
+R.divide(a: number)(b: number); // a/b
+```
+
+- inc() 함수
+
+  사실 add()를 사용해 만든 함수
+
+  - **포인트가 있는 함수**로 구현
+
+    ```typescript
+    const inc (b: number): number => R.add(1)(b)
+    ```
+
+    
+
+  - **포인트가 없는 함수**로 구현
+
+    ```typescript
+    const inc = R.add(1)
+    ```
+
+    
+
+  - map 함수 내부에서 포인트가 있는 형태로 사용
+
+    ```typescript
+    R.map((n: number) => inc(n))
+    ```
+
+    이는 익명의 콜백함수를 만들어 map의 인자로 넘겨주는 형태
+
+    inc() 자체가 콜백으로 동작할 수 있기 때문에 다음과 같이 표현 가능
+
+    ```typescript
+    R.map(inc)
+    // of
+    R.map(R.add(1))
+    ```
+
+    
+
+### R.addIndex 함수
+
+- R.map은 Array.prototype.map() 과 같이 index를 매개변수로 사용할 수 없다. 직접 새로운 함수를 만들어야 한다.
+
+```typescript
+const indexedMap = R.addIndex(R.map)
+```
+
+사용
+
+```typescript
+// 두 번째 매개변수로 index 제공
+const indexedMap = R.addIndex(R.map);
+
+const result = indexedMap(
+  //
+  (v: number, i: number) => R.add(v, i),
+)(R.range(1, 5));
+
+console.log(result); // [ 1, 3, 5, 7 ]
+```
+
+
+
+### R.flip
+
+: 콜백함수의  매개변수 순서를 변경한다.(콜백함수는 2차 고차함수)
+
+- R.subtract, R.divide는 매개변수의 순서에 따라 결과값이 달라진다.
+- 따라서 매개변수의 순서를 변경할 수 있는 함수 필요
+
+순서 변경 전 (10 - value)
+
+```typescript
+// subtract, divide 는 매개변수의 순서에 따라 값이 달라진다.
+const subtract10 = R.subtract(10);
+
+R.pipe(
+  //
+  R.map(subtract10), // 10 - value
+  R.tap((n) => console.log(n)),
+)(R.range(1, 10));
+
+```
+
+순서 변경 후(value - 10)
+
+```typescript
+// ! R.flip : 매개변수의 순서를 거꾸로 변경한다.
+const subR = R.flip(R.subtract);
+
+const subR10 = subR(10);
+
+R.pipe(
+  //
+  R.map(subR10), // value - 10
+  R.tap((n) => console.log(n)),
+)(R.range(1, 9 + 1));
+```
+
+
+
+### 지수 연산자
+
+```typescript
+// 지수 연산자 **
+// x의 n승 => x ** n
+console.log(2 ** 10 // 1024
+```
+
+
+
+### 사칙 연산 함수들의 조합
+
+> f(x) = ax2 + bx + c 수식 typescript 표현
+
+1. typescirpt 로 구현
+
+   ```typescript
+   
+   // * type 선언
+   type NumberToNUmberFunc = (number) => number;
+   
+   // * 001. typescript 로 구현
+   
+   export const f =
+     (a: number, b: number, c: number): NumberToNUmberFunc =>
+     //
+     (x: number): number =>
+       a * x ** 2 + b * x + c;
+   ```
+
+   
+
+2. ramda 사용해서 구현  - 고차함수들의 연속
+
+   ```typescript
+   // * 002. ramda 라이브러리 사용
+   // R.add 는 2차 고차함수라는 걸 기억하자
+   
+   // 제곱을 구하는 2차함수 exp(N)(x) -> x의 N승
+   const exp =
+     (N: number) =>
+     (x: number): number =>
+       x ** N;
+   
+   const square = exp(2);
+   
+   // 괄호의 대 환장 파티...
+   export const fUsingRamda =
+     (a: number, b: number, c: number): NumberToNUmberFunc =>
+     (x: number): number =>
+       R.add(
+         //
+         R.add(
+           //
+           R.multiply(a)(square(x)),
+         )(R.multiply(b)(x)),
+   
+         c,
+       );
+   
+   console.log(fUsingRamda(2, 2, 2)(2));
+   ```
+
+   
+
+## 09 - 4 서술자와 조건 연산
+
+### 서술자 predicate
+
+: Array.prototype.fileter의 콜백함수는 boolean 타입을 반환하는 함수
+
+함수형 프로그래밍에서는 boolean 타입을 반환해, 어떤 조건에 부합하는 지 여부를 판단하는 함수를 **서술자**라 부름
+
+```typescript
+// * ramda 에서 제공하는 predicate 들
+// 순서가 몹시 헷갈린다...
+ R.lt(a)(b): boolean // a < b
+```
+
+```typescript
+ R.lte(a)(b) : boolean // a < =  b
+```
+
+```typescript
+ R.gt(a)(b): boolean // a > b
+```
+
+```typescript
+ R.gte(a)(b):boolean // a > = b
+```
+
+
+
+### R.filter
+
+- 콜백함수로 위의 predicate 함수를 사용
+- `R.lte(3)(x)` 의 식은 `3 <= x` 을 의미
+
+3보다 같거나 큰 수
+
+```typescript
+R.pipe(
+  R.filter(R.lte(3)),
+  R.tap((v) => console.log(v)),
+)(R.range(1, 10));
+// [  3, 4, 5, 6,  7, 8, 9 ]
+```
+
+
+
+7보다 작은 수
+
+```typescript
+//* 7보다 작은 수 뽑기
+R.pipe(
+  R.filter(R.gt(7)),
+  R.tap((v) => console.log(v)),
+)(R.range(1, 10));
+```
+
+
+
+3과 같거나 크고, 7보다 작은 수 - R.filter 함수 두 번 사용
+
+```typescript
+// * 3보다 같거나 크고 7보다 작은 수 뽑기
+R.pipe(
+  R.filter(R.lte(3)),
+  R.filter(R.gt(7)),
+  R.tap((v) => console.log(v)),
+)(R.range(1, 10));
+```
+
+
+
+### R.allPass, R.anyPass
+
+```typescript
+R.allPass(predicate 배열)	// 베열의 조건을 모두 만족하면 true
+```
+
+```typescript
+R.anyPass(predicate 배열) // 배열의 조건을 하나라도 만족하면 true 
+```
+
+3보다 크거나 같고 7보다 작은 수인지 판단하는 함수 생성
+
+```typescript
+import * as R from 'ramda';
+
+type NumberToBooleanFunc = (n: number) => boolean;
+
+// * min 과 같거나 크고 max보다 작은 범의의 수인지 판단하는 selectRange
+export const selectRange = (min: number, max: number): NumberToBooleanFunc =>
+  //
+  R.allPass([R.lte(min), R.gt(max)]);
+```
+
+위 함수 사용 (포인트가 없는 함수로) - R.filter 함수 한 번 사용
+
+```typescript
+R.pipe(
+  R.filter(selectRange(3, 6 + 1)),
+  R.tap((v) => console.log(v)), // [ 3, 4, 5, 6 ]
+)(R.range(1, 10));
+```
+
+
+
+### R.not 함수
+
+: 입력이 true이면 false 반환, false면 true 반환
+
+```typescript
+import * as R from 'ramda';
+import { selectRange } from './allPass_anyPass';
+
+export const notRange = (min: number, max: number) =>
+  //
+  R.pipe(
+    selectRange(min, max), 
+    R.not // not 사용!
+  );
+```
+
+호출
+
+```typescript
+// 호출
+R.pipe(
+  R.filter(notRange(3, 6 + 1)),
+  R.tap((n) => console.log(n)), // [ 1, 2, 7, 8, 9 ]
+)(R.range(1, 10)); 
+```
+
+### R.ifElse 함수
+
+```typescript
+R.ifElse(
+  조건서술자,
+  true일때실행할함수,
+  false일때실행할함수
+);
+```
+
+1부터 10까지 수 배열을 인자로 받고, 중간값인 6보다 같거나 큰 수는 1씩 증가, 작은 수는 1씩 감소
+
+```typescript
+import * as R from 'ramda';
+
+// 1부터 10까지 수에서 중간값인 6보다 작은 수는 1씩 감소시키고, 같거나 큰 수는 1씩 증가시키는
+
+const input: number[] = R.range(1, 10 + 1);
+const halfValue = input[input.length / 2];
+
+const subtractOrAdd = R.pipe(
+  R.map(
+    R.ifElse(
+      R.lte(halfValue), // x => half <= x
+      R.inc,
+      R.dec,
+    ),
+  ),
+  R.tap((n) => console.log(n)),
+);
+
+const result = subtractOrAdd(input); // [  0, 1, 2,  3,  4,   7, 8, 9, 10, 11]
+
+```
+
+
+
+## 09-5 문자열 다루기
+
+### trim 문자열 앞 뒤의 백색 문자 자르기 
+
+```typescript
+import * as R from 'ramda';
+
+// ! type 선언
+type StringToStringFunc = (string) => string;
+
+// * trim
+console.log(R.trim('\t hello         \n'));
+
+// * toLower, toUpper
+console.log(
+  //
+  R.toLower('HELLO, lolLOLELO'),
+  R.toUpper('hellohello?'),
+);
+
+// * split(구분자)(문자열)
+const words: string[] = R.split(' ')('hello my name is jee jee jee');
+console.log(words);
+
+// * join(구분자)(문자열)
+console.log(R.join('_')(words));
+
+// * toCamelCase -> 'no overload matches thius call' error 발생
+const toCamelCase = (delim: string): StringToStringFunc => {
+  const makeFirstToCapital = (word: string) => {
+    const characters = word.split('');
+    return characters.map((c, index) => (index === 0 ? c.toUpperCase() : c)).join('');
+  };
+
+  const indexedMap = R.addIndex(R.map);
+  return R.pipe(
+    R.trim,
+    R.split(delim),
+    R.map(R.toLower),
+    indexedMap((value: string, index: number) =>
+      index > 0
+        ? //
+          makeFirstToCapital(value)
+        : value,
+    ),
+    // R.join(''), // 'no overload matches thius call' error 발생
+  ) as StringToStringFunc;
+};
+
+console.log(toCamelCase(' ')('fuck the word'));
+```
+
