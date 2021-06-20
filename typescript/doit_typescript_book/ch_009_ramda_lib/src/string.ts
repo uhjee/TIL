@@ -38,7 +38,7 @@ const toCamelCase = (delim: string): StringToStringFunc => {
           makeFirstToCapital(value)
         : value,
     ),
-    // R.join(''),
+    // R.join(''), // 에러 발생함
   ) as StringToStringFunc;
 };
 
