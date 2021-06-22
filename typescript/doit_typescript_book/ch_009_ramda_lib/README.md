@@ -591,3 +591,14 @@ const toCamelCase = (delim: string): StringToStringFunc => {
 console.log(toCamelCase(' ')('fuck the word'));
 ```
 
+
+
+## 09-6. chance 패키지로 객체 만들기
+
+: 더미데이터를 만들어주는 라이브러리
+
+```sh
+TIL/libary/chance 
+```
+
+- 위 경로 확인
