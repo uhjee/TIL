@@ -726,3 +726,156 @@ console.log(newPerson);
 const anotherPerson = setLongitudeUsingFunc(R.add(0.123456))(person)
 console.log(anotherPerson);
 ```
+
+---
+
+## 09-8 객체 다루기
+
+### R.toPairs
+
+: 객체의 속성들을 분해해 배열로 만들어 준다. 
+
+각 아이템들은 `[ key:string, value: any]` 형태의 튜플
+
+### R.fromPairs
+
+[key, value] 형태의 아이템을 가진 배열을 다시 객체로 만들어 준다.
+
+```typescript
+import * as R from 'ramda';
+import { IPerson, makeIPerson, makeRandomIPerson } from '../model/person';
+
+const person: IPerson = makeRandomIPerson();
+
+const pairs: [string, any][] = R.toPairs(person); // toPairs()
+console.log(pairs);
+
+const person1: IPerson = R.fromPairs(pairs) as IPerson; // fromPairs()
+console.log(person1);
+
+```
+
+실행 결과
+
+```typescript
+// toPairs()
+[
+  [ 'name', 'Ethel Blake' ],
+  [ 'age', 49 ],
+  [ 'title', 'Sanitation Engineer' ],
+  [
+    'location',
+    {
+      country: 'CL',
+      city: 'Gemazloh',
+      address: '1482 Rehse Glen',
+      coordinates: [Object]
+    }
+  ]
+]
+// fromPairs()
+{
+  name: 'Charles Jackson',
+  age: 26,
+  title: 'Retail Store Manager',
+  location: {
+    country: 'SA',
+    city: 'Otajamid',
+    address: '309 Zipica Parkway',
+    coordinates: { latitude: -80.49071, longitude: 28.8119 }
+  }
+}
+```
+
+
+
+### R.keys
+
+: 객체의 속성 이름(key)만 추려서 string[] 타입 배열로 반환
+
+### R.values
+
+: 객체의 속성의 값(value)만 추려서 any[] 타입의 배열로 반환
+
+```typescript
+import * as R from 'ramda';
+import { IPerson, makeRandomIPerson } from '../model/person';
+
+const keys: string[] = R.keys(makeRandomIPerson());
+console.log('keys: ', keys); //keys:  [ 'name', 'age', 'title', 'location' ]
+
+const values: any[] = R.values(makeRandomIPerson());
+console.log('values: ', values); 
+```
+
+
+
+### R.zipObj
+
+: **키 배열**과 **값 배열**이라는 두 가지 매개변수를 결합해 객체로 만들어 준다.
+
+아래 예제에서는 R.keys(), R.values() 를 R.zipObj() 함수로 결합
+
+```typescript
+import * as R from 'ramda';
+import { IPerson, makeRandomIPerson } from '../model/person';
+
+const keys: string[] = R.keys(makeRandomIPerson());
+const values: any[] = R.values(makeRandomIPerson());
+
+const zippedPerson: IPerson = R.zipObj(keys, values) as IPerson;
+console.log(zippedPerson);
+```
+
+
+
+### R.mergeLeft, R.mergeRight
+
+: 두 개의 객체를 입력받아 두 객체의 속성을 결합해 새로운 객체를 생성한다.
+
+```typescript
+새로운객체 = R.mergeLeft(obj1)(obj2)   // 속성값이 다를 때, 왼쪽 객체의 우선순위 높음
+새로운객체 = R.mergeRight(obj1)(obj2)  // 오른쪽
+```
+
+```typescript
+import * as R from 'ramda';
+
+const left = { name: 'obj1' };
+const right = { name: 'obj2', age: 32 };
+const person = R.mergeLeft(left)(right);
+console.log(person); // { name: 'obj1', age: 32 }
+
+const person1 = R.mergeRight(left)(right);
+console.log(person1); // { name: 'obj2', age: 32 }
+```
+
+
+
+### R.mergeDeepLeft, R.mergeDeepRight
+
+deep 한 프로퍼티들의 속성값가지 바꿀 수 있다.
+
+```typescript
+import * as R from 'ramda';
+import { IPerson, makeRandomIPerson } from '../model/person';
+import { ILocation, makeRandomILocation } from '../model/location';
+import { ICoordinates, makeRandomICoordinates } from '../model/coordinates';
+
+const person: IPerson = makeRandomIPerson();
+const location: ILocation = makeRandomILocation();
+const coordinates: ICoordinates = makeRandomICoordinates();
+
+console.log(location);
+console.log(coordinates);
+
+const newLocation = R.mergeDeepLeft(location, { coordinates });
+const newLocation1 = R.mergeDeepRight(location, { coordinates });
+console.log(newLocation);
+console.log(newLocation1);
+
+const newPerson = R.mergeDeepRight(person, { newLocation1 });
+
+console.log(newPerson);
+```
+
