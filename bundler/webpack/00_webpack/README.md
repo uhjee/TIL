@@ -1,10 +1,91 @@
 # webpack
 
-: bundler
+: 가장 널리 사용되고 있는 모듈 번들러
 
+> 빌드, 번들링, 변환 모두 같은 의미로 사용
 
+## 01. 정의
 
-## 01. 환경
+#### 모듈 번들러 module bundler
+
+: 웹 어플리케이션을 구성하는 자원(HTML, CSS, JS, images, Font 등)을 모두 각각의 모듈로 보고, 이를 조합해서 병합된 하나의 결과물을 만드는 도구 
+
+#### 모듈 module
+
+: 특정 기능을 갖는 작은 코드 단위(HTML, CSS, JS, images, Font 등)
+
+- 주로 파일 단위의 자바스크립트 모듈 관리
+
+#### 웹팩으로 해결되는 문제들
+
+- js 변수의 유효범위
+- 브라우저별 HTTP 요청 숫자의 제약(크로스 브라우징)
+- 사용하지 않는 코드 관리(tree shaking..?)
+- dynamic loading & lazy loading 미지원
+
+### 주요 개념
+
+1. **Entry**
+
+   : webpack에서 웹 자원을 번들하기 위해 필요한 최초 진입점이자 js 파일의 경로
+
+   - entry 속성으로 지정된 js 파일에는 웹 어플리케이션에 대한 전반적인 구조와 내용이 담겨져 있어야 한다. 
+
+   - e.g. 사용하려는 모듈들 import 선언 
+
+     ```js
+     // example
+     import './assets/scss/index.scss';
+     import './assets/css/icon-font/icons.css';
+     import './assets/img/favicon.ico';
+     ```
+
+     
+
+2. **Output**
+
+   : 번들링 후의 결과물의 파일경로 의미
+
+   - 객체 형태로 옵션 설정
+   - `filename`은 필수, 보통 `path`까지 작성
+
+3. **Loader**
+
+   :css, image와 같은 js가 아닌 파일들을 webpackd 이 인식할 수 있도록 추가하는 속성
+
+   - 로더는 오른쪽에서 왼쪽순으로 적용
+
+   - 자주 사용되는 loader
+     - Css loader
+     - [Babel Loader](https://webpack.js.org/loaders/babel-loader/#root)
+     - [Sass Loader](https://webpack.js.org/loaders/sass-loader/#root)
+     - [File Loader](https://webpack.js.org/loaders/file-loader/#root)
+     - [Vue Loader](https://github.com/vuejs/vue-loader)
+     - [TS Loader](https://webpack.js.org/guides/typescript/#loader)
+
+4. **Plugin**
+
+   : webpack으로 변환한 파일에 추가적인 기능을 더하고 싶을 때 사용하는 속성
+
+   - 웹팩 번들링 과정 전반에 대한 제어권을 갖고 있음.
+
+   - 자주 쓰이는 plugrin
+
+     - HtmlWebpackPlugin
+
+     - [split-chunks-plugin](https://webpack.js.org/plugins/split-chunks-plugin/)
+
+     - [clean-webpack-plugin](https://www.npmjs.com/package/clean-webpack-plugin)
+
+     - [image-webpack-loader](https://github.com/tcoopman/image-webpack-loader)
+
+     - [webpack-bundle-analyzer-plugin](https://github.com/webpack-contrib/webpack-bundle-analyzer)
+
+     - CopyWebpackPlugin 
+
+       
+
+## 02. 환경
 
 아래 3가지 패키지 설치
 
@@ -76,6 +157,8 @@ plugins: [
 
 
 ## 02.정적 파일 연결
+
+> 정적 자원 static resource: image 등 동적으로 변경될 경우가 없는 자원들
 
 - copy-webpack-plugin
 

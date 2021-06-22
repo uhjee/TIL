@@ -592,7 +592,6 @@ console.log(toCamelCase(' ')('fuck the word'));
 ```
 
 
-
 ## 09-6. chance 패키지로 객체 만들기
 
 : 더미데이터를 만들어주는 라이브러리
@@ -602,3 +601,128 @@ TIL/libary/chance
 ```
 
 - 위 경로 확인
+=======
+## 09-7. 렌즈를 이용한 객체의 속성 다루기
+
+### 렌즈
+
+: 하스켈 언어의 Control.Lens 라이브러리 내용 중, js 에서 동작할 수 있는 getter, setter 기능만 람다 함수로 구현한 것
+
+속성 값을 얻구나 재할당하는 기능을 쉽게 할 수 있다.
+
+> 1. R.lens 함수로 객체의 특정 속성에 대한 렌즈를 만든다
+> 2. 렌즈를 R.view 함수에 적용해 속성값을 얻는다.
+> 3. 렌즈를 R.set 함수에 적용해 속성값이 바뀐 새로운 객체를 얻는다.
+> 4. 렌즈와 속성값을 바꾸는 함수를 R.over 함수에 적용해 값이 바뀐 새로운 객체를 얻는다.
+
+### R.prop
+
+: 객체의 속성값을 가져오는 함수; getter
+
+### R.assoc
+
+: 객체의 속성값 세팅하는 함수; setter
+
+### R.lens
+
+: 렌즈 기능 사용을 위해 렌즈 생성
+
+```typescript
+export const makeLens = (propName: string) => R.lens(R.prop(propName), R.assoc(propName))
+```
+
+### R.view, R.set, R.over
+
+다음과 같은 getter, setter, 함수를 사용한 setter 생성
+
+```typescript
+import * as R from 'ramda'
+
+export const makeLens = (propName: string) => 
+R.lens(R.prop(propName), R.assoc(propName))
+
+export const getter = (lens) => R.view(lens)
+export const setter = (lens) => <T>(newValue: T) => R.set(lens, newValue)
+export const setterUsingFunc = (lens) => <T,R>(func: (T) =>R) => R.over(lens, func)
+```
+
+
+
+사용 예제
+
+- 직접 속성에 접근하는 일이 렌즈를 생성할 때 한번뿐이므로, 사이드 이펙트를 일으키지 않는 장점 
+
+```typescript
+import * as R from 'ramda'
+import { makeLens, getter, setter, setterUsingFunc } from './lens'
+import { IPerson, makeRandomIPerson } from '../model/person'
+
+const nameLens = makeLens('name') // 속성으로 렌즈 생성
+const getName = getter(nameLens)
+const setName = setter(nameLens)
+const setNameUsingFunc = setterUsingFunc(nameLens)
+
+const person: IPerson = makeRandomIPerson()
+
+const name = getName(person)
+// console.log(name);
+const newPerson = setName('jeehun jung')(person)
+// console.log(newPerson);
+const anotherPerson = setNameUsingFunc(name => `Mr. ${name}`)(person)
+// console.log(anotherPerson);
+const capitalPerson = setNameUsingFunc( R.toUpper)(person)
+// console.log(capitalPerson);
+```
+
+
+
+### R.lensPath
+
+```typescript
+{
+  name: 'AUSTIN GILL',
+  age: 65,
+  title: 'Service Manager',
+  location: {
+    country: 'LK',
+    city: 'Sipijnov',
+    address: '954 Cadis Road',
+    coordinates: { latitude: 5.77025, longitude: -160.10787 }
+  }
+}
+```
+
+- 위와 같은 코드에서 내부의 `longitude` 속성에 접근하기 위해서는 다음과 같이 작성해야 한다.
+
+  ```typescript
+  person.location.coordinates.longitude
+  ```
+
+- 위아 같은 경로(path)의 속성을 렌즈로 만들면 다음과 같다
+
+  ```typescript
+  렌즈 = R.lensPath(['location', 'coordinates', 'longitude'])
+  ```
+
+사용
+
+```typescript
+import * as R from 'ramda'
+import { makeLens, getter, setter, setterUsingFunc } from './lens'
+import { IPerson, makeRandomIPerson } from '../model/person'
+
+const longitudeLens = R.lensPath(['location', 'coordinates', 'longitude']) // lensPath 생성
+
+const getLongitude = getter(longitudeLens)
+const setLongitude = setter(longitudeLens)
+const setLongitudeUsingFunc = setterUsingFunc(longitudeLens)
+
+const person: IPerson = makeRandomIPerson()
+
+const longitude = getLongitude(person)
+console.log(longitude);
+const newPerson = setLongitude(0.1234567)(person)
+console.log(newPerson);
+const anotherPerson = setLongitudeUsingFunc(R.add(0.123456))(person)
+console.log(anotherPerson);
+```
