@@ -198,14 +198,27 @@ plugins: [
 
 ### loader
 
-: 번들링하기 전에 어떠한 조건에 해당하는 소스들을 bundler가 각각 어떻게 처리하면서 읽을 것인지 작성
+: 번들링하기 전에 어떠한 조건에 해당하는 모듈들을 bundler가 각각 어떻게 처리하면서 읽을 것인지 작성
 
 ```sh
 npm i -D css-loader style-loader
 ```
 
-	- css-loader: js에서 css를 읽을 수 있도록 
-	- style-loader: js에서 읽은 css를 실제 html의 style 태그에 적용하도록
+### 자주 사용 되는 loaders
+
+- css-loader: js에서 css를 읽을 수 있도록 
+
+- style-loader: js에서 읽은 css를 실제 html의 style 태그에 적용하도록
+
+- file-loader: 파일을 로딩하는 loader. 실제 사용되는 파일만 복사
+
+  css 내부의 url(bg.svg) 와 같이 파일을 불러올 때 사용
+
+- url-loader: 아이콘과 같이 용량이 작거나, 반복해서 사용하지 않는 이미지들은 Data URI Scheme를 적용하기 위해 url-loader 사용
+
+  limit 을 정해두어  사용
+
+
 
 - webpack.config.js
 
