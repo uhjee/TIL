@@ -1038,3 +1038,22 @@ displayPersons('by name ')(nameSortedPersons)
 displayPersons('by age ')(ageSortedPersons)
 ```
 
+---
+
+## 09-10. 조합논리 이해하기
+
+### 조합자 Combinator
+
+조합 논리학은 조합자라는 특별한 형태의 고차함수를 결합해 새로운 조합자를 만들어 낸다. 대다수의 함수형 라이브러리들은 조합 논리로 개발된 몇 가지 유용한 조합자들을 제공
+
+| 조합자 이름 | 의미         | 람다 함수 이름 |
+| ----------- | ------------ | -------------- |
+| I           | identity     | R.identity     |
+| K           | constant     | R.always       |
+| T           | thrush       | R.applyTo      |
+| W           | duplication  | R.unnest       |
+| C           | flip         | R.filp         |
+| S           | substitution | R.ap           |
+
+
+
