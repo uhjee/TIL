@@ -921,3 +921,120 @@ const flattenArray = R.flatten(array)
 console.log(flattenArray) // [ 1, 1, 1, 2,  2, 1, 2, 2]
 ```
 
+### R.unnest
+
+: flatten과 다르게 한 depth 만 벗겨낸다.
+
+```typescript
+import * as R from 'ramda'
+
+const array = R.range(1, 3 + 1).map((x: number) => {
+  return R.range(1, 2 + 1).map((y: number) => {
+    return [x, y]
+  })
+})
+
+console.log(array)
+// [  [ [ 1, 1 ], [ 1, 2 ] ],  [ [ 2, 1 ], [ 2, 2 ] ],  [ [ 3, 1 ], [ 3, 2 ] ]]
+// 한번 
+const unnestArray1 = R.unnest(array)
+console.log(unnestArray1)
+//[ [ 1, 1 ], [ 1, 2 ], [ 2, 1 ], [ 2, 2 ], [ 3, 1 ], [ 3, 2 ] ]
+
+// 한번더 
+const unnestArray2 = R.unnest(unnestArray1)
+console.log(unnestArray2)
+// [1, 1, 1, 2, 2, 1, 2, 2, 3, 1, 3, 2]
+```
+
+### R.sort
+
+```typescript
+정렬된배열 = R.sort(콜백함수)(배열)
+```
+
+- 첫 번째 매개변수로 콜백함수(comparator)를 받는 2차 고차 함수
+
+- number[] 라면, 오름차순, 내림차순으로 정렬 가능
+
+- 콜백함수(comparator)는 다음처럼 구현해야 한다
+
+  ```typescript
+  // 음수값이면 오름차순, 0, 양수값이면 내림차순
+  (a: number, b: number): number => a -b
+  ```
+
+```typescript
+import * as R from 'ramda'
+
+type voidToNumberFunc = () => number
+
+const makeRandomNumber =
+  (max: number): voidToNumberFunc =>
+  (): number =>
+    Math.floor(Math.random() * max)
+
+const array = R.range(1, 5 + 1).map(makeRandomNumber(100))
+
+//오름차순
+const asc = (a: number, b: number): number => a - b
+const desc = (a: number, b: number): number => a + b
+
+const ascArray = R.sort(asc)(array)
+const descArray = R.sort(desc)(array)
+
+console.log(array); //[ 84, 0, 13, 76, 28 ]
+console.log(ascArray, descArray);
+// [ 0, 13, 28, 76, 84 ] [ 84, 0, 13, 76, 28 ]
+```
+
+### R.sortBy
+
+: 객체의 배열인 경우, 객체의 특정 prop에 따라 정렬
+
+⚠항상 오름차순으로만 정렬
+
+```typescript
+정렬된 배열 = R.sortBy(객체의 속성을 얻는 함수)(배열)
+```
+
+```typescript
+import * as R from 'ramda'
+import { IPerson, makeRandomIPerson } from '../model/person'
+
+const displayPersons = (prefix: string) =>
+  R.pipe(
+    R.map((person: IPerson) => ({ name: person.name, age: person.age })),
+    R.tap((o) => console.log(prefix, o)),
+  ) as any
+
+const persons: IPerson[] = R.range(1, 4 + 1).map(makeRandomIPerson)
+
+const nameSortedPersons = R.sortBy(R.prop('name'))(persons)
+const ageSortedPersons = R.sortBy(R.prop('age'))(persons)
+
+displayPersons('by name')(nameSortedPersons)
+displayPersons('by age')(ageSortedPersons)
+```
+
+### R.sortWith
+
+ sortBy는 항상 오름차순이기 때문에, 내림차순, 오름차순 구분지어 정렬할 필요가 있을 때는 sortWth 사용
+
+- `R.ascend`, `R.descend` 로 comparator를 감싸서 사용
+
+```typescript
+import * as R from 'ramda'
+import { IPerson, makeRandomIPerson } from '../model/person'
+import { displayPersons } from '../model/person/displayPerson'
+
+const persons: IPerson[] = R.range(1, 4 + 1).map(makeRandomIPerson)
+// R.sortWith, R.descend 사용
+const nameSortedPersons = R.sortWith([R.descend(R.prop('name'))])(persons)
+// R.sortWith,, R.ascend 사용
+const ageSortedPersons = R.sortWith([R.ascend(R.prop('age'))])(persons)
+
+displayPersons('by name ')(nameSortedPersons)
+displayPersons('by age ')(ageSortedPersons)
+```
+

@@ -31,7 +31,7 @@
   console.log(isEmpty({})) // true
   console.log(isEmpty([])) // true
   
-  console.log(isEmpty(0)) // true
+  console.log(isEmpty(0)) // true  ** 주의
   console.log(isEmpty(9)) // true
   console.log(isEmpty(true)) // true
   console.log(isEmpty(null)) // true
