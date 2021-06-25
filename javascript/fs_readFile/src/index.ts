@@ -1,22 +1,15 @@
+import path from 'path'
 import { exportFile, readFilePromise } from './file'
-import { getDate, getTotalTime } from './util'
-
-const path: string = `./files`
+import { getDate, getTotalTime, countGroupByError } from './util'
 
 const regexErrorMessage: RegExp = /\s{2}\?\?\s+http[\w\[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]+(google|eslint)[\w\[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]+/gi
 const regexErrorFile: RegExp = /src[\w\[\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"]+(vue|js|json)/gim
 
-const countGroupByError = (array: any[]): any[] => {
-  const result = {}
-  for (let item of array) {
-    result[item] = result[item] !== undefined ? result[item] + 1 : 1
-  }
-  return Object.entries(result)
-  // return Object.keys(result)
-  // return Object.values(result)
-}
+const fileToRead = './dev_log.txt'
+const pathToExport = './files'
 
-readFilePromise('./dev_log.txt')
+
+readFilePromise(fileToRead)
   .then((content) => {
     if (content === null && content === undefined) {
       console.log('content is undefined')
@@ -35,8 +28,9 @@ readFilePromise('./dev_log.txt')
     const totalTime = getTotalTime(content)
     const printProp = { totalTime, totalCount }
 
-    exportFile(`${path}/errors_count${getDate()}.txt`, groupErrors, 'array', printProp)
-    exportFile(`${path}/files${getDate()}.txt`, files, 'value', printProp)
+
+    exportFile(`${pathToExport}/errors_count__${getDate()}.txt`, groupErrors, 'array', printProp)
+    exportFile(`${pathToExport}/files__${getDate()}.txt`, files, 'value', printProp)
 
     console.log('  - total build time: ', totalTime)
     console.log('  - total errors count: ', totalCount)
@@ -48,3 +42,4 @@ readFilePromise('./dev_log.txt')
   .catch((err) => {
     console.log(err)
   })
+

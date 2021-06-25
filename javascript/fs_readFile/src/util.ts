@@ -1,8 +1,8 @@
 const regexTotalTime: RegExp = /general output[\w\,\.\s]+$/gim
 
-export const getDate = (): number => {
+export const getDate = (): string => {
   const today = new Date()
-  return today.getTime()
+  return `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}__${today.getHours()}_${today.getMinutes()}`
 }
 
 export const getTotalTime = (content: string): string => {
@@ -14,4 +14,14 @@ export const getTotalTime = (content: string): string => {
 
   // console.log(parsedTotalTimeArr.slice(4).join(' '))
   return parsedTotalTimeArr.slice(4).join(' ')
+}
+
+export const countGroupByError = (array: any[]): any[] => {
+  const result = {}
+  for (let item of array) {
+    result[item] = result[item] !== undefined ? result[item] + 1 : 1
+  }
+  return Object.entries(result)
+  // return Object.keys(result)
+  // return Object.values(result)
 }
