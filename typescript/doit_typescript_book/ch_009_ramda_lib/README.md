@@ -879,3 +879,45 @@ const newPerson = R.mergeDeepRight(person, { newLocation1 });
 console.log(newPerson);
 ```
 
+
+
+---
+
+## 09-9 배열 다루기
+
+### R.prepend, R.append
+
+: 기존 배열의 앞 , 뒤에 새로운 아이템을 삽입한 새 배열을 만든다.
+
+**기존 배열에 영향을 주지 않고자 사용**
+
+```typescript
+import * as R from 'ramda'
+
+const array: number[] = [3, 4]
+const newArray = R.prepend(1)(array) // 가장 앞에 삽입
+console.log(newArray);
+
+
+const newArray1 = R.append(5)(array) // 가장 뒤에 삽입
+console.log(newArray1);
+```
+
+### R.flatten
+
+: depth가 깊은 배열을 depth 0의 배열로 변경
+
+```typescript
+import * as R from 'ramda'
+
+const array = R.range(1, 2 + 1).map((x: number) => {
+  return R.range(1, 2 + 1).map((y: number) => {
+    return [x, y]
+  })
+})
+
+console.log(array)
+const flattenArray = R.flatten(array)
+console.log(flattenArray) // [ 1, 1, 1, 2,  2, 1, 2, 2]
+```
+
