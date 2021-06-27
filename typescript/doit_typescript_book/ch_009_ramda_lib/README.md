@@ -1119,3 +1119,203 @@ R.pipe(
 
 
 
+### R.filp 
+
+: 2차 고차함수를 매개변수로 받고,  그 함수의 매개변수의 순서를 서로 바꾸어 준다.
+
+```typescript
+// 2차 고차함수를 매개변수로 받아, 매개변수의 순서를 바꿔준다.
+const flip = (cb) => (a) => (b) => cb(b)(a);
+```
+
+예제 - substract
+
+```typescript
+import * as R from 'ramda';
+
+// 2차 고차함수를 매개변수로 받아, 매개변수의 순서를 바꿔준다.
+const flip = (cb) => (a) => (b) => cb(b)(a);
+
+// subtract 순서 변경
+const reverseSub = flip(R.subtract);
+
+const newArr = R.pipe(
+  //
+  R.map(reverseSub(10)), // value - 10
+  R.tap((a) => console.log(a)),  // [ -9, -8, -7, -6, -5 ]
+)(R.range(1, 5 + 1));
+```
+
+
+
+### R.identity
+
+: 반드시 **함수**가 있어야 하는 곳에 위치할 때 위력을 발휘
+
+```typescript
+// 반드시 함수가 있어야 하는 곳에 위치할 때 위력을 발휘
+const identity = x => x;
+```
+
+예제 - flatMap의 콜백함수로 사용
+
+```typescript
+import * as R from 'ramda';
+
+// 반드시 함수가 있어야 하는 곳에 위치할 때 위력을 발휘
+const identity = x => x;
+
+const flatMap = f =>
+  R.pipe(
+    R.map(f),
+    R.flatten,
+  );
+
+const unnest = flatMap(R.identity); // 콜백으로 identity 전달
+
+const arr = [[1], [2, 3], [4]];
+R.pipe(
+  //
+  unnest,
+  R.tap(a => console.log(a)), // [ 1, 2, 3, 4 ]
+)(arr);
+```
+
+
+
+예제 - 5000원 이상이면 500원 할인, 아니면 그대로 반홚하는 로직
+
+```typescript
+// ! 5000원 이상일 경우 500원 할인
+
+type NumToNumFunc = (n: number) => number;
+
+// 2차 고차 함수
+const applyDiscount = (minimum: number, discount: number): NumToNumFunc =>
+  //
+  R.pipe(
+    //
+    R.ifElse(
+      R.flip(R.gte)(minimum),
+      R.flip(R.subtract)(discount), // if에 해당하는 return 값
+      R.identity, // else 에 해당하는 return 값
+    ),
+    R.tap(a => console.log(a)),
+  );
+
+const calcPrice = applyDiscount(5000, 500);
+
+const discountedPrice = calcPrice(6000); // 5500
+const notDiscountedPrice = calcPrice(4500); // 4500
+```
+
+
+
+### R.always
+
+: 두 개의 **고차 매개변수** 중 **첫 번째 것**을 반환한다.
+
+- K-조합자 라고 불리며, K는 독일어 Konstante(상수)
+
+```typescript
+import * as R from 'ramda';
+
+// ! always:  두 개의 고차 매개변수 중 첫 번째 것을 반환한다.
+const always = x => y => x;
+
+const flip = (cb: Function) => a => b => cb(b)(a); // flip 별도 구현
+
+const first =
+  <T>(a: T) =>
+  (b: T): T =>
+    always(a)(b); // a 반환
+
+const second =
+  <T>(a: T) =>
+  (b: T): T =>
+    flip(always)(a)(b); // b 반환
+
+console.log(
+  //
+  first(1)(2), // 1
+  second(1)(2), // 2
+);
+```
+
+
+
+> ⚠️ 단순히 값을 반환하는 함수를 1차 함수라고 하면, 1차 함수를 반환하면 2차 고차함수, 2차 함수를 반환하면 3차 고차 함수라고 표현함
+
+### R.applyTo
+
+: 첫 번째 고차 매개변수로 `value`을, 두 번째 고차 매개변수로 `콜백함수`를 받는다. 
+
+- 일반적인 순서`(콜백)(value)`와 반대
+
+```typescript
+import * as R from 'ramda';
+
+const T = value =>
+  R.pipe(
+    //
+    R.applyTo(value),
+    R.tap(value => console.log(value)),
+  );
+
+const value100 = T(100); // 2차 고차함수: 일반 함수를 반환
+
+const sameValue = value100(R.identity); // 100
+const add1Value = value100(R.inc); // 101
+```
+
+### R.ap
+
+: 콜백 함수들의 배열을 첫 번째 매개변수로, 배열을 두 번째 매개변수로 입력받는 2차 고차함수
+
+```typescript
+const ap = ([콜백 함수]) => 배열 => [콜백 함수](배열)
+```
+
+- **콜백함수가 한 개**일 때는 `R.map` 처럼 동작
+
+  ```typescript
+  import * as R from 'ramda';
+  
+  const callAndAppend = R.pipe(
+    R.ap([R.multiply(2)]), // 배열에 콜백이 한 개
+    R.tap(a => console.log(a)),
+  );
+  
+  const input = [1, 2, 3];
+  const result = callAndAppend(input); // [ 2, 4, 6 ]
+  ```
+
+- **콜백함수가 2개**일 때는 각각의 콜백함수의 결과(배열)을 통합해 하나의 배열로 반환
+
+  ```typescript
+  import * as R from 'ramda';
+  
+  const callAndAppend2 = R.pipe(
+    //
+    R.ap([R.multiply(2), R.add(10)]), // 배열에 콜백이 두 개
+    R.tap(a => console.log(a)),
+  );
+  const input = [1, 2, 3];
+  const result2 = callAndAppend2(input); // [ 2, 4, 6, 11, 12, 13 ]
+  ```
+
+예제 -  배열을 복제 후 하나로 통합
+
+```typescript
+// 예제 2
+const repeat = (N, cb) => R.range(1, N + 1).map(n => cb);
+
+const callAndAppend3 = R.pipe(
+  R.ap(repeat(3, R.identity)), // ! R.identity를 3번 반복
+ㅜ  R.tap(a => console.log(a)),
+);
+
+const input = [1, 2, 3];
+const result3 = callAndAppend3(input); // [  1, 2, 3, 1, 2,  3, 1, 2, 3]
+```
+
