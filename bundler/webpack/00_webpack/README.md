@@ -144,7 +144,7 @@ module.exports = {
 > npm i -D html-webpack-plugin 
 ```
 
-package.json
+webpack.config.js
 
 ```js
 ...
@@ -164,8 +164,14 @@ plugins: [
 
   : 특정 폴더를 복사해 번들링 결과물에 포함되도록
 
-  package.json
-
+  ```sh
+  npm i -D copy-webpack-plugin
+  ```
+  
+  
+  
+  webpack.config.js
+  
   ```js
     plugins: [
   		...
@@ -177,7 +183,7 @@ plugins: [
       ...
     ],
   ```
-
+  
   
 
 ## 03.Modules
