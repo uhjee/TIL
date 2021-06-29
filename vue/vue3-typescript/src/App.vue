@@ -1,47 +1,50 @@
 <template>
-  <div class="row">
-    <div class="col">
-      <div class="row">
-        <button @click="appendNum">appendNum</button>
-      </div>
-      <div class="row" v-for="(item, index) in arr" :key="item + index">{{ item }}</div>
-    </div>
-    <div class="col">
-      <div class="row">
-        <input v-model="message" @input="changeMessage($event.target.value)" type="text" />
-        <button @click="appendTodo">appendTodo</button>
-      </div>
-      <div class="row" v-for="(todo, index) in todoArr" :key="todo + index">{{ todo }}</div>
-    </div>
+  <nav class="title-bar">
+    <my-button @click="currentTabComponent = 'Setup'" :color="isCurrentTab('Setup')">
+      <template #text>
+        Setup
+      </template>
+    </my-button>
+    <my-button @click="currentTabComponent = 'List'" :color="isCurrentTab('List')">
+      <template #text>
+        Todo List
+      </template>
+    </my-button>
+    <my-button @click="currentTabComponent = 'Other'" :color="isCurrentTab('Other')">
+      <template #text>
+        Other
+      </template>
+    </my-button>
+  </nav>
+  <div class="container">
+    <component :is="currentTabComponent"> </component>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import Setup from './components/Setup.vue';
+import List from './components/List/index.vue';
+import Other from './components/Other.vue';
+
+import MyButton from './components/MyButton.vue';
 
 export default defineComponent({
   name: 'App',
-  components: {},
+  components: {
+    Setup,
+    Other,
+    MyButton,
+    List,
+  },
   data() {
     return {
-      message: '' as string,
-      arr: [0, 1] as number[],
-      todoArr: ['d', 'dsfa'] as string[],
-      lastNum: 0 as number,
+      currentTabComponent: 'Setup',
     };
   },
   methods: {
-    appendNum(): void {
-      this.arr.push((this.lastNum += 1));
-    },
-    appendTodo() {
-      if (this.message !== '') {
-        this.todoArr.push(this.message);
-        this.message = '';
-      }
-    },
-    changeMessage(value: string): void {
-      this.message = value.trim();
+    isCurrentTab(tabName: string): string {
+      return this.currentTabComponent === tabName ? 'red' : 'grey';
     },
   },
 });
@@ -53,10 +56,24 @@ export default defineComponent({
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
-  margin-top: 60px;
+  // margin: 60px 20px;
+
+  .title-bar {
+    padding: 10px 15px;
+    height: 40px;
+    border-bottom: 1px solid #777;
+    margin-bottom: 20px;
+  }
+
+  .container {
+    margin: 0 5px 20px 5px;
+    display: flex;
+    justify-content: center;
+  }
 
   .row {
     display: flex;
+    width: 100%;
     align-items: center;
 
     .col {
