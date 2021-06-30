@@ -1,19 +1,20 @@
 <template>
   <div class="box">
-    <item-box></item-box>
+    <item-box
+      @changeDoneFlag="changeDoneFlag"
+      :todo="todo"
+      v-for="(todo, i) in todoArr"
+      :key="`${todo}${i}`"
+    />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import * as C from 'chance';
-import * as R from 'ramda';
 import { TodoType } from '@/types/TodoType';
+import { makeTodoList } from '@/utils/TodoList';
+import { find } from 'lodash';
 import ItemBox from './ItemBox.vue';
-
-const c = new C.Chance();
-
-const COLORS = ['red', 'blue', 'grey', 'yellow', 'green'];
 
 export default defineComponent({
   name: 'List',
@@ -23,19 +24,30 @@ export default defineComponent({
   data() {
     return {
       todoArr: [] as TodoType[],
+      win: window,
+      doc: document.documentElement,
     };
   },
   mounted() {
-    this.todoArr = R.range(1, 10 + 1).map(() => this.makeTodo());
+    this.loadData();
+    window.addEventListener('scroll', this.appendData);
   },
   methods: {
-    makeTodo(): TodoType {
-      return {
-        color: COLORS[Math.floor(Math.random() * 10) % 5],
-        content: c.paragraph(),
-        date: ((d: Date) => `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`)(c.date()),
-        isDone: false,
-      } as TodoType;
+    loadData() {
+      this.todoArr = makeTodoList(10);
+    },
+    appendData(): void {
+      const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
+      if (scrollTop + clientHeight > scrollHeight - 5) {
+        const todoArr = [...this.todoArr];
+        const newTodoArr = makeTodoList(10);
+
+        this.todoArr = todoArr.concat(newTodoArr);
+      }
+    },
+    changeDoneFlag(todo: TodoType): void {
+      const foundTodo = find(this.todoArr, { id: todo.id }) as TodoType;
+      foundTodo.isDone = !foundTodo?.isDone;
     },
   },
 });
