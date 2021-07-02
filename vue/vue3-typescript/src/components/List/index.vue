@@ -10,7 +10,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import {
+  defineComponent, onMounted, ref, Ref,
+} from 'vue';
 import { TodoType } from '@/types/TodoType';
 import { makeTodoList } from '@/utils/TodoList';
 import { find } from 'lodash';
@@ -21,34 +23,39 @@ export default defineComponent({
   components: {
     ItemBox,
   },
-  data() {
-    return {
-      todoArr: [] as TodoType[],
-      win: window,
-      doc: document.documentElement,
+  setup() {
+    const todoArr: Ref<TodoType[]> = ref([]);
+
+    const loadData = (): void => {
+      todoArr.value = makeTodoList(10);
     };
-  },
-  mounted() {
-    this.loadData();
-    window.addEventListener('scroll', this.appendData);
-  },
-  methods: {
-    loadData() {
-      this.todoArr = makeTodoList(10);
-    },
-    appendData(): void {
+
+    const appendData = (): void => {
       const { scrollHeight, scrollTop, clientHeight } = document.documentElement;
       if (scrollTop + clientHeight > scrollHeight - 5) {
-        const todoArr = [...this.todoArr];
+        const copiedTodoArr = [...todoArr.value];
         const newTodoArr = makeTodoList(10);
 
-        this.todoArr = todoArr.concat(newTodoArr);
+        todoArr.value = copiedTodoArr.concat(newTodoArr);
       }
-    },
-    changeDoneFlag(todo: TodoType): void {
-      const foundTodo = find(this.todoArr, { id: todo.id }) as TodoType;
+    };
+
+    const changeDoneFlag = (todo: TodoType) => {
+      const foundTodo = find(todoArr.value, { id: todo.id }) as TodoType;
       foundTodo.isDone = !foundTodo?.isDone;
-    },
+    };
+
+    onMounted(() => {
+      loadData();
+      window.addEventListener('scroll', appendData);
+    });
+
+    return {
+      todoArr,
+      loadData,
+      appendData,
+      changeDoneFlag,
+    };
   },
 });
 </script>
