@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, watch } from 'vue';
 import CircleBtn from './components/CircleBtn.vue';
 
 export default defineComponent({
@@ -33,6 +33,7 @@ export default defineComponent({
         isDone: !props?.todo?.isDone,
       });
     };
+
     return {
       changeDoneFlag,
     };

@@ -24,3 +24,30 @@
   background: DarkGreen;
   box-shadow: 0 0 1px rgba(0, 100, 0, 0.25);
   color: #fff; }
+
+.grand {
+  background-color: #888;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 500px;
+  width: 800px; }
+  .grand .parent {
+    background-color: #666;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 450px;
+    width: 500px;
+    flex-direction: column; }
+    .grand .parent > * {
+      background-color: #888;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+      width: 100px;
+      margin-top: 20px;
+      margin-right: 3px;
+      margin-bottom: 20px;
+      margin-left: 3px; }

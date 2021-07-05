@@ -139,6 +139,16 @@ _mixin.scss 생성
   box-shadow: 0 0 1px rgba($theme, 0.25);
   color: #fff;
 }
+
+@mixin center-box($width: 100px, $height: 100px, $color: $color--grey) {
+  background-color: $color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: $height;
+  width: $width;
+}
 ```
 
 main.scss
@@ -159,4 +169,28 @@ main.scss
   // 파라미터처럼 전달
   @include theme($theme: DarkGreen);
 }
+
+.grand {
+  @include center-box(800px, 500px);
+
+  .parent {
+    @include center-box($color: #666); // 파라미터명 명시
+
+    flex-direction: column;
+
+    & > * {
+      @include center-box();
+
+      margin: {
+        top: 20px;
+        right: 3px;
+        bottom: 20px;
+        left: 3px;
+      }
+    }
+  }
+}
 ```
+
+- 
+
