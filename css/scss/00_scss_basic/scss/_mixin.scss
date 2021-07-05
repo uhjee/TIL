@@ -5,3 +5,14 @@
   box-shadow: 0 0 1px rgba($theme, 0.25);
   color: #fff;
 }
+
+@mixin center-box($width: 100px, $height: 100px, $color: $color--grey) {
+  background-color: $color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  height: $height;
+  width: $width;
+}
+

@@ -1,6 +1,8 @@
 @import 'variables';
 @import '_mixin';
 
+// -------------------------variable
+
 .test-wrapper {
   background-color: $color--black;
   display: flex;
@@ -17,6 +19,8 @@
   }
 }
 
+// ---------------------------mixin
+
 .info {
   @include theme;
 }
@@ -25,4 +29,25 @@
 }
 .success {
   @include theme($theme: DarkGreen);
+}
+
+.grand {
+  @include center-box(800px, 500px);
+
+  .parent {
+    @include center-box(500px, 450px, #666); // 파라미터명 명시
+
+    flex-direction: column;
+
+    & > * {
+      @include center-box();
+
+      margin: {
+        top: 20px;
+        right: 3px;
+        bottom: 20px;
+        left: 3px;
+      }
+    }
+  }
 }
