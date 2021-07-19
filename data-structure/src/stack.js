@@ -29,7 +29,7 @@ class Stack {
   }
 
   print() {
-    return this.items.toString();
+    console.log(this.items.toString());
   }
 }
 
@@ -49,7 +49,6 @@ stack2.push('girl');
 console.log(stack2.isEmpty());
 
 stack2.push('boy');
-console.log(stack2.print());
 console.log(stack2.size());
 
 stack2.clear();
