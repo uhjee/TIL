@@ -2,7 +2,7 @@ const LinkedList = require('./src/linkedList');
 const DoublyLinkedList = require('./src/doublyLinkedList');
 const Set = require('./src/set');
 const Dictionary = require('./src/dictionary');
-const HashTable = require('./src/hashTable');
+const { HashTable, HashTableChaining, HashTableLinearProbing } = require('./src/hashTable');
 
 // ! Linked List
 
@@ -87,7 +87,24 @@ const dic = new Dictionary();
 const hashtable = new HashTable();
 
 hashtable.put('A1', ' a111');
-hashtable.put('happy', ' happt');
+hashtable.put('Paul', ' happt');
+hashtable.put('Mindy', ' happt');
 console.log(hashtable.get('A1'));
 console.log(hashtable.remove('A1'));
 console.log(hashtable.get('A1'));
+
+// chaining
+const hashtableChaining = new HashTableChaining();
+
+hashtableChaining.put('A1', ' a111');
+hashtableChaining.put('Paul', ' happt');
+hashtableChaining.put('Mindy', ' happt');
+console.log(hashtableChaining.get('A1'));
+console.log(hashtableChaining.remove('A1'));
+console.log(hashtableChaining.get('A1'));
+
+const hashTableLinearProbing = new HashTableLinearProbing();
+
+hashTableLinearProbing.put('Paul', 'happy1');
+hashTableLinearProbing.put('Mindy', 'happy2');
+console.log(hashTableLinearProbing.get('Paul'));
