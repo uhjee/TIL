@@ -132,6 +132,21 @@ tree.insert(18);
 tree.insert(25);
 tree.insert(6);
 
-tree.inOrderTraverse((value) => {
-  console.log(value);
-});
+// 중위 순회
+// tree.inOrderTraverse((value) => {
+//   console.log(value);
+// });
+
+// 전위 순회
+// tree.preOrderTraverse((value) => {
+//   console.log(value);
+// });
+
+// tree.postOrderTraverse(value => {
+//   console.log(value);
+// });
+
+// const result = tree.max();
+const result = tree.remove(7);
+
+console.log(result);
