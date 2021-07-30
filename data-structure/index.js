@@ -2,7 +2,12 @@ const LinkedList = require('./src/linkedList');
 const DoublyLinkedList = require('./src/doublyLinkedList');
 const Set = require('./src/set');
 const Dictionary = require('./src/dictionary');
-const { HashTable, HashTableChaining, HashTableLinearProbing } = require('./src/hashTable');
+const {
+  HashTable,
+  HashTableChaining,
+  HashTableLinearProbing,
+} = require('./src/hashTable');
+const BinarySearchTree = require('./src/binaryTree');
 
 // ! Linked List
 
@@ -86,25 +91,47 @@ const dic = new Dictionary();
 // ! Hash Table
 const hashtable = new HashTable();
 
-hashtable.put('A1', ' a111');
-hashtable.put('Paul', ' happt');
-hashtable.put('Mindy', ' happt');
-console.log(hashtable.get('A1'));
-console.log(hashtable.remove('A1'));
-console.log(hashtable.get('A1'));
+// hashtable.put('A1', ' a111');
+// hashtable.put('Paul', ' happt');
+// hashtable.put('Mindy', ' happt');
+// console.log(hashtable.get('A1'));
+// console.log(hashtable.remove('A1'));
+// console.log(hashtable.get('A1'));
 
-// chaining
+// // chaining
 const hashtableChaining = new HashTableChaining();
 
-hashtableChaining.put('A1', ' a111');
-hashtableChaining.put('Paul', ' happt');
-hashtableChaining.put('Mindy', ' happt');
-console.log(hashtableChaining.get('A1'));
-console.log(hashtableChaining.remove('A1'));
-console.log(hashtableChaining.get('A1'));
+// hashtableChaining.put('A1', ' a111');
+// hashtableChaining.put('Paul', ' happt');
+// hashtableChaining.put('Mindy', ' happt');
+// console.log(hashtableChaining.get('A1'));
+// console.log(hashtableChaining.remove('A1'));
+// console.log(hashtableChaining.get('A1'));
 
 const hashTableLinearProbing = new HashTableLinearProbing();
 
-hashTableLinearProbing.put('Paul', 'happy1');
-hashTableLinearProbing.put('Mindy', 'happy2');
-console.log(hashTableLinearProbing.get('Paul'));
+// hashTableLinearProbing.put('Paul', 'happy1');
+// hashTableLinearProbing.put('Mindy', 'happy2');
+// console.log(hashTableLinearProbing.get('Paul'));
+
+// ! Binary Search Tree
+const tree = new BinarySearchTree();
+tree.insert(11);
+tree.insert(7);
+tree.insert(15);
+tree.insert(5);
+tree.insert(3);
+tree.insert(9);
+tree.insert(8);
+tree.insert(10);
+tree.insert(13);
+tree.insert(12);
+tree.insert(14);
+tree.insert(20);
+tree.insert(18);
+tree.insert(25);
+tree.insert(6);
+
+tree.inOrderTraverse((value) => {
+  console.log(value);
+});
