@@ -30,13 +30,13 @@ class Queue {
   }
 }
 
-const q1 = new Queue();
-q1.enqueue(1);
-q1.enqueue(2);
-q1.enqueue(3);
-q1.print();
-q1.dequeue();
-console.log(q1.front());
+// const q1 = new Queue();
+// q1.enqueue(1);
+// q1.enqueue(2);
+// q1.enqueue(3);
+// q1.print();
+// q1.dequeue();
+// console.log(q1.front());
 
 class QueueElement {
   constructor(element, priority) {
@@ -95,34 +95,36 @@ class PriorityQueue {
   }
 }
 
-const pQ = new PriorityQueue();
+// const pQ = new PriorityQueue();
 
-pQ.enqueue('a', 1);
-pQ.enqueue('b', 1);
-pQ.enqueue('c', 2);
-pQ.enqueue('d', 3);
-pQ.enqueue('a1', 1);
-pQ.print();
+// pQ.enqueue('a', 1);
+// pQ.enqueue('b', 1);
+// pQ.enqueue('c', 2);
+// pQ.enqueue('d', 3);
+// pQ.enqueue('a1', 1);
+// pQ.print();
 
 // ! 환형큐 (뜨거운 감자 게임)
-const hotPotato = (nameList, num) => {
-  const q = new Queue();
+// const hotPotato = (nameList, num) => {
+//   const q = new Queue();
 
-  for (let i = 0; i < nameList.length; i++) {
-    q.enqueue(nameList[i]);
-  }
+//   for (let i = 0; i < nameList.length; i++) {
+//     q.enqueue(nameList[i]);
+//   }
 
-  let eliminated = '';
-  while (q.size() > 1) {
-    for (let i = 0; i < num; i++) {
-      q.enqueue(q.dequeue()); // 환형 구성
-    }
-    eliminated = q.dequeue();
-    console.log(`${eliminated}를 퇴장시킵니다.`);
-  }
-  return q.dequeue();
-};
+//   let eliminated = '';
+//   while (q.size() > 1) {
+//     for (let i = 0; i < num; i++) {
+//       q.enqueue(q.dequeue()); // 환형 구성
+//     }
+//     eliminated = q.dequeue();
+//     console.log(`${eliminated}를 퇴장시킵니다.`);
+//   }
+//   return q.dequeue();
+// };
 
-const names = ['A', 'B', 'C', 'D', 'E'];
-const winner = hotPotato(names, 7);
-console.log(winner);
+// const names = ['A', 'B', 'C', 'D', 'E'];
+// const winner = hotPotato(names, 7);
+// console.log(winner);
+
+module.exports = { Queue, PriorityQueue };

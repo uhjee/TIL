@@ -8,6 +8,7 @@ const {
   HashTableLinearProbing,
 } = require('./src/hashTable');
 const BinarySearchTree = require('./src/binaryTree');
+const Graph = require('./src/graph');
 
 // ! Linked List
 
@@ -116,21 +117,21 @@ const hashTableLinearProbing = new HashTableLinearProbing();
 
 // ! Binary Search Tree
 const tree = new BinarySearchTree();
-tree.insert(11);
-tree.insert(7);
-tree.insert(15);
-tree.insert(5);
-tree.insert(3);
-tree.insert(9);
-tree.insert(8);
-tree.insert(10);
-tree.insert(13);
-tree.insert(12);
-tree.insert(14);
-tree.insert(20);
-tree.insert(18);
-tree.insert(25);
-tree.insert(6);
+// tree.insert(11);
+// tree.insert(7);
+// tree.insert(15);
+// tree.insert(5);
+// tree.insert(3);
+// tree.insert(9);
+// tree.insert(8);
+// tree.insert(10);
+// tree.insert(13);
+// tree.insert(12);
+// tree.insert(14);
+// tree.insert(20);
+// tree.insert(18);
+// tree.insert(25);
+// tree.insert(6);
 
 // 중위 순회
 // tree.inOrderTraverse((value) => {
@@ -147,6 +148,29 @@ tree.insert(6);
 // });
 
 // const result = tree.max();
-const result = tree.remove(7);
+// const result = tree.remove(7);
 
-console.log(result);
+// console.log(result);
+
+const graph = new Graph();
+['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].forEach(i => {
+  graph.addVertex(i);
+});
+
+graph.addEdge('A', 'B');
+graph.addEdge('A', 'C');
+graph.addEdge('A', 'D');
+graph.addEdge('C', 'D');
+graph.addEdge('C', 'G');
+graph.addEdge('D', 'G');
+graph.addEdge('D', 'H');
+graph.addEdge('B', 'E');
+graph.addEdge('B', 'F');
+graph.addEdge('E', 'I');
+
+// console.log(graph.toString());
+// graph.bfs();
+
+graph.bfs('A', v => {
+  console.log(`탐색한 정점: ${v}`);
+});
