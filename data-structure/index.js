@@ -9,6 +9,7 @@ const {
 } = require('./src/hashTable');
 const BinarySearchTree = require('./src/binaryTree');
 const Graph = require('./src/graph');
+const { ArrayList } = require('./src/sorting/bubble');
 
 // ! Linked List
 
@@ -152,51 +153,71 @@ const tree = new BinarySearchTree();
 
 // console.log(result);
 
+// ! Graph
+
 const graph = new Graph();
-['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].forEach(i => {
-  graph.addVertex(i);
-});
-
-graph.addEdge('A', 'B');
-graph.addEdge('A', 'C');
-graph.addEdge('A', 'D');
-graph.addEdge('C', 'D');
-graph.addEdge('C', 'G');
-graph.addEdge('D', 'G');
-graph.addEdge('D', 'H');
-graph.addEdge('B', 'E');
-graph.addEdge('B', 'F');
-graph.addEdge('E', 'I');
-
-// console.log(graph.toString());
-// graph.bfs();
-
-// graph.bfs('A', v => {
-//   console.log(`탐색한 정점: ${v}`);
-// });
-// const shortedPathA = graph.bfs('A');
-// console.log(shortedPathA);
-
-// graph.dfs(v => {
-//   console.log(`탐색한 정점: ${v}`);
+// ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'].forEach(i => {
+//   graph.addVertex(i);
 // });
 
-// const result = graph.DFS();
+// graph.addEdge('A', 'B');
+// graph.addEdge('A', 'C');
+// graph.addEdge('A', 'D');
+// graph.addEdge('C', 'D');
+// graph.addEdge('C', 'G');
+// graph.addEdge('D', 'G');
+// graph.addEdge('D', 'H');
+// graph.addEdge('B', 'E');
+// graph.addEdge('B', 'F');
+// graph.addEdge('E', 'I');
+
+// // console.log(graph.toString());
+// // graph.bfs();
+
+// // graph.bfs('A', v => {
+// //   console.log(`탐색한 정점: ${v}`);
+// // });
+// // const shortedPathA = graph.bfs('A');
+// // console.log(shortedPathA);
+
+// // graph.dfs(v => {
+// //   console.log(`탐색한 정점: ${v}`);
+// // });
+
+// // const result = graph.DFS();
+// // console.log(result);
+
+// const graph1 = new Graph();
+// const myVertices = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+// myVertices.forEach(i => {
+//   graph1.addVertex(i);
+// });
+
+// graph1.addEdge('A', 'C');
+// graph1.addEdge('A', 'D');
+// graph1.addEdge('B', 'D');
+// graph1.addEdge('B', 'E');
+// graph1.addEdge('C', 'F');
+// graph1.addEdge('F', 'E');
+
+// const result = graph1.DFS();
 // console.log(result);
 
-const graph1 = new Graph();
-const myVertices = ['A', 'B', 'C', 'D', 'E', 'F'];
+// ! sort ! =========================================================
 
-myVertices.forEach(i => {
-  graph1.addVertex(i);
-});
+// ! bubble sort
+const createNodeArray = size => {
+  const array = new ArrayList();
+  for (let i = 0; i < size; i++) {
+    array.insert(Math.floor(Math.random() * 10));
+  }
+  return array;
+};
 
-graph1.addEdge('A', 'C');
-graph1.addEdge('A', 'D');
-graph1.addEdge('B', 'D');
-graph1.addEdge('B', 'E');
-graph1.addEdge('C', 'F');
-graph1.addEdge('F', 'E');
-
-const result = graph1.DFS();
-console.log(result);
+const arr = createNodeArray(10);
+console.log(arr.toString());
+// arr.bubbleSort()
+// arr.selectionSort();
+arr.mergeSort();
+console.log(arr.toString());
