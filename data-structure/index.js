@@ -171,6 +171,32 @@ graph.addEdge('E', 'I');
 // console.log(graph.toString());
 // graph.bfs();
 
-graph.bfs('A', v => {
-  console.log(`탐색한 정점: ${v}`);
+// graph.bfs('A', v => {
+//   console.log(`탐색한 정점: ${v}`);
+// });
+// const shortedPathA = graph.bfs('A');
+// console.log(shortedPathA);
+
+// graph.dfs(v => {
+//   console.log(`탐색한 정점: ${v}`);
+// });
+
+// const result = graph.DFS();
+// console.log(result);
+
+const graph1 = new Graph();
+const myVertices = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+myVertices.forEach(i => {
+  graph1.addVertex(i);
 });
+
+graph1.addEdge('A', 'C');
+graph1.addEdge('A', 'D');
+graph1.addEdge('B', 'D');
+graph1.addEdge('B', 'E');
+graph1.addEdge('C', 'F');
+graph1.addEdge('F', 'E');
+
+const result = graph1.DFS();
+console.log(result);
