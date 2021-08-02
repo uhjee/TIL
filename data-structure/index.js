@@ -207,7 +207,7 @@ const graph = new Graph();
 // ! sort ! =========================================================
 
 // ! bubble sort
-const createNodeArray = size => {
+const createNodeArray = (size) => {
   const array = new ArrayList();
   for (let i = 0; i < size; i++) {
     array.insert(Math.floor(Math.random() * 10));
@@ -219,5 +219,6 @@ const arr = createNodeArray(10);
 console.log(arr.toString());
 // arr.bubbleSort()
 // arr.selectionSort();
-arr.mergeSort();
+// arr.mergeSort();
+arr.quickSort();
 console.log(arr.toString());
