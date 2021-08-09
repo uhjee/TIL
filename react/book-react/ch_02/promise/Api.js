@@ -29,17 +29,43 @@ const checkKeyAPICall = key =>
   });
 
 // ! 01. 개별 API 호출
-// loginAPICall('jimny', 9999).then(response => {
-//   console.log(response);
-// });
+
+
+// loginAPICall('jimny', 99998).then(response => {
+  //   console.log(response);
+  // })
+//   .catch((error) => console.log(error));
+
+
 
 // checkKeyAPICall(10000).then(response => {
 //   console.log(response);
 // });
 
+//(번외) 1. async - await 
+async function callApi(id, pw) {
+  try {
+    const p = await loginAPICall(id, pw); // 프로미스 객체
+    console.log(p);
+  } catch (error) {
+    console.log(error);
+  }
+}
+callApi('jimny', 9999);
+
 // ! 02. then 으로 순차적으로 호출
 // loginAPICall('jimny', 9999)
 //   .then(checkKeyAPICall)
+//   .then(response => {
+//     console.log(response);
+//    // response 데이터로 할 일 하기
+//   })
+//   .catch(errorMessage => console.log(errorMessage));
+
+// loginAPICall('jimny', 9999)
+//   .then(response => {
+//     checkKeyAPICall(response);
+//   })
 //   .then(response => {
 //     console.log(response);
 //    // response 데이터로 할 일 하기
