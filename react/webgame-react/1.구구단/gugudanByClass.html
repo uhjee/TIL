@@ -1,0 +1,91 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>구구단</title>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@16/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      class GuGuDan extends React.Component {
+        state = {
+          first: Math.ceil(Math.random() * 9),
+          second: Math.ceil(Math.random() * 9),
+          value: '',
+          result: '',
+          resultValue: '',
+          color: '',
+        };
+
+        // this 가 꼬이지 않도록, 화살표 함수 사용
+        onSubmitHandler = e => {
+          e.preventDefault();
+          if (
+            parseInt(this.state.value) ===
+            this.state.first * this.state.second
+          ) {
+            this.setState({
+              result: '정답',
+              first: Math.ceil(Math.random() * 9),
+              second: Math.ceil(Math.random() * 9),
+              value: '',
+              resultValue: this.state.value,
+              color: 'royalBlue',
+            });
+          } else {
+            this.setState({
+              result: '땡',
+              value: '',
+              resultValue: this.state.value,
+              color: 'orange',
+            });
+          }
+        };
+
+        onChangeHandler = e => {
+          this.setState({ value: e.target.value });
+        };
+
+        render() {
+          return (
+            // 감싸주는 쓸데없는 div가 렌더링되지 않도록 Fragment 사용
+            <React.Fragment>
+              <div>
+                {this.state.first} 곱하기 {this.state.second} 는?
+              </div>
+              <form onSubmit={this.onSubmitHandler}>
+                <input
+                  type="number"
+                  value={this.state.value}
+                  onChange={this.onChangeHandler}
+                />
+                <button>입력</button>
+              </form>
+              <div style={{ backgroundColor: this.state.color }}>
+                {this.state.resultValue} {this.state.result}
+              </div>
+            </React.Fragment>
+          );
+        }
+      }
+    </script>
+    <script type="text/babel">
+      ReactDOM.render(
+        <div>
+          <GuGuDan />
+          <GuGuDan />
+          <GuGuDan />
+        </div>,
+        document.querySelector('#root'),
+      );
+    </script>
+  </body>
+</html>

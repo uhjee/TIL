@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>구구단</title>
+    <script
+      crossorigin
+      src="https://unpkg.com/react@16/umd/react.development.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      // 컴포넌트 함수
+      function GuGuDan() {
+        const randomNum = Math.ceil(Math.random() * 9);
+
+        // 상태값 정의
+        const [first, setFirst] = React.useState(randomNum);
+        const [second, setSecond] = React.useState(randomNum);
+        const [value, setValue] = React.useState('');
+        const [result, setResult] = React.useState('');
+
+        const onSubmitHandler = e => {
+          e.preventDefault();
+
+          if (parseInt(value, 10) === first * second) {
+            setResult('정답');
+            setFirst(randomNum);
+            setSecond(randomNum);
+            setValue('');
+          } else {
+            setResult('땡');
+            setValue('');
+          }
+        };
+
+        const onChangeHandler = e => {
+          console.log(e.target.value);
+          setValue(e.target.value);
+        };
+
+        return (
+          <React.Fragment>
+            <div>
+              {first} 곱하기 {second} 는?
+            </div>
+            <form onSubmit={onSubmitHandler}>
+              <input type="number" value={value} onChange={onChangeHandler} />
+              <button>입력</button>
+            </form>
+            <div>{result}</div>
+          </React.Fragment>
+        );
+      }
+    </script>
+    <script type="text/babel">
+      ReactDOM.render(
+        <div>
+          <GuGuDan />
+        </div>,
+        document.querySelector('#root'),
+      );
+    </script>
+  </body>
+</html>
