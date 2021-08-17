@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
-export default function Profile({ userId }) {
+// custom hook
+function useUser(userId) {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    getUserApi(userId).then(res => setUser(res.data));
+    getUserApi(userId).then((res) => setUser(res.data));
   }, [userId]); // 의존성 배열(배열의 요소가 변경되는 경우에만 부수효과 함수 호출)
+
+  return user;
+}
+
+export default function Profile({ userId }) {
+  // custom hook 사용
+  const user = useUser(userId);
 
   return (
     <div>
