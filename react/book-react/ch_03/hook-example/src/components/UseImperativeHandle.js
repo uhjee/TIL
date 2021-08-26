@@ -21,6 +21,7 @@ function Profile(props, ref) {
 // 부모 객체에서 직접 처리하기 위해 forwardRef 함수로 호출
 export default React.forwardRef(Profile);
 
+// ! 부모 컴포넌트에서 자식 컴포넌트 함수 호출하기
 function Parent() {
   const profileRef = React.useRef();
   const onClick = () => {
@@ -32,6 +33,7 @@ function Parent() {
 
   return (
     <div>
+      {/* 컴포넌트 속성으로 ref 객체 전달 */}
       <Profile ref={profileRef} />
       <button onClick={onClick}>add age 5</button>
     </div>
