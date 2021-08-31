@@ -108,3 +108,157 @@ function useWindowWidth() {
 ```
 
 - 컴포넌트 코드가 복잡하지 않은 경우에는 커스텀 훅이 오히려 가독성이 떨어질 수 있으니 주의한다.
+
+## 4.1.2 속성값 타입 정의하기: prop-types
+
+### prop-types
+
+속성값의 타입 정보를 정의할 때 사용하는 리액트 공식 패키지
+
+리액트가 렌더링하는 과정에서 잘못된 속성값 타입을 검사한 후, 콘솔에 에러 메세지 출력
+
+개발 모드에만 동작
+
+타입 정의 자체가 해당 컴포넌트에 대한 개발 문서가 될 수 있기 때문에 편리
+
+### 예시 코드
+
+```jsx
+User.propTypes = {
+	male: PropTypes.bool.isRequired,
+	age: PropTypes.number,
+	type: PropTypes.oneOf(["gold", "silver", "bronze"]),
+	onChangeName: PropTypes.func,
+	onChangeTitle: PropTypes.func.isRequired
+
+};
+```
+
+```jsx
+function User({ type, age, male, onChangeName, onChangeTitle }) {
+	function onClick1 () {
+		const msg = `type: ${type}, age: ${age ? age : '알수없음'}`;
+		log(msg, { color: type === 'gold' ? 'red' : 'black' })
+	}
+	
+	function onClick2 () {
+		if(onChangeName) {
+			onChangeName(name);
+		}
+		onChangeTitle(title);
+		male ? goMalePage() : goFemalePage();
+		// ...
+	}
+	// ...
+}
+```
+
+- 함수 자체의 매개변수와 반환값까지 정의할 수는 없다.
+
+### prop-types로 정의할 수 있는 타입
+
+1. 리액트 요소
+
+    PropTypes.element
+
+    ```jsx
+    MyComponent.protoTypes = {
+    	menu: ProtoTypes.element
+    	// <div>hello</div>  // 참
+    	// <ComeComponent />  // 참
+    	// 123 // 거짓
+    }
+    ```
+
+2. 컴포넌트 함수가 반환할 수 있는 모든 것
+
+    PropTypes.node
+
+    ```jsx
+    MyComponent.protoTypes = {
+    	description: ProtoTypes.node
+    	// number, string, array, element  // 참
+    	// <ComeComponent />  // 참
+    	// 123 // 참
+    }
+    ```
+
+3. Message 클래스로 생성된 모든 객체
+
+    PropTypes.instanceOf(Message),
+
+    ```jsx
+    MyComponent.protoTypes = {
+    	message: ProtoTypes.instanceOf(Message)
+    	// new Message()  // 참
+    	// new Car()  // 거짓
+    }
+    ```
+
+4. 배열에 포함된 '값' 중에서 하나를 만족
+
+    PropTypes.oneOf([ 'john', 'mike' ])
+
+    ```jsx
+    MyComponent.protoTypes = {
+    	name: ProtoTypes.oneOf([ 'john', 'mike' ])
+    	// 'john'  // 참
+    	// 'messy'  // 거짓
+    }
+    ```
+
+5. 배열에 포함된 '타입' 중에서 하나를 만족
+
+    PropTypes.oneOfType([ PropTypes.number, PropTypes.string ])
+
+    ```jsx
+    MyComponent.protoTypes = {
+    	width: PropTypes.oneOfType([ PropTypes.number, PropTypes.string ])
+    	// 123  // 참
+    	// 'messy'  // 참
+    }
+    ```
+
+6. 특정 타입만 포함하는 배열
+
+    PropTypes.arrayOf(PropTypes.number)
+
+    ```jsx
+    MyComponent.protoTypes = {
+    	ages: PropTypes.arrayOf(PropTypes.number)
+    	// [ 1, 5, 7 ]  // 참
+    	// [ 'a', 'b' ]  // 거짓
+    }
+    ```
+
+7. 객체의 속성값 타입을 정의
+
+    PropTypes.shape({
+
+    color: PropTypes.string,
+
+    weight: PropTypes.number
+
+    })
+
+    ```jsx
+    MyComponent.protoTypes = {
+    info:	PropTypes.shape({
+    	color: PropTypes.string,
+    	weight: PropTypes.number
+    })
+    	// { color: 'red', weight: '123kg' } // 거짓
+    }
+    ```
+
+8. 객체에서 모든 속성값의 타입이 같은 경우
+
+    PropTypes.objectOf(PropTypes.number)
+
+    ```jsx
+    MyComponent.protoTypes = {
+    	infos: PropTypes.objectOf(PropTypes.number)
+    	// {prop1: 123, prop2: 567} // 참
+    	// {prop1: 'red', prop2: 567} // 거짓
+    }
+    ```
