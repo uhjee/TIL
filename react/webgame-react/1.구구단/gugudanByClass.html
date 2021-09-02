@@ -25,27 +25,33 @@
           color: '',
         };
 
-        // this 가 꼬이지 않도록, 화살표 함수 사용
+        // this 가 꼬이지 않도록, 화살표 함수 사용(class 기반 컴포넌트이기 때문에)
         onSubmitHandler = e => {
           e.preventDefault();
           if (
             parseInt(this.state.value) ===
             this.state.first * this.state.second
           ) {
-            this.setState({
+            // setState 함수는 비동기로 동작
+            // setState 함수의 매개변수로 콜백함수를 넣어주기(콜백 함수의 매개변수로 이전 값을 넣어준다)
+            this.setState(prevState => ({
               result: '정답',
               first: Math.ceil(Math.random() * 9),
               second: Math.ceil(Math.random() * 9),
               value: '',
-              resultValue: this.state.value,
+              resultValue: prevState.value,
               color: 'royalBlue',
-            });
+            }));
           } else {
-            this.setState({
-              result: '땡',
-              value: '',
-              resultValue: this.state.value,
-              color: 'orange',
+            this.setState(prevState => {
+              // ref로 잡아온 react element에 focus()
+              this.input.focus(); 
+              return {
+                result: '땡',
+                value: '',
+                resultValue: prevState.value,
+                color: 'orange',
+              };
             });
           }
         };
@@ -54,7 +60,11 @@
           this.setState({ value: e.target.value });
         };
 
+        input;
+
+        // 컨텐츠
         render() {
+          console.log('렌더링...'); // state, prop이 변경될 때마다 찍힌다(렌더링)
           return (
             // 감싸주는 쓸데없는 div가 렌더링되지 않도록 Fragment 사용
             <React.Fragment>
@@ -66,6 +76,10 @@
                   type="number"
                   value={this.state.value}
                   onChange={this.onChangeHandler}
+                  ref={c => {
+                    this.input = c;
+                    // class의 input 변수에 element를 넣어준다
+                  }}
                 />
                 <button>입력</button>
               </form>
@@ -80,8 +94,6 @@
     <script type="text/babel">
       ReactDOM.render(
         <div>
-          <GuGuDan />
-          <GuGuDan />
           <GuGuDan />
         </div>,
         document.querySelector('#root'),
