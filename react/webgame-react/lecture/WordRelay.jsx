@@ -1,63 +1,55 @@
 const React = require('react');
-const { Component } = React;
+const { useState, useRef } = React;
 
-class WordRelay extends Component {
-  state = {
-    word: '허지행',
-    value: '',
-    result: '',
-    history: [],
-  };
+const WordRelay = () => {
+  const [word, setWord] = useState('허지행');
+  const [value, setValue] = useState('');
+  const [result, setResult] = useState('');
+  const [history, setHistory] = useState([]);
 
-  // 화살표 함수로 만들어야 this 바인딩이 꼬이지 않는다.
-  onSubmitForm = e => {
+  const inputRef = useRef();
+
+  const onSubmitForm = e => {
     e.preventDefault();
     // 끝말잇기 로직
-    if (this.state.word[this.state.word.length - 1] === this.state.value[0]) {
-      this.setState({
-        result: '딩동댕',
-        word: this.state.value,
-        value: '',
-        history: [...this.state.history, this.state.value],
-      });
-      this.input.focus();
+    if (word[word.length - 1] === value[0]) {
+      setWord(value);
+      setValue('');
+      setResult('딩동댕');
+      setHistory([...history, value]);
+      inputRef.current.focus();
     } else {
-      this.setState({
-        result: '땡',
-        value: '',
-      });
-      this.input.focus();
+      setResult('땡'), setValue('');
+      inputRef.current.focus();
     }
   };
 
-  onChangeInput = e => {
-    this.setState({ value: e.target.value });
+  const onChangeInput = e => {
+    setValue(e.target.value);
   };
 
-  input;
-  onRefInput = c => {
-    this.input = c;
-  };
-
-  render() {
-    return (
-      <>
-        <div>{this.state.word}</div>
-        <form onSubmit={this.onSubmitForm}>
-          {/* value, onChange는 세트... 같이 사용하자 */}
-          <input
-            ref={this.onRefInput}
-            value={this.state.value}
-            onChange={this.onChangeInput}
-            type="text"
-          />
-          <button>입렵</button>
-        </form>
-        <div>{this.state.result}</div>
-        <div>{this.state.history}</div>
-      </>
-    );
-  }
-}
+  console.log('rendering...');
+  return (
+    <>
+      <h2>function component</h2>
+      <div>시작어: {word}</div>
+      <form onSubmit={onSubmitForm}>
+        {/* for, class는 js에서 예약어 이기 때문에, htmlFor, className 으로 사용 */}
+        <label htmlFor="wordInput">글자를 입력하세요.</label>
+        <input
+          id="wordInput"
+          className="word-input"
+          ref={inputRef}
+          value={value}
+          onChange={onChangeInput}
+          type="text"
+        />
+        <button>입력!</button>
+      </form>
+      <div>{result}</div>
+      <div>{history}</div>
+    </>
+  );
+};
 
 module.exports = WordRelay;

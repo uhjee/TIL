@@ -1,9 +1,10 @@
 const path = require('path');
+const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = {
   name: 'word-relay-setting',
   mode: 'development', // 실서비스에서는 : production
-  devtool: 'eval', // 실 서비스에는 hidden-source-map
+  devtool: 'inline-source-map', // 실 서비스에는 hidden-source-map
 
   // 확장자 생략 가능
   resolve: {
@@ -36,15 +37,27 @@ module.exports = {
             ],
             '@babel/preset-react',
           ],
-          plugins: [],
+          plugins: ['react-refresh/babel'],
         },
+        exclude: path.join(__dirname, 'node_modules'),
       },
     ],
   },
 
+  plugins: [
+    new ReactRefreshWebpackPlugin(), // hot reloading
+  ],
+
   // 출력
   output: {
-    path: path.join(__dirname, 'dist'),
-    filename: 'app.js',
+    path: path.join(__dirname, 'dist'), // 실제 경로
+    filename: '[name].js',
+    publicPath: '/dist', // 가상 경로 느낌
+  },
+  devServer: {
+    devMiddleware: { publicPath: '/dist' },
+    static: { directory: path.resolve(__dirname) },
+    hot: true,
+    open: true,
   },
 };
