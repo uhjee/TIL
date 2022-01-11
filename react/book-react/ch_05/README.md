@@ -1,0 +1,277 @@
+# 6장. 리덕스로 상태 관리하기
+
+### 리덕스 사용 이유 - 데이터 접근, 관리 측면
+
+1. 컴포넌트 코드로부터 상태 관리 코드 분리
+2. SSR시 데이터 전달 간편
+3. 로컬 스토리지에 데이터를 저장하고 불러오는 코드를 쉽게 작성 가능
+4. 같은 상탯값을 다수의 컴포넌트에서 필요로 할 때 유용
+5. 부모 컴포넌트에서 깊은 곳에 있는 자식 컴포넌트에 상탯값을 전달할 때 유용
+6. 알림창과 같은 전역 컴포넌트의 상탯값을 관리할 때 유용
+7. 페이지가 전환되어도 데이터는 살아 있어야 할 때 유용
+
+## 6-1. 리덕스 사용 시 따라야할 세 가지 원칙
+
+1. 전체 상탯값을 **하나의 객체**에 저장
+
+2. 상탯값은 **불변 객체**
+
+   - 상탯값은 오직 액션 객체에 의해서만 변경
+
+     ```js
+     // 1. action 객체
+     const incrementAction = {
+       type: 'INCREMENT', 	// type 속성값으로 식별
+       amount: 123, 				// type을 제외한 나머지는 상탯값을 수정하기 위해 사용되는 정보
+     };
+     
+     const conditionalIncrementAction = {
+       type: 'CONDITIONAL_INCREMENT',
+       amount: 2,
+       gt: 10,
+       lt: 100,
+     };
+     
+     // 2. action 객체와 함께 dispatch 메소드 호출하면 상탯값 변경
+     store.dispatch(incrementAction);
+     store.dispatch(conditionalIncrementAction);
+     ```
+
+3. 상탯값은 **순수 함수**에 의해서만 변경되어야 한다.
+
+   - 순수 함수: 부수효과 발생 X / 같은 인수에 대해 항상 같은 반환값 => test 코드 작성에도 유리
+
+   - 리덕스의 상탯값 변경 함수: reducer
+     - reducer의 구조:  `(state, action) => nextState`
+
+## 6-2. 리덕스의 주요 개념 이해하기
+
+![리덕스에서_상탯값이_변경되는_과정](/Users/uhjee/Desktop/git_remote/TIL/react/book-react/ch_04/image_00.png)
+
+c.f. vuex의 경우 상탯값 흐름도: **View** --(dispatch)--> **Action** --(commit)--> **Mutation** --> **State**(store)
+
+### 6-2-1. 액션
+
+: type 프로퍼티를 식별자로 갖는 JS 객체
+
+ store.dispatch() 메소드의 매개변수로 사용된다.
+
+- type 프로퍼티는 식별성을 갖기 때문에 unique해야 한다.
+
+  ```js
+  store.dispatch({ type: 'todo/ADD', title: '영화 보기', priority: 'high' }); // 접두사 사용으로 식별성 up
+  store.dispatch({ type: 'todo/REMOVE', id: '00001' });
+  store.dispatch({ type: 'todo/REMOVE_ALL' });
+  ```
+
+- dispatch 메소드의 매개변수로 직접 action 객체를 넘기지 않고, 생성자 함수 사용
+
+  ```js
+  function addTodo( { title, priority } ) { // action을 반환하는 생성자 함수
+    return { type: 'todo/ADD', title, priority }
+  }
+  
+  store.dispatch(addTodo({ title: '영화보기', priority: 'high' })); // dispatch 호출
+  ```
+
+- action의 type은 상수로 관리 - dispatch 메소드로 이후에 호출되는 reducer에서도 사용되기 때문
+
+  ```js
+  export const ADD = 'todo/ADD';		// module system 으로 외부로 노출
+  export const REMOVE = 'todo/REMOVE';
+  export const REMOVE_ALL = 'todo/REMOVE_ALL';
+  
+  function addTodo( { title, priority } ) { // action을 반환하는 생성자 함수
+    return { type: ADD, title, priority }
+  }
+  
+  store.dispatch(addTodo({ title: '영화보기', priority: 'high' })); // dispatch 호출
+  ```
+
+- type 프로퍼티 외에도 원하는 프로퍼티를 넣을 수 있다.
+
+### 6-2-2. 미들웨어
+
+: reducer가 action을 처리하기 전에 실행되는 함수
+
+e.g. 디버깅 목적 - 상탯값 변경 시 로그 출력 / reducer에서 발생한 예외를 서버로 전송하는 등
+
+- 미들웨어의 기본 구조
+
+  ```js
+  const myMiddleware = store => next => action => next(action);
+  ```
+
+  - 3개 함수의 콜백 구조
+  - 콜백 가장 내부에서 `next(action);` 이 호출되면서 reducer 호출
+
+- 미들웨어 설정 방법
+
+  ```js
+  import { createStore, applyMiddleware } from 'redux';
+  
+  const middleware1 = store => next => action => {
+    console.log('middleware1 start');
+    
+    const result = next(action);	 // middleware2 호출
+    
+    console.log('middleware1 end');
+    return result;
+  };
+  
+  const middleware2 = store => next => action => {
+    console.log('middleware2 start');
+    
+    const result = next(action);	 // 바깥 함수가 갖고 있는 store.dispatch 호출
+    
+    console.log('middleware2 end');
+    return result;
+  };
+  
+  const myReducer = (state, action) => {
+    console.log('myReducer');
+    return state;
+  };
+  
+  const store = createStore(myReducer, applyMiddleware(middleware1, middleware2)); // store 생성
+  store.dispatch({ type: 'someAction' });l 		// dispatch() 호출
+  ```
+
+  ```te
+  // middleware1 start
+  // middleware2 start
+  // myReducer
+  // middleware1 end
+  // middleware2 end
+  ```
+
+- 미들웨어 활용의 예
+
+  - 디버깅 - 상탯값 로그 출력
+
+    ```js
+    const printLog = store => next => action => {
+      console.log(`prev state = ${store.getState()}`);
+      const result = next(action);
+      console.log(`next state = ${store.getState()}`);
+    };
+    ```
+
+  - 에러 정보를 서버로 전송해주는 미들웨어
+
+    ```js
+    const reportcrash = store => next => action => {
+      try {
+      	const result = next(action);  
+      } catch (err) {
+        // 서버로 예외 정보 전송
+      }
+    };
+    ```
+
+  - 실행을 연기할 수 있는 미들웨어
+
+    ```js
+    const printLog = store => next => action => {
+    	const delay = action.meta && action.meta.delay;
+      if (!delay) {
+        return next(action);
+      }
+      const timeoutId = setTimeout(() => next(action), delay); // delay 만큼 연기
+      
+      // setTimeout을 취소할 수 있는 함수를 리턴
+      return function cancel() {
+        clearTimeout(timeoutId);
+      }
+    }
+    ```
+
+    호출
+
+    ```js
+    const cancel = store.dispatch({
+      type: 'SomeAction',
+      meta: { delay: 1000 },
+    });
+    
+    cancel(); // 호출하지 않으면 지연된 시간 후에 reducer 호출
+    ```
+
+  - 특정 액션일 때, 로컬 스토리지에 값을 저장하는 미들웨어
+
+    ```js
+    const saceToLocalStorage = store => next => action => {
+      if(action.type === 'SET_NAME') {
+        localStorage.setItem('name', action.name);
+      }
+      return next(action);
+    }
+    ```
+
+    - `SET_NAME` 액션이 발생할 때마다 로컬 스토리지에 값 저장
+
+### 6-2-3. 리듀서
+
+: action이 발생했을 때 새로운 상탯값을 만드는 함수
+
+- reducer의 구조
+
+  ```js
+  (state, action) => nextState
+  ```
+
+- reducer 예시
+
+  ```js
+  function reducer( state = INITIAL_STATE, action) {
+    switch (action.type) {
+      case REMOVE_ALL:
+        return {
+          ...state,
+          todos: [],
+        };			// 새로운 state 반환 -> 불변객체이기 때문에
+      case REMOVE:
+        return {
+          ...state,
+          todos: state.todos.filter(todo => todo.id !== action.id),
+        };
+      default:
+        return state;
+    }
+  }
+  
+  const INITIAL_STATE = { todos: [] };
+  ```
+
+  - action의 type 프로퍼티에 따라 새로운 state 객체를 반환한다.
+  - 새로운 state를 반환해야 하기 때문에, 전개 연산자 사용
+
+- 중첩된 객체 내부의 데이터 수정하기
+
+  ```js
+  function reducer(state = INITIAL_STATE, action) {
+    switch (action.type) {
+      case ADD:
+        return {
+          ...state,
+          todos: [
+            ...state.todos,
+            { 
+              id:getNewId(), 
+              title: action.title, 
+              priority: action.priority 
+            },
+          ],
+        }
+      default:
+        return state;
+    }
+  }
+  ```
+
+  state 를 반환하기 위해 전개연산자를 두 번이나 사용하고 있다. => 가독성이 떨어짐
+
+  이를 해결하기 위해 JS 의 불변 객체 관리 목적의 패키지 존재 => 그 중 immer 패키지 사용
+
+  
+
