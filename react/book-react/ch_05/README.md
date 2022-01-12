@@ -46,7 +46,7 @@
 
 ## 6-2. 리덕스의 주요 개념 이해하기
 
-![리덕스에서_상탯값이_변경되는_과정](/Users/uhjee/Desktop/git_remote/TIL/react/book-react/ch_04/image_00.png)
+![리덕스에서_상탯값이_변경되는_과정](/Users/uhjee/Desktop/git_remote/TIL/react/book-react/ch_05/image_00.png)
 
 c.f. vuex의 경우 상탯값 흐름도: **View** --(dispatch)--> **Action** --(commit)--> **Mutation** --> **State**(store)
 
