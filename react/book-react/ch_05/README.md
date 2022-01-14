@@ -271,7 +271,97 @@ e.g. 디버깅 목적 - 상탯값 변경 시 로그 출력 / reducer에서 발�
 
   state 를 반환하기 위해 전개연산자를 두 번이나 사용하고 있다. => 가독성이 떨어짐
 
-  이를 해결하기 위해 JS 의 불변 객체 관리 목적의 패키지 존재 => 그 중 immer 패키지 사용
+  이를 해결하기 위해 JS 의 불변 객체 관리 목적의 패키지 존재 => 그 중 **immer** 패키지 사용
 
-  
 
+- immer 패키지 사용하기
+
+  - immer를 사용해 불변 객체 관리하기 예제
+
+    ```js
+    import produce from 'immer';
+    
+    const person = { name: 'mike', age: 22 };
+    const newPerson = produce(person, draft => {
+      draft.age = 32;
+    });
+    ```
+
+    - produce 함수
+      - 첫 번째 매개변수는 변경하고자 하는 객체
+      - 두 번째 매개변수는 첫 번째 매개변수로 입력된 객체를 수정하는 함수
+      - 첫 번째 매개변수로 받은 객체를 수정하지 않으며, 새로운 객체를 반환
+
+- immer 패키지를 사용해 reducer 리팩토링
+
+  ```js
+  import produce from 'immer';
+  // ...
+  function reducer(state = INITIAL_STATE, action) {
+    return produce(state, draft => {  // switch 문 전체를 produce로 감싸 return
+      switch (action.type) {
+        case ADD:
+  				draft.todos.push(action.todo); // draft 매개변수 사용
+          break;
+        case REMOVE_ALL:
+          draft.todos = [];
+          break;
+        case REMOVE:
+          	draft.todos = draft.todos.filter(todo => todo.id !== action.id);
+          	break;
+        default:
+          break;
+      }  
+    });
+  }
+  ```
+
+- 🚨 reducer 사용 시 주의할 점 :
+
+  1. 데이터 참조
+
+     - 리덕스의 상탯값은 불변 객체 => 언제든지 객체의 참조값이 변경될 수 있음
+
+     - 따라서 객체를 참조할 때에는 객체의 참조값이 아닌 고유한 ID 값(primitive type)을 사용
+
+  2. 순수 함수
+
+     - reducer는 순수함수로 작성해야 함
+     - Math.random() 사용할 수 없다.
+     - API 호출은 부수효과(side effect)이기 때문에 사용 X -> 생성자 함수 또는 미들웨어에서 호출해야 함
+
+- createReducer 함수로 reducer 생성하기
+
+  redux 환경에서는 직접 reducer를 작성하지 않고, createReducer 라는 함수로 생성
+
+  - createReducer 함수 생성
+
+    ```js
+    import produce from 'immer';
+    
+    function createReducer(initialState, handlerMap) {
+      return function(state = initialState, action) { 	// reducer 리턴
+        return produce(state, draft => {								// immer.produce 사용
+          const handler = handlerMap[action.type];
+          if (handler) {
+            handler(draft, action);											// 등록된 액션 처리함수가 있다면 호출
+          }
+        })
+      }
+    }
+    ```
+
+    
+
+  - createReducer 사용하기
+
+    ```js
+    const reducer = createReducer(INITIAL_STATE, {
+      [ADD]: (state, action) => state.todos.push(action.todo),
+      [REMOVE_ALL]: state => (state.todos = []),
+      [REMOVE]: (state, action) => (state.todos.filter(todo => todo.id !== action.id)),
+    })
+    ```
+
+    - 첫 번째 매개변수로 초기 상탯값
+    - 두 번째 매개변수로 액션 처리 함수를 담고 있는 객체
