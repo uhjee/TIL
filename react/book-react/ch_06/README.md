@@ -419,3 +419,46 @@ e.g. 디버깅 목적 - 상탯값 변경 시 로그 출력 / reducer에서 발�
 - 리덕스에서 제공하는 combineReducer 함수를 사용하면 reducer 함수를 여러 개로 분리할 수 있음
 - reducer 가 여러 개로 작성되다 보면 공통 로직이 생길 수 있다.
 
+- 덕스 패턴
+  - 연관된 action type, action 생성자 함수, reducer 함수를 하나의 파일로 작성
+  - reducer 함수는 `export default` 키워드로 내보낸다.
+  - action 생성자 함수는 `export` 키워드로 내보낸다.
+  - 액션 타입은 접두사와 액션 이름을 조합해서 만든다.
+
+## 6.4 react-redux 패키지 사용
+
+- Provider 컴포넌트 사용
+
+  - Provider 컴포넌트 하위에 있는 컴포넌트는 redux의 상탯값이 변경되면 자동으로 컴포넌트 함수가 호출되도록 할 수 있다.
+
+  - store 객체를 Provider 컴포넌트의 속성값으로 넣는다
+
+    - store.subscribe 메소드를 호출해 action 처리가 끝날 때 알림을 받고, context API를 사용해 redux의 상탯값을 하위 컴포넌트로 전달
+
+    ```jsx
+    import React from 'react';
+    import ReactDOM from 'react-dom';
+    import TimelineMain from './timeline/container/TimelineMain';
+    import FriendMain from './friend/container/FriendMain';
+    
+    import store from './common/store';
+    import { Provider } from 'react-redux';
+    
+    ReactDOM.render(
+      <Provider store={store}>
+        <div>
+          <FriendMain />
+          <TimelineMain />
+        </div>
+      </Provider>,
+      document.getElementById('root'),
+    );
+    ```
+
+    
+
+- useSelector, useDispatch
+  - useSelector 훅
+    - 선택자 함수를 인자로 받는다.
+    - 선택자 함수의 반환값이 훅의 반환값
+    - redux의 상탯값이 변경되면, 이전 반환값과 새로운 반환값을 비교해, 다른 경우에만 rendering
