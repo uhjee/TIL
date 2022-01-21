@@ -427,7 +427,9 @@ e.g. 디버깅 목적 - 상탯값 변경 시 로그 출력 / reducer에서 발�
 
 ## 6.4 react-redux 패키지 사용
 
-- Provider 컴포넌트 사용
+: react 컴포넌트에서 redux에 저장된 store.state의 변화를 감지해 쉽게 핸들링할 수 있는 패키지
+
+- **Provider** 컴포넌트 사용
 
   - Provider 컴포넌트 하위에 있는 컴포넌트는 redux의 상탯값이 변경되면 자동으로 컴포넌트 함수가 호출되도록 할 수 있다.
 
@@ -458,7 +460,73 @@ e.g. 디버깅 목적 - 상탯값 변경 시 로그 출력 / reducer에서 발�
     
 
 - useSelector, useDispatch
-  - useSelector 훅
+  - **useSelector** 훅
     - 선택자 함수를 인자로 받는다.
     - 선택자 함수의 반환값이 훅의 반환값
     - redux의 상탯값이 변경되면, 이전 반환값과 새로운 반환값을 비교해, 다른 경우에만 rendering
+
+## 6.5 reselect 패키지로 선택자 함수 만들기
+
+: reselect 패키지로 선택자 함수 작성
+
+- reselect 패키지는 메모이제이션 기능 존재
+  - 연산에 사용되는 데이터가 변경된 경우에만 연산 수행, 변경되지 않았다면, 이전 결괏값 재사용
+
+```js
+import { createSelector } from 'reselect';
+
+// state의 데이터 getter
+const getFriends = state => state.friend.friends;
+const getAgeLimit = state => state.friend.ageLimit;
+const getShowLimit = state => state.friend.showLimit;
+
+export const getFriendsWithAgeLimit = createSelector(
+  [getFriends, getAgeLimit],
+  (friends, ageLimit) => friends.filter(f => f.age <= ageLimit), // 배열의 함수 반환값을 파라미터로 받아 처리
+);
+
+export const getFriendsWithAgeShowLimit = createSelector(
+  [getFriendsWithAgeLimit, getShowLimit],
+  (getFriendsWithAgeLimit, showLimit) =>
+    getFriendsWithAgeLimit.slice(0, showLimit),
+);
+
+```
+
+
+
+```js
+// 사용 컴포넌트
+// ...
+// 정의한 getter import
+import {
+  getAgeLimit,
+  getShowLimit,
+  getFriendsWithAgeLimit,
+  getFriendsWithAgeShowLimit,
+} from '../state/selector';
+
+// ! react-redux 패키지 사용 (useSelector, useDispatch)
+// ! reselect 사용
+const FriendMain = () => {
+  const [ageLimit, showLimit, friendsWithAgeLimit, friendsWithAgeShowLimit] =
+    // 01. reselect 로 인해 useSelector 의 콜백함수 간결화
+    useSelector(
+      state => [
+        getAgeLimit(state),
+        getShowLimit(state),
+        getFriendsWithAgeLimit(state),
+        getFriendsWithAgeShowLimit(state),
+      ],
+      shallowEqual,
+    );
+  
+  	// 02. 다음과 같이 사용 가능
+  const ageLimit = useSelector(getAgeLimit);
+  const showLimit = useSelector(getShowLimit);
+  const friendsWithAgeLimit = useSelector(getFriendsWithAgeLimit);
+  const friendsWithAgeShowLimit = useSelector(getFriendsWithAgeShowLimit);
+  // ...
+}
+```
+
