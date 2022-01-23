@@ -530,3 +530,74 @@ const FriendMain = () => {
 }
 ```
 
+## 6.6 리덕스 사가를 이용한 비동기 액션 처리
+
+리덕스에서 비동기 액션을 처리하기 위해 많이 사용되는 패키지 목록
+
+- redux-thunk
+- redux-observale
+- redux-saga
+
+redux-saga
+
+```js
+// redux-saga 에서 부수효과를 발생시킬 때 사용하는 함수
+import { all, call, put, take, fork } from 'redux-saga/effects';
+import { actions, types } from '.';
+import { callApiLike } from '../../common/api';
+
+
+/**
+ * REQUEST_LIKE 액션을 처리하는 제네레이터 함수 - 사가 함수
+ * 제네레이터 객체(next, done 프로퍼티 보유) 반환
+ * 사가 미들웨어에서 호출하며 로직 실행
+ *
+ * @param   {[type]}  action  [action description]
+ *
+ * @return  {[type]}          [return description]
+ */
+export function* fetchData(action) {
+  while (true) {
+    const { timeline } = yield take(types.REQUEST_LIKE); // take: 액션객체 가져온다
+    yield put(actions.setLoading(true));  // put : 새로운 액션 발생 -> store.dispatch 호출
+    yield put(actions.addLike(timeline.id, 1));
+    yield call(callApiLike);              // 입력된 함수를 대신 호출(해당 함수가 Promise 객체를 반환하면 resolve 까지 기다림) 
+    yield put(actions.setLoading(false));
+  }
+}
+
+// 여러 개의 사가 함수를 모아놓은 함수
+export default function* watcher() {
+  yield all([fork(fetchData)]);
+}
+
+```
+
+store.js
+
+```js
+import { createStore, combineReducers, applyMiddleware } from 'redux';
+import timelineReducer from '../timeline/state';
+import friendReducer from '../friend/state';
+
+import createSagaMiddleware from '@redux-saga/core';
+import timelineSaga from '../timeline/state/saga';
+
+const reducer = combineReducers({
+  timeline: timelineReducer,
+  friend: friendReducer,
+});
+
+// saga middleware 생성
+const sagaMiddleware = createSagaMiddleware();
+
+// store 생성시 미들웨어 전달
+const store = createStore(reducer, applyMiddleware(sagaMiddleware));
+
+// store 객체를 원하는 곳에서 가져다 사용할 수 있다.
+export default store;
+
+sagaMiddleware.run(timelineSaga); // 사가 미들웨어 호출
+
+```
+

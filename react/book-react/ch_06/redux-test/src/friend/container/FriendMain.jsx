@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { getNextFriend } from '../../common/mockData';
 import { addFriend, setAgeLimit, setShowLimit } from '../state';
 import FriendList from '../component/FriendList';
@@ -8,13 +9,14 @@ import {
   getShowLimit,
   getFriendsWithAgeLimit,
   getFriendsWithAgeShowLimit,
+  makeGetFriendsWithAgeLimit,
 } from '../state/selector';
 
 import NumberSelect from '../component/NumberSelect';
 import { MAX_AGE_LIMIT, MAX_SHOW_LIMIT } from '../common';
 
 // ! react-redux 패키지 사용 (useSelector, useDispatch)
-const FriendMain = () => {
+const FriendMain = ({ ageLimit }) => {
   // ? reselect 사용 01
   // const [ageLimit, showLimit, friendsWithAgeLimit, friendsWithAgeShowLimit] =
   //   useSelector(
@@ -27,10 +29,14 @@ const FriendMain = () => {
   //     shallowEqual,
   //   );
   // ? reselect 사용 02
-  const ageLimit = useSelector(getAgeLimit);
+  // const ageLimit = useSelector(getAgeLimit);
   const showLimit = useSelector(getShowLimit);
-  const friendsWithAgeLimit = useSelector(getFriendsWithAgeLimit);
-  const friendsWithAgeShowLimit = useSelector(getFriendsWithAgeShowLimit);
+  // const friendsWithAgeLimit = useSelector(getFriendsWithAgeLimit);
+  const getFriendsWithAgeLimit = useMemo(makeGetFriendsWithAgeLimit, []);
+  const friendsWithAgeLimit = useSelector(state =>
+    getFriendsWithAgeLimit(state, ageLimit),
+  );
+  // const friendsWithAgeShowLimit = useSelector(getFriendsWithAgeShowLimit);
 
   const friends = useSelector(state => state.friend.friends); // 상탯값의 변경 여부 판단 -> 다르면 재렌더링
   const dispatch = useDispatch();
@@ -44,20 +50,20 @@ const FriendMain = () => {
   return (
     <div>
       <button onClick={onAdd}>친구 추가</button>
-      <NumberSelect
+      {/* <NumberSelect
         onChange={v => dispatch(setAgeLimit(v))}
         value={ageLimit}
         options={AGE_LIMIT_OPTIONS}
         postfix="세 이하만 보기"
-      />
+      /> */}
       <FriendList friends={friendsWithAgeLimit} />
-      <NumberSelect
+      {/* <NumberSelect
         onChange={v => dispatch(setShowLimit(v))}
         value={showLimit}
         options={SHOW_LIMIT_OPTIONS}
         postfix="명 이하만 보기 (연령 제한 적용됨)"
       />
-      <FriendList friends={friendsWithAgeShowLimit} />
+      <FriendList friends={friendsWithAgeShowLimit} /> */}
     </div>
   );
 };

@@ -9,7 +9,8 @@ import { Provider } from 'react-redux';
 ReactDOM.render(
   <Provider store={store}>
     <div>
-      <FriendMain />
+      <FriendMain ageLimit={30}/> 
+      <FriendMain ageLimit={15}/>
       <TimelineMain />
     </div>
   </Provider>,
