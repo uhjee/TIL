@@ -1,0 +1,7 @@
+{
+  "extends": "../../common/.babelrc", // 다른 파일 설정 가져오기
+  "plugins": [
+    "@babel/plugin-transform-arrow-functions",
+    "@babel/plugin-transform-template-literals" // 중복될 경우 overriding
+  ]
+}

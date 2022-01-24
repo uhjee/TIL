@@ -1,0 +1,12 @@
+{
+  "presets": ["@babel/preset-react"],
+  "plugins": ["@babel/plugin-transform-template-literals"],
+  // 파일 별로 다른 설정 가능
+  "overrides": [
+    {
+      "include": "./service1",
+      "exclude": "./service1/code2.js",
+      "plugins": ["@babel/plugin-transform-arrow-functions"]
+    }
+  ]
+}
