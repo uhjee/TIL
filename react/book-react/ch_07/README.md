@@ -288,6 +288,58 @@
 - 오래된 브라우저를 지원하기 위해 바벨로 코드 문법을 변환하는 동시에 폴리필도 사용 필요
 - 런타임에 기능이 존재하는지 검사해서 기능이 없는 경우에만 주입
 - 컴파일 시 변환이 되는 기능과 그렇지 않고 런타임에 주입되어 사용하는 기술이 있다.
+  - ES8 : String.padStart 등
+  - 컴파일 시, 변환 필요 예시 : async - await
 
+### core-js 모듈의 모든 폴리필 사용하기
 
+- `import 'core-js'`
 
+  단순히 import 하는 것만으로 모든 폴리필이 포함됨
+
+- 웹팩 사용하는 경우
+
+  - entry로 설정
+
+  ```js
+  module.exports = {
+      entry: ['core-js', './src/index.js'],
+      // ...
+  };
+  ```
+
+  - 파일 크기에 민감판 프로젝트라면, `core-js/features` 내부에서 필요한 기능만 가져다가 쓸 수 있다.
+
+### @babel/preset-env 프리셋 이용하기
+
+- 실행 환경에 대한 정보를 설정해두면, 자동으로 필요한 기능을 주입해준다.
+
+- 예시 - 특정 버전의 브라우저를 위한 플러그인 포함
+
+  ```js
+  const presets = [
+      [
+          '@babel/preset-env',
+          {
+         	 targets: '> 0.25%, not dead', // 지원하는 브라우저 정보 입력
+          },
+      ],
+  ]；
+  module.exports = { presets };
+  ```
+
+  
+
+## 7.2 바벨 플러그인 제작하기
+
+바벨은 프리셋과 플러그인을 제작할 수 있는 API 제공
+
+### 7.2.1 AST 구조 들여다 보기
+
+바벨은 문자열로 입력되는 코드를 AST : abstract syntax tree 라는 구조체로 변환해 처리
+
+[https://astexplorer.net/](https://astexplorer.net/)
+
+- 위 사이트에서 AST 구조 확인 가능
+- 바벨은 babylon 이라는 parser를 사용해 AST 를 만든다.
+- AST 의 각 노드는 **type** 이라는 속성이 있다.
