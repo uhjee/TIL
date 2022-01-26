@@ -343,3 +343,57 @@
 - 위 사이트에서 AST 구조 확인 가능
 - 바벨은 babylon 이라는 parser를 사용해 AST 를 만든다.
 - AST 의 각 노드는 **type** 이라는 속성이 있다.
+### console.log 제거 플러그인
+
+./plugins/remove-log.js
+
+```js
+module.exports = function ({ types : t }) {
+  return {
+    visitor: {
+      ExpressionStatement(path) {
+        // Expressionstatement 노드가 생성되면 호출되도록 메소드 등록
+        if (t.isCallExpression(path.node.expression)) {
+          // Expressionstatement 노드의 expression 속성이 CallExpression인지 검사
+          if (t.isMemberExpression(path.node.expression.callee)) {
+            // callee 속성이 MemberExpression 노드인지 검사
+            const memberExp = path.node.expression.callee;
+            if (
+              memberExp.object.name === 'console' &&
+              memberExp.property.name === 'log' // console 객체의 log 메소드가 호출된 것인지 검사
+            ) {
+              path.remove(); // AST에서 Expressionstatement 노드 제거
+            }
+          }
+        }
+      },
+    },
+  };
+};
+
+```
+
+babel.config.js
+
+```js
+const plugins = ['./plugins/remove-log.js'];
+module.exports = { plugins };
+
+```
+
+
+
+## 7.3 웹팩 초급편
+
+### webpack
+
+: 모듈 번들러
+
+- 모듈: 각자 하나의 리소스 파일
+- 번들: 웹팩 실행 후의 결과 파일
+
+### 7.3.2 로더 사용하기
+
+- 모듈(파일)을 입력받아 원하는 형태로 변환한 후, 새로운 모듈을 출력해주는 함수
+- js 파일 뿐만 아니라, 이미지 파일, CSS 파일, CSV 파일 등 모든 파일은 모듈
+
