@@ -397,3 +397,191 @@ module.exports = { plugins };
 - 모듈(파일)을 입력받아 원하는 형태로 변환한 후, 새로운 모듈을 출력해주는 함수
 - js 파일 뿐만 아니라, 이미지 파일, CSS 파일, CSV 파일 등 모든 파일은 모듈
 
+#### babel-loader
+
+babel.config.js
+
+```js
+const presets = ['@babel/preset-react'];
+module.exports = { presets };
+```
+
+webpack.config.js
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [
+      // .js  확장자를 갖는 모듈은 babel-loader가 처리하도록 설정
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: 'babel-loader',
+      },
+    ],
+  },
+  mode: 'production'
+};
+
+```
+
+
+
+#### CSS loader
+
+- js 파일에 import 된 .css 파일들을 css 객체로 만들어 준다.
+- css-module 역시 css-loader 가 제공하는 기능
+- 그 외에 css 파일 내에서 사용하는 `@import`, `url()` 등의 처리 
+
+./src/index.js
+
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+import Style from './App.css';   // js 에서는 css 파일을 읽을 수 없기 때문에 에러 발생
+
+console.log({Style}); // js 에서는 css 파일을 읽을 수 없기 때문에 에러 발생
+
+function App() {
+  return (
+    <div className="container">
+      <h3 className="title">webpack example</h3>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+```
+
+```
+npm intall css-loader
+```
+
+webpack.config.js
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [
+			// ...
+      // css-loader
+      {
+        test: /\.css$/,
+        use: 'css-loader',
+      },
+    ],
+  },
+  mode: 'production',
+};
+```
+
+- 이제는 콘솔에 Style 객체가 출력된다.
+- css-loader는 js파일에서 css 파일을 읽을 수 있도록 해주는 패키지
+
+- 하지만 실제 html element에는 적용되지 않는다.
+
+#### style-loader
+
+- css-loader 가 만든 css 객체를 **style 태그로 만들어서 html head에 삽입**한다.
+- style-loader는 번들 파일이 **브라우저에서 실행될 때** style 태그 삽입
+
+```js
+npm install style-loader
+```
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [
+			// ...
+      // css-loader
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
+  },
+  mode: 'production',
+};
+```
+
+#### 기타 파일 처리하기
+
+- txt 파일, png 파일
+
+  ```js
+  npm install file-loader raw-loader
+  ```
+
+  ```js
+  const path = require('path');
+  
+  module.exports = {
+    entry: './src/index.js',
+    output: {
+      filename: 'main.js',
+      path: path.resolve(__dirname, 'dist'),
+    },
+    module: {
+      rules: [
+  			// ..
+        {
+          test: /\.(png|jpg|gif)$/,
+          use: 'file-loader',
+        },
+        {
+          test: /\.txt$/,
+          use: 'raw-loader',
+        },
+      ],
+    },
+    mode: 'production',
+  };
+  
+  ```
+
+  
+
+- json 파일은 webpack 에 기본 내장
+
+#### image 파일 요청 횟수 줄이기
+
+```sh
+npm install url-loader
+```
+
+webpack.config.js
+
+```js
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: {
+          loader: 'url-loader',
+          oprtions: {
+            limit: 8192, // 파일 크기가 이 값보다 큰 경우 다른 로더가 처리하도록 fullback 옵션 제공
+          },
+        },
+      },
+```
+

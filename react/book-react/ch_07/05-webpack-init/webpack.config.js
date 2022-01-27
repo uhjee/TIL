@@ -7,5 +7,5 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
   },
   mode: 'production',
-  optimization: { minimizer: [] },
+  optimization: { minimizer: [] }, // 압축 X 설정
 };
