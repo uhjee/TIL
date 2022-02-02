@@ -585,3 +585,210 @@ webpack.config.js
       },
 ```
 
+### 7.3.3 webpack 플러그인 사용하기
+
+- plugin: 각 모듈을 하나로 합친 번들에 대한 처리 담당
+- loader: 특정 모듈(file)에 대한 처리만 담당
+
+#### html-webpack-plugin
+
+- html 파일 수동 작성의 불편함
+
+  - 웹팩을 실행해서 나오는 결과물을 확인하기 위해서는 HTML 파일을 수동으로 작성해야 함
+    - ex) dist 폴더 하위에 index.html 생성해야 함
+
+  - 번들 파일 이름에 **[chunkhash]** 옵션을 설정했기 때문에, 번들파일이 변경될 때마다 html 파일 내용도 수정해야함
+
+webpack.config.js
+
+```js
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
+
+module.exports = {
+  /** ---------------ENTRY----------------- */
+  entry: './src/index.js',
+  /** ---------------OUTPUT----------------- */
+  output: {
+    filename: '[name].[chunkhash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  /** ---------------LOADER----------------- */
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-react'],
+          },
+        },
+      },
+    ],
+  },
+  /** ---------------PLUGINS----------------- */
+  plugins: [
+    // 01-1. webpack이 실행될 때, dist 폴더를 정라하는 플러그인
+    new CleanWebpackPlugin(),
+    // 01-2. index.html 자동 생성하는 플러그인
+    new HtmlWebpackPlugin({
+      template: './template/index.html', // 자동 생성 시, 우리가 원하는 template대로 생성하도록
+    }),
+  ],
+  mode: 'production',
+};
+
+```
+
+template/index.html
+
+```html
+<html>
+  <head>
+    <title>웹팩 플러그인 예제</title>
+  </head>
+  <body>
+    <div id="root" />
+  </body>
+</html>
+```
+
+#### DefinePlugin
+
+- 모듈 내부에 있는 문자열을 대체해주는 플러그인
+- webpack에 내장된 플러그인이기 때문에 별도 설치 필요 없음
+
+src/index.js
+
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+function App() {
+  return (
+    <div>
+      <p>{`앱 버전은 '${APP_VERSION}' 입니다.`}</p>
+      <p>{`10 * 10 = ${TEN * TEN}`}</p>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+
+```
+
+webpack.config.js
+
+```js
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
+const webpack = require('webpack');
+
+module.exports = {
+  /** ---------------ENTRY----------------- */
+  entry: './src/index.js',
+  /** ---------------OUTPUT----------------- */
+  output: {
+    filename: '[name].[chunkhash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  /** ---------------LOADER----------------- */
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-react'],
+          },
+        },
+      },
+    ],
+  },
+  /** ---------------PLUGINS----------------- */
+  plugins: [
+    // 02. 문자열 대체 플러그인
+    new webpack.DefinePlugin({
+      APP_VERSION: JSON.stringify('1.2.3'),
+      TEN: '10',
+    }),
+  ],
+  mode: 'production',
+};
+
+```
+
+
+
+#### ProvidePlugin
+
+- 자주 사용되는 모듈은 항상 import 키워드를 사용해 가져와야 함 -> 귀찮음
+- 미리 설정된 모듈을 자동으로 등록해준다.
+- webpack 에 기본 내장되어 있어 별도 설치 필요 없음
+
+src/index.js
+
+```jsx
+// import React from 'react';         // ------ react 모듈 import 주석 처리
+import ReactDOM from 'react-dom';
+
+function App() {
+  return (
+    <div>
+      <h3>안녕하세요, 웹팩 플러그인 예제입니다.</h3>
+      <p>html-webpack-plugin 플러그인을 사용합니다.</p>
+      <p>{`앱 버전은 '${APP_VERSION}' 입니다.`}</p>
+      <p>{`10 * 10 = ${TEN * TEN}`}</p>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, $('#root')[0]); // ---- jQuery 사용 (import 안함)
+```
+
+webpack.config.js
+
+```js
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
+const webpack = require('webpack');
+
+module.exports = {
+  /** ---------------ENTRY----------------- */
+  entry: './src/index.js',
+  /** ---------------OUTPUT----------------- */
+  output: {
+    filename: '[name].[chunkhash].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  /** ---------------LOADER----------------- */
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-react'],
+          },
+        },
+      },
+    ],
+  },
+  /** ---------------PLUGINS----------------- */
+  plugins: [
+    // 03. 미리 전역으로 모듈 등록
+    new webpack.ProvidePlugin({
+      React: 'react',
+      $: 'jquery',
+    }),
+  ],
+  mode: 'production',
+};
+```
+
