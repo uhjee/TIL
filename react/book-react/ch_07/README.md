@@ -973,7 +973,7 @@ myFunc();
 
 - 만약 동적 임포트를 하는 함수가 특정 이벤트의 핸들러로 사용된다면, 해당 이벤트가 발생하기 전에는 모듈을 임포트하지 않음 => 꼭 필요할 때만 모듈을 가져오기 때문에 게으른 로딩(**lazy loading**)이라고 불림
 - 번들 파일의 크기가 큰 경우에는 응답 속도가 느리다는 단점 존재
-- webpack에서 제공하는 prefetch, preload 기능 활용
+- webpack에서 제공하는 **prefetch**, **preload** 기능 활용
   - **prefetch**: 가까운 미래에 필요한 파일이라고 브라우저에게 알려주는 기능
     - 브라우저가 바쁘지 않을 때 미리 다운로드
   - **preload**: 지금 당장 필요한 파일이라고 브라우저에게 알려주는 기능
@@ -989,5 +989,138 @@ async function myFunc() {
   console.log('value', _.fill(new Array(3).fill(1), add(30, 20)));
 }
 myFunc();
+```
+
+
+
+### 7.4.3 loader 제작하기
+
+csv 모듈 loader 제작
+
+webpack.config.js
+
+```js
+const path = require('path');
+
+module.exports = {
+  entry: './src/index.js',
+  output: {
+    filename: 'main.js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  module: {
+    rules: [
+      {
+        test: /\.csv$/,
+        use: './my-csv-loader',    // custom-loader
+      },
+    ],
+  },
+  mode: 'production',
+};
+
+```
+
+my-csv-loader.js
+
+```js
+// laoder는 모듈의 내용을 문자열로 입력받는 함수
+module.exports = function (source) {
+  const result = { header: undefined, rows: [] }; // 모듈을 사용하는 쪽에서 받게 될 데이터
+  const rows = source.split('\n');
+// 문자열 parsing
+  for (const row of rows) {
+    const cols = row.split(',');
+    if (!result.header) {
+      result.header = cols;
+    } else {
+      result.rows.push(cols);
+    }
+  }
+  return `export default ${JSON.stringify(result)}`;
+};
+
+```
+
+member.csv
+
+```csv
+index,name,age
+1,mike,23
+2,john,26
+3,uhjee,33
+```
+
+### 7.4.4 플로그인 제작하기
+
+webpack의 처리 과정을 이해해야 작성할 수 있기 때문에 loader보다 작성이 어려움
+
+`DefinePlugin` 처럼 플러그인은 모듈의 내용도 수정할 수 있기 때문에, loader가 할 수 있는 거의 모든 일을 할 수 있음
+
+my-plugin.js
+
+```js
+// plugin 은 class 로 정의 가능
+class MyPlugin {
+  // webpack.config.js 에서 설정한 옵션이 생성자 매개변수로 넘어옴
+  constructor(options) {
+    this.options = options;
+  }
+
+  // webpack의 각 처리 단계에서 호출될 콜백함수 등록
+  apply(compiler) {
+    // webpack 실행 완료시
+    compiler.hooks.done.tap('MyPlugin', () => {
+      console.log('bundling complted!');
+    });
+
+    // webpack이 결과 파일을 생성하기 직전에 호출
+    compiler.hooks.emit.tap('MyPlugin', compilation => {
+      let result = '';
+      for (const filename in compilation.assets) {
+        if (this.options.showSize) {
+          const size = compilation.assets[filename].size();
+          result += `${filename}(${size})\n`;
+        } else {
+          result += `${filename}\n`;
+        }
+      }
+
+      // webpack이 생성할 파일들의 목록
+      compilation.assets['fileList.txt'] = {
+        source: function () {
+          return result;
+        },
+        size: function () {
+          return result.length;
+        },
+      };
+    });
+  }
+}
+
+module.exports = MyPlugin;
+```
+
+webpack.config.js
+
+```js
+const path = require('path');
+const MyPlugin = require('./my-plugin');
+
+module.exports = {
+  entry: {
+    app1: './src/index1.js',
+    app2: './src/index2.js',
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  // apply custom plugin
+  plugins: [new MyPlugin({ showSize: true })],
+  mode: 'production',
+};
+
 ```
 
