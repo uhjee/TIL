@@ -792,3 +792,202 @@ module.exports = {
 };
 ```
 
+---
+
+## 7.4 webpack 고급편
+
+### 7.4.1 Tree Shaking
+
+- 불필요한 코드를 제거해주는 기능
+- webpack은 기본적으로 tree shaking 기능을 제공
+
+- 다음의 경우에는 tree shaking 동작하지 않음
+  - 사용되는 모듈이 ESM(ECMA Script Modules)이 아닌 경우
+  - 사용하는 쪽에서 ESM이 아닌 다른 모듈 시스템을 사용하는 경우
+  - 동적 임포트(Dynamic Import)는 사용하는 경우
+
+#### 외부 패키지 tree shaking
+
+- 예를 들면 lodash 패키지는 ESM으로 되어있지 않기 때문에, tree shaking으로 제거되지 않는다.
+
+잘못된 사용 예
+
+```js
+import { fill } from 'lodash';	// 모든 lodash 코드 포함함
+const arr = [1, 2, 3];
+fill(arr, 'a');
+```
+
+올바른 사용 예
+
+- lodash 패키지에는 ESM 모듈 시스템을 사용하는 **lodash-es** 패키지를 별도로 제공하고 있음
+
+```js
+import { fill } from 'lodash-es';
+```
+
+#### 바벨 사용 시 주의할 점
+
+- 바벨로 컴파일한 이후에도 ESM 문법으로 남아있도록 해야한다.
+
+babel.config.js 
+
+```js
+const presets = [
+  [
+      '@babel/preset-env',
+      {
+          // ...
+          modules: false,   // 모듈 시스템이 변경되지 않도록 설정
+      }
+  ]  
+];
+```
+
+### 7.4.2 코드 분할
+
+- 어플리케이션 전체 코드를 하나의 번들 파일로 만드는 것이 좋지 않을 수도 있다.
+- 불필요한 코드까지 전송되어 사용자 요청으로부터 렌더링되기 까지 오랜 시간이 걸릴 수 있음
+- 다수의 사용자를 대상으로 하는 서비스라면 응답 시간을 최소화하기 위해 코드 분할하는 게 좋음
+
+webpack.config.js
+
+```js
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+module.exports = {
+  // code split을 위해 entry 파일을 각각 입력
+  entry: {
+    page1: './src/index1.js',
+    page2: './src/index2.js',
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin()],
+  mode: 'production',
+};
+```
+
+- index1, index2 모두 같은 내용을 담고 있기 때문에 비효율적
+
+#### SplitChnksPlugin
+
+- webpack 내장 코드 분할 플러그인
+
+webpack.config.js
+
+```js
+const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+
+module.exports = {
+  // code split을 위해 entry 파일을 각각 입력
+  entry: {
+    page1: './src/index1.js',
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
+  },
+  plugins: [new CleanWebpackPlugin()],
+  optimization: {
+    // 코드 분할 설정
+    splitChunks: {
+      chunks: 'all', // 동적 임포트가 아니더라도 코드 분할되도록
+      name: 'vendor',
+    },
+  },
+  mode: 'production',
+};
+
+```
+
+- splitChunks 속성의 기본값
+
+  ```js
+  module.exports = {
+    // ...
+    optimization: {
+      splitChunks: {
+        chunks: 'async', // --- 동적 임포트만 코드를 분할하도록 설정
+        minSize: 30000,  // file szie 30kb 이상인 모듈만 분할 대상
+        minChunks: 1,    // 한 개 이상의 chunk에 포함되어 있어야 함
+        // ...
+        cacheGroups: {   // 파일 분할은 그룹별로 이뤄짐 (기본적으로 내부모듈default과 외부모듈vendors)
+            default: {
+                minChunks: 2,  // 내부 모듈은 두 개 이상의 번들 파일에 포함되어야 분할 처리
+                prioity: -20,
+                reuseExistingChunk: true,
+            },
+            defaultVendors: {
+              test: /[\\/]node_modules[\\/]/,
+                priority: -10,
+            },
+        },
+      },
+    },
+    mode: 'production',
+  };
+  
+  ```
+
+#### 동적 임포트 dynamic import
+
+- 동적으로 모듈을 가져올 수 있는 기능
+- 웹팩에서 동적 임포트를 사용하면 해당 모듈의 코드는 자동으로 분할되며, 오래된 브라우저에서도 잘 동작함
+- javascript 표준이 될 것이 유력(stage 3)
+
+```js
+function myFunc() {
+  import('./util').then(({ add }) =>
+    import('lodash').then(({ default: _ }) =>
+      console.log('value', _.fill([1, 2, 3], add(10, 20))),
+    ),
+  );
+};
+
+myFunc();
+```
+
+- import 함수를 사용하면 동적으로 모듈을 가져올 수 있다.
+- import 함수는 Promise 객체를 반환한다.
+
+Promise.all() 메소드 사용한 동적 임포트
+
+```js
+async function myFunc() {
+  const [{ add }, { default: _ }] = await Promise.all([
+    import('./util'),
+    import('lodash'),
+  ]);
+  console.log('value', _.fill(new Array(3).fill(1), add(30, 20)));
+}
+myFunc();
+
+```
+
+#### 분할된 파일을 prefetch, preload로 빠르게 가져오기
+
+- 만약 동적 임포트를 하는 함수가 특정 이벤트의 핸들러로 사용된다면, 해당 이벤트가 발생하기 전에는 모듈을 임포트하지 않음 => 꼭 필요할 때만 모듈을 가져오기 때문에 게으른 로딩(**lazy loading**)이라고 불림
+- 번들 파일의 크기가 큰 경우에는 응답 속도가 느리다는 단점 존재
+- webpack에서 제공하는 prefetch, preload 기능 활용
+  - **prefetch**: 가까운 미래에 필요한 파일이라고 브라우저에게 알려주는 기능
+    - 브라우저가 바쁘지 않을 때 미리 다운로드
+  - **preload**: 지금 당장 필요한 파일이라고 브라우저에게 알려주는 기능
+    - 첫 페이지 로딩 시 즉시 다운로드 -> 남발할 경우, 첫 페이지 로딩 속도 느려짐
+
+```js
+async function myFunc() {
+  await new Promise((res) => setTimeout(res, 1000)); // 1초 지연
+  const [{ add }, { default: _ }] = await Promise.all([
+    import(/* webpackPreload: true */ './util'),
+    import(/* webpackPrefetch: true */ 'lodash'),
+  ]);
+  console.log('value', _.fill(new Array(3).fill(1), add(30, 20)));
+}
+myFunc();
+```
+
