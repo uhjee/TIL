@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Home from './Home';
 import About from './About';
 
-export default function App({ page }) {
-  const [page, setPage] = useState(page);
+export default function App({ propPage }) {
+  const [page, setPage] = useState(propPage);
 
   useEffect(() => {
     // 페이지 뒤가 버튼 클릭 시, 아래 이벤트 발생
