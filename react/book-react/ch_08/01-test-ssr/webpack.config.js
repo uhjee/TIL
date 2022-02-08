@@ -3,11 +3,13 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
-function getConfig(isServer) {
+function getConfig(isServer, name) {
   return {
-    entry: isServer
-      ? { server: './src/server.js' }
-      : { main: './src/index.js' },
+    // entry: isServer
+    //   ? { server: './src/server.js' }
+    //   : { main: './src/index.js' },
+    // 미리 렌더링된 페이지 활용
+    entry: { [name]: `./src/${name}` },
     output: {
       // server는 캐싱 효과 필요 X
       filename: isServer ? '[name].bundle.js' : '[name].[chunkhash].js',
@@ -67,8 +69,8 @@ function getConfig(isServer) {
   };
 }
 
-// 배열의 요소 수 만큼 웹팩이 실행
-module.exports = [getConfig(false), getConfig(true)];
+// // 배열의 요소 수 만큼 웹팩이 실행
+// module.exports = [getConfig(false), getConfig(true)];
 
 // module.exports = {
 //   entry: './src/index.js',
@@ -98,3 +100,10 @@ module.exports = [getConfig(false), getConfig(true)];
 //   ],
 //   mode: 'production',
 // };
+
+// 미리 렌더링 해놓은 페이지 활용
+module.exports = [
+  getConfig(false, 'index'),
+  getConfig(true, 'server'),
+  getConfig(true, 'prerender'),
+];

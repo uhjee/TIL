@@ -10,7 +10,7 @@ const Container = styled.div`
 `;
 
 // API Mock
-function getchUsername() {
+function fetchUsername() {
   const usernames = ['mike', 'june', 'jamie'];
   return new Promise((resolve) => {
     const username = usernames[Math.floor(Math.random() * 3)];
