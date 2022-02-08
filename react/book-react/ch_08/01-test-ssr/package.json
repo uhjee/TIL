@@ -6,7 +6,7 @@
   "scripts": {
     "build-server": "babel src --out-dir dist-server --config-file ./.babelrc.server.js",
     "build": "webpack",
-    "start": "node dist-server/server.js",
+    "start": "node dist/server.bundle.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
