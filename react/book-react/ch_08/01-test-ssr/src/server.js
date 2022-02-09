@@ -11,6 +11,9 @@ import { ServerStyleSheet } from 'styled-components';
 // 미리 렌더링한 페이지 활용
 import { renderPage, prerenderPages } from './common';
 
+// caching
+import lruCache from 'lru-cache';
+
 // express 객체인 app 변수를 사용해, 미들웨어와 url 경로 설정
 const app = express();
 
@@ -19,6 +22,12 @@ const app = express();
 //   path.resolve(__dirname, '../dist/index.html'),
 //   'utf8',
 // );
+
+// caching
+const ssrCache = new lruCache({
+  max: 100, // 최대  100개 페이지
+  maxAge: 1000 * 60, // 60sec
+});
 
 // 미리 렌더링한 페이지 활용 :: prerender.js 파일 실행 시, 미리 렌더링해 놓은 페이지를 객체에 저장
 const prerenderHtml = {};
@@ -37,6 +46,16 @@ app.use('/dist', express.static('dist'));
 app.get('/favicon.ico', (req, res) => res.sendStatus(204));
 app.get('*', (req, res) => {
   const parsedUrl = url.parse(req.url, true); // 문자열 주소값을 구조체로 변환
+
+  // caching
+  const cacheKey = parsedUrl.path;
+
+  if (ssrCache.has(cacheKey)) {
+    console.log('캐시 사용');
+    res.send(ssrCache.get(cacheKey));
+    return;
+  }
+
   const page = parsedUrl.pathname ? parsedUrl.pathname.substring(1) : 'home'; // 'pathname' 앞의 / 를 삭제해 page 변수 만들기
 
   // const sheet = new ServerStyleSheet(); // style 추출하는데 사용되는 객체 생성
@@ -61,6 +80,10 @@ app.get('*', (req, res) => {
     '__DATA_FROM_SERVER__',
     JSON.stringify(initialData),
   );
+
+  // caching
+  ssrCache.set(cacheKey, result);
+
   res.send(result);
 });
 app.listen(3000);
