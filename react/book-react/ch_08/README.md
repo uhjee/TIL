@@ -148,3 +148,52 @@ npm install styled-components
 - 제한된 메모리 안에 캐싱 데이터를 저장하기 위해 지울 데이터를 결정하는 알고리즘 지원 패키지
 - 최대 캐시 개수를 초과하면 **LRU(least recently used)** 알고리즘에 따라 가장 오랫동안 사용되지 않은 캐시를 제거
 
+### 8.2.3 SSR 렌더링 함수 사용해보기
+
+- react는 SSR 을 위해 `renderToString` 함수 외에 `renderToNodeStream` 함수 제공
+
+#### renderToString 함수
+
+- 모든 렌더링 과정이 끝나야 문자열로된 결과값 반환
+
+#### renderToNodeStream 함수
+
+호출 즉시 node의 stream 객체 반환
+
+렌더링 데이터를 빠르게 전달할 수 있다는 장점
+
+페이지가 아무리 복잡하더라도 첫 번째 chunk가 준비되면 바로 전송 시작하기 때문
+
+- node의 stream
+
+  - 배열이나 문자열 같은 data collection
+
+  - 크기가 큰 데이터를 다룰 때 유용
+
+  - 데이터를 chunk 단위로 쪼개서 전달하기 때문에, 데이터가 완전히 준비되지 않아도 전송 시작 가능
+
+  - stream을 사용해 크기가 큰 파일 읽어오기
+
+    메모리를 효율적으로 사용할 뿐 아니라, 첫 번째 청크가 준비되면 바로 전송을 시작하기 때문에 빠름
+
+    ```js
+    app.get('/readFile', (req, res) => {
+        const fileStream = fs.createReadStream('./big_file.zip'); // file을 읽기 위해 읽기 가능한 reable stream 객체 생성
+        fileStream.pipe(res);	// node의 HTTP response 객체는 쓰기 가능한 writable steram 객체
+        // 데이터는 reable stream 에서 writable stream으로 흐른다.
+    })
+    ```
+
+  - 읽기 쓰기 가능한 steam : duplex stream
+
+    - readble stream 과 writable stream  연결 역할
+
+    ```js
+    reabaleStream
+    	.pipe(transformStream1)
+    	.pipe(transformStream2)
+    	.pipe(writableStream)
+    ```
+
+    
+
