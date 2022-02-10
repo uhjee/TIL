@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import * as url from 'url';
 // react-dom 패키지의 server 디렌토리 하위에 서버에서 사용하는 기능
-import { renderToString } from 'react-dom/server';
+import { renderToString, renderToNeedStream } from 'react-dom/server';
 import React from 'react';
 import App from './App';
 import { ServerStyleSheet } from 'styled-components';
@@ -60,7 +60,7 @@ app.get('*', (req, res) => {
 
   // const sheet = new ServerStyleSheet(); // style 추출하는데 사용되는 객체 생성
 
-  // const renderString = renderToString(sheet.collectStyles(<App page={page} />));
+  // const renderString = , renderToNeedStream(sheet.collectStyles(<App page={page} />));
   // const styles = sheet.getStyleTags(); // 스타일 정보추출
 
   const initialData = { page };

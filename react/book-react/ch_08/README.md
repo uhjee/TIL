@@ -197,3 +197,36 @@ npm install styled-components
 
     
 
+## 8.3 Next 초급
+
+- cra는 CSR만 하는 반면, Next는 SSR에 특화된 프레임워크
+
+### 8.3.1 Next 시작하기
+
+- 모든 페이지 컴포넌트는 pages 폴더 및에 생성
+
+
+
+#### Next의 번들 파일 분석
+
+- 프로젝트 루트의 `.next` 디렉토리 하위에 번들파일이 생성됨
+
+- `.next/static`
+  - chunks : 여러 페이지에서 공통으로 사용하는 번들 파일
+    - pages : 각 페이지의 번들 파일
+  - runtime : webpack, next의 런타임과 관련된 번들 파일
+- `./next/server/static` 
+  - : 서버에서 사용하는 파일들
+  - 하위의 파일들은 코드가 압축되어 있지 않다.
+  - node_modules 디렉토리의 외부 모듈의 코드가 번들 파일에 포함되어 있지 않음
+    - 어차피 서버에서 실행되는 코드이기 때문
+  - pages
+    - 정적 페이지는 미리 렌더링해 html 파일로 저장
+    - `_document.js` 파일은 서버 측에서 HTML 요소를 추가하는 용도
+
+SSR 요청 후 응답 파일들 
+
+- _app.js : 모든 페이지의 최상단에서 실행되는 리액트 컴포넌트 코드
+- framework.[해시값].js : Next 에서 사용하는 주요 패키지(react 등)의 코드
+- [해시값].js : 여러 페이지에서 공통으로 사용하는 코드
+- main-[해시값].js : 웹팩 런타임 코드
