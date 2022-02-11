@@ -230,3 +230,151 @@ SSR 요청 후 응답 파일들
 - framework.[해시값].js : Next 에서 사용하는 주요 패키지(react 등)의 코드
 - [해시값].js : 여러 페이지에서 공통으로 사용하는 코드
 - main-[해시값].js : 웹팩 런타임 코드
+
+#### Next 기본 기능 사용하기
+
+- 정적 파일 import
+- HTML head 태그
+- style 코드 작성
+
+```jsx
+import Head from 'next/head';
+
+function Page1() {
+  return (
+    <div>
+      <p>This is home page</p>
+      {/* 정적 파일 직접 import 후 사용- 캐싱 안됨 */}
+      <img src="/static/icon.png" />
+
+      {/* Next 제공 Head 컴포넌트 사용 
+          여러 개로 사용해도 이후 컴파일 시 하나로 합쳐짐
+      */}
+
+      <Head>
+        <title>page1</title>
+      </Head>
+      <Head>
+        <meta name="description" content="hello next" />
+      </Head>
+
+      {/* Next는 styled-jsx 패키지를 통해 css-in-js 방식 지원 
+          선언된 style은 현 컴포넌트 내부에만 적용
+      */}
+
+      <style jsx>
+        {`
+          p {
+            color: blue;
+            font-size: 18pt;
+          }
+        `}
+      </style>
+    </div>
+  );
+}
+
+export default Page1;
+```
+
+#### Next가 생성한 HTML 분석
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
+    <title class="jsx-fe0073b77777a978">page1</title>
+
+      Head 컴포넌트를 사용해 입력한 DOM 요소
+    <meta
+      name="description"
+      content="hello next"
+      class="jsx-fe0073b77777a978"
+    />
+    <meta name="next-head-count" content="4" />
+    <noscript data-n-css=""></noscript>
+    <script
+      defer=""
+      nomodule=""
+      src="/_next/static/chunks/polyfills-5cd94c89d3acac5f.js"
+    ></script>
+	// ...
+    <script
+      src="/_next/static/jUPe9HMDDGC4vvNf41cWI/_middlewareManifest.js"
+      defer=""
+    ></script>
+      
+      style-jsx 문법으로 작성한 스타일 코드
+    <style id="__jsx-fe0073b77777a978">
+      p.jsx-fe0073b77777a978 {
+        color: blue;
+        font-size: 18pt;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="__next" data-reactroot="">
+      <div class="jsx-fe0073b77777a978">
+        <p class="jsx-fe0073b77777a978">This is home page</p>
+        <img src="/static/icon.png" class="jsx-fe0073b77777a978" />
+      </div>
+    </div>
+      
+      서버에서 생성된 데이터
+    <script id="__NEXT_DATA__" type="application/json">
+      {
+        "props": { "pageProps": {} },
+        "page": "/page1",
+        "query": {},
+        "buildId": "jUPe9HMDDGC4vvNf41cWI",
+        "nextExport": true,
+        "autoExport": true,
+        "isFallback": false,
+        "scriptLoader": []
+      }
+    </script>
+  </body>
+</html>
+
+```
+
+
+
+### 8.3.2 웹팩 설정 변경하기
+
+Next는 cra 와 달리 webpack 설정을 변경할 수 있음
+
+- 정적파일은 프로젝트 루트의 static 이용
+- 브라우저 캐싱 기능을 활용하기 위해서는, 파일의 내용이 변경되면 파일의 path도 변경되는게 좋음
+- webpack의 file-loader로 이 기능 구현
+
+next.config.js
+
+```js
+module.exports = {
+  // webpack 설정을 변경하기 위한 함수
+  webpack: (config) => {
+    // module 에 file-loader 추가
+    config.module.rules.push({
+      test: /.(png|jpg)$/,
+      use: [
+        {
+          loader: 'file-loader',
+          options: {
+            // 쿼리 파라미터 부분에 해시 추가해 파일의 내용이 변경될 때마다 파일 경로가 변경되도록 처리
+            name: '[path][name].[ext]?[hash]',
+            // next는 static 폴더의 정적파일을 그대로 서비스하기 때문에 복사필요 X
+            emitFile: false,
+            publicPath: '/',
+          },
+        },
+      ],
+    });
+    return config;
+  },
+};
+
+```
+
