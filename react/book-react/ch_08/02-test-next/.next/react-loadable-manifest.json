@@ -1,1 +1,8 @@
-{}
+{
+  "page2.js -> ../src/sayHello": {
+    "id": 5948,
+    "files": [
+      "static/chunks/948.7528f163b9a814b6.js"
+    ]
+  }
+}

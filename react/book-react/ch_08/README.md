@@ -509,3 +509,109 @@ promotion 모드로 실행
 npx next build && npx next start
 ```
 
+---
+
+## 8.4 넥스트 고급편
+
+### 8.4.1 페이지 공통 기능 구현
+
+- `pages/_app.js` 파일에서 구현
+
+- `myApp` 컴포넌트는 페이지가 전환되는 경우에도 unmount되지 않는다.
+
+- unmount 되지 않기 때문에, 전역 상탯값을 관리하는 것도 가능
+
+- 페이지 전환되어도 메뉴 UI 유지
+
+  ​	pages/_app.js
+
+  ```jsx
+  import Link from 'next/link';
+  
+  /**
+   * 공통 메뉴 UI 반환
+   *
+   * @param   {ReactElement}  Component  렌더링하려는 페이지의 컴포넌트
+   * @param   {object}  pageProps  해당 페이지의 getInitialProps 함수가 반환한 값
+   *
+   * @return  {[type]}             [return description]
+   */
+  export default function myApp({ Component, pageProps }) {
+    return (
+      <div>
+        <Link href="/page1">
+          <a>page1</a>
+        </Link>
+        <Link href="/page2?text=uhjee">
+          <a>page2</a>
+        </Link>
+        {/* 페이지 컴포넌트 렌더링 */}
+        <Component {...pageProps} />
+      </div>
+    );
+  }
+  
+  ```
+
+  
+
+  ### 8.4.2 넥스트에서의 코드 분할
+
+  - Next는 기본적으로 페이지 별로 번들 파일 생성
+    - 동적 임포트 사용 시에는 해당 모듈의 코드는 별도의 파일로 분할
+    - 여러 페이지에 공통적으로 사용되는 모듈도 별도의 파일로 분할
+
+  #### 동적 임포트로 코드 분할하기
+
+  pages/page2.js
+
+  ```jsx
+  import { callApi } from '../src/api';
+  import Router from 'next/router';
+  
+  export default function Page2({ text, data }) {
+    function onClick() {
+      // Dynamic Import
+      import('../src/sayHello').then(({ sayHello }) => console.log(sayHello()));
+    }
+  
+    return (
+      <div>
+        <button onClick={onClick}>sayHello(dynamic import)</button>
+      </div>
+    );
+  }
+  ```
+
+  - sayHello button 을 클릭하는 순간, sayHello.js 모듈이 담긴 js 파일이 전송되는 것 확인
+  - .next/static/chunks 디렉토리 밑에 sayHello.js 모듈의 코드 포함하는 번들 파일 존재
+  - .next/server 폴더 밑에 sayHello.js 모듈 코드 포함한 번들 파일 존재 => SSR 시 사용
+
+#### getInitialProps 함수에서 동적 임포트 사용하기
+
+getInitialProps 함수에서 사용된 동적 임포트는 어떻게 동작하는지 확인
+
+```jsx
+import { callApi } from '../src/api';
+import Router from 'next/router';
+import { add } from '../src/util';
+
+Page2.getInitialProps = async ({ query }) => {
+  // dynamic import
+  const { sayHello } = await import('../src/sayHello');
+  console.log(sayHello());
+	// ...
+};
+
+export default function Page2({ text, data }) {
+
+  return (
+    <div>
+      <p>{`10 + 20 = ${add(10, 20)}`}</p>
+    </div>
+  );
+}
+```
+
+- url로 접근 시, 서버에서 getInitialProps 호출
+- 이후 페이지 이동으로 접근 시, sayHello 가 담긴 번들 파일을 브라우저가 가져온다.
