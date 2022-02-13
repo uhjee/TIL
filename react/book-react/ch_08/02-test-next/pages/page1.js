@@ -1,10 +1,14 @@
 import Head from 'next/head';
+import Link from 'next/link';
 
-import Icon from '../static/icon.png';
+import Icon from '../static/icon1.png';
 
 function Page1() {
   return (
     <div>
+      <Link href="/page2">
+        <a>page2로 이동</a>
+      </Link>
       <p>This is home page</p>
       {/* 정적 파일 직접 import 후 사용- 캐싱 안됨 */}
       <img src={Icon} />

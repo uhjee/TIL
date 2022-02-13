@@ -1,6 +1,6 @@
 module.exports = {
   // webpack 설정을 변경하기 위한 함수
-  webpack: (config) => {
+  webpack: config => {
     // module 에 file-loader 추가
     config.module.rules.push({
       test: /.(png|jpg)$/,
@@ -18,5 +18,10 @@ module.exports = {
       ],
     });
     return config;
+  },
+  // next version 10 이후로 Image component가 내장되어 있기 때문에... 별도 설정
+  //  next@canary 설치 필요
+  images: {
+    disableStaticImages: true,
   },
 };

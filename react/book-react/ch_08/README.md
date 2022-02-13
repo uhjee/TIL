@@ -355,7 +355,7 @@ next.config.js
 ```js
 module.exports = {
   // webpack 설정을 변경하기 위한 함수
-  webpack: (config) => {
+  webpack: config => {
     // module 에 file-loader 추가
     config.module.rules.push({
       test: /.(png|jpg)$/,
@@ -374,7 +374,138 @@ module.exports = {
     });
     return config;
   },
+  // next version 10 이후로 Image component가 내장되어 있기 때문에... 별도 설정
+  //  next@canary 설치 필요
+  images: {
+    disableStaticImages: true,
+  },
 };
 
+```
+
+ next version 10 부터는 Image 컴포넌트가 내장되어 있기 때문에, 아래 패키지 설치 필요
+
+```sh
+npm install next@canary
+```
+
+### 8.3.3 서버에서 생성된 데이터를 전달하기
+
+- next 에서는 `getInitialProps` 라는 함수를 이용해 페이지 컴포넌트로 속성값을 전달
+- 각 페이지의 `getInitialProps` 함수는 페이지 진입 직전에 호출
+  - 사용자가 첫 페이지를 요청하면 `getInitialProps` 함수는 서버에서 호출
+  - 이후 클라이언트 페이지 전환을 하면 `getInitialProps` 함수는 클라이언트에서 호출
+
+pages/page2.js
+
+```jsx
+import { callApi } from '../src/api';
+
+// getInitialProps 함수 정의 - 매개변수로 다양한 정보가 전달되지만 여기선 쿼리 파라미터만 사용
+Page2.getInitialProps = async ({ query }) => {
+  const text = query.text || 'none'; // 쿼리 파라미터로부터 text 변수 생성
+  const data = await callApi(); // 데이터를 가져오기 위해 API 호출 - (서버 | 클라이언트)에서 호출
+  return { text, data }; // getInitialProps 함수의  return 값은 페이지 컴포넌트의 props 값으로 전달
+};
+
+export default function Page2({ text, data }) {
+  return (
+    <div>
+      <p>this is home page2</p>
+      <p>{`text: ${text}`}</p>
+      <p>{`data is ${data}`}</p>
+    </div>
+  );
+}
+```
+
+src/api.js
+
+```js
+export function callApi() {
+  return Promise.resolve(123);
+}
+```
+
+### 8.3.4 페이지 이동하기
+
+- Next 는 페이지 이동을 위해 `Link` 컴포넌트와 `Router` 객체 제공
+
+#### Link 컴포넌트를 이용해서 페이지 이동하기
+
+pages/page1.js
+
+```jsx
+import Head from 'next/head';
+import Link from 'next/link'; // Link 컴포넌트
+
+import Icon from '../static/icon1.png';
+
+function Page1() {
+  return (
+    <div>
+      <Link href="/page2">
+        <a>page2로 이동</a>
+      </Link>
+			// ...
+    </div>
+  );
+}
+
+export default Page1;
+```
+
+
+
+#### Router 개체를 이용해서 페이지 이동하기
+
+pages/page2.js
+
+```jsx
+import { callApi } from '../src/api';
+import Router from 'next/router';  // Router 객체 
+
+// ...
+
+export default function Page2({ text, data }) {
+  return (
+    <div>
+      <button onClick={() => Router.push('/page1')}>page1로 이동</button>
+      // ...
+    </div>
+  );
+}
+```
+
+### 8.3.5 에러 페이지 구현하기
+
+- 별도로 에러 페이지를 구현하지 않았다면, Next에서 제공하는 에러 페이지가 사용됨
+- 직접 구현하기 위해서는 `pages` 디렉토리 하위에  `_error.js` 파일 작성
+
+pages/_error.js
+
+```jsx
+
+// 에러 페이지도 getInitialProps 함수 사용 가능
+ErrorPage.getInitialProps = ({ res, err }) => {
+  const statusCode = res ? res.statusCode : err ? err.statusCode : null;
+  return { statusCode };
+};
+
+export default function ErrorPage({ statusCode }) {
+  return (
+    <div>
+      {statusCode === 404 && '페이지를 찾을 수 없습니다.'}
+      {statusCode === 500 && '알 수 없는 에러가 발생했습니다.'}
+      {!statusCode && '클라이언트에서 에러가 발생했습니다.'}
+    </div>
+  );
+}
+```
+
+promotion 모드로 실행
+
+```sh
+npx next build && npx next start
 ```
 
