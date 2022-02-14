@@ -1,38 +1,39 @@
 {
   "polyfillFiles": [
-    "static/chunks/polyfills-5cd94c89d3acac5f.js"
+    "static/chunks/polyfills.js"
   ],
-  "devFiles": [],
-  "ampDevFiles": [],
+  "devFiles": [
+    "static/chunks/react-refresh.js"
+  ],
+  "ampDevFiles": [
+    "static/chunks/webpack.js",
+    "static/chunks/amp.js"
+  ],
   "lowPriorityFiles": [
-    "static/JposBXBv9JtUOeLI32Uks/_buildManifest.js",
-    "static/JposBXBv9JtUOeLI32Uks/_ssgManifest.js",
-    "static/JposBXBv9JtUOeLI32Uks/_middlewareManifest.js"
+    "static/development/_buildManifest.js",
+    "static/development/_ssgManifest.js",
+    "static/development/_middlewareManifest.js"
   ],
   "pages": {
     "/_app": [
-      "static/chunks/webpack-effdb3e0fd4e366c.js",
-      "static/chunks/framework-e70c6273bfe3f237.js",
-      "static/chunks/main-984ed4aad7f6b82f.js",
-      "static/chunks/pages/_app-a8b9586f81e5610f.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/_app.js"
     ],
     "/_error": [
-      "static/chunks/webpack-effdb3e0fd4e366c.js",
-      "static/chunks/framework-e70c6273bfe3f237.js",
-      "static/chunks/main-984ed4aad7f6b82f.js",
-      "static/chunks/pages/_error-548307965b26c6d3.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/_error.js"
     ],
     "/page1": [
-      "static/chunks/webpack-effdb3e0fd4e366c.js",
-      "static/chunks/framework-e70c6273bfe3f237.js",
-      "static/chunks/main-984ed4aad7f6b82f.js",
-      "static/chunks/pages/page1-5667ae48f618b6d9.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/page1.js"
     ],
     "/page2": [
-      "static/chunks/webpack-effdb3e0fd4e366c.js",
-      "static/chunks/framework-e70c6273bfe3f237.js",
-      "static/chunks/main-984ed4aad7f6b82f.js",
-      "static/chunks/pages/page2-e2c758dece539d42.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main.js",
+      "static/chunks/pages/page2.js"
     ]
   },
   "ampFirstPages": []

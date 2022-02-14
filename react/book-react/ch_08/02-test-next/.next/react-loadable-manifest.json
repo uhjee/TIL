@@ -1,8 +1,8 @@
 {
   "page2.js -> ../src/sayHello": {
-    "id": 5948,
+    "id": "page2.js -> ../src/sayHello",
     "files": [
-      "static/chunks/948.7528f163b9a814b6.js"
+      "static/chunks/src_sayHello_js.js"
     ]
   }
 }

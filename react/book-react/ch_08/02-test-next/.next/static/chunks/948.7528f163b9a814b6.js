@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[948],{5948:function(n,e,u){function t(){return"hello~!"}u.r(e),u.d(e,{sayHello:function(){return t}})}}]);
