@@ -43,6 +43,27 @@ app.prepare().then(() => {
   });
 });
 
+const fs = require('fs');
+
+const prerenderList = [
+  { name: 'page1', path: '/page1' },
+  { name: 'page2-hello', path: '/page2?text=hello' },
+  { name: 'page2-world', path: '/page2?text=world' },
+];
+
+const prerenderCache = {};
+
+// next export 는 production 모드에서만 사용
+// out 폴더에 있는 미리 렌더링된 HTML 파일을 읽어서 prerenderCache에 저장
+if (!dev) {
+  for (const info of prerenderList) {
+    const { name, path } = info;
+    const html = fs.readFileSync(`./out/${name}.html`, 'utf8');
+    prerenderCache[path] = html;
+  }
+}
+console.log(prerenderCache);
+
 // SSR caching 기능 개발
 async function renderAndCache(req, res) {
   const parsedUrl = url.parse(req.url, true);
@@ -53,10 +74,16 @@ async function renderAndCache(req, res) {
     return;
   }
 
+  if (prerenderCache.hasOwnProperty(cacheKey)) {
+    console.log('미리 렌더링한 HTML 사용');
+    res.send(prerenderCache[cacheKey]);
+    return;
+  }
+
   try {
     const { query, pathname } = parsedUrl;
     // cache가 없으면, 넥스트의 renderToHTML 메소드 호출
-    const html = await app.renderToHTML(req, res, pathname, query); 
+    const html = await app.renderToHTML(req, res, pathname, query);
     // 결과 커밋
     if (res.statusCode === 200) {
       ssrCache.set(cacheKey, html);

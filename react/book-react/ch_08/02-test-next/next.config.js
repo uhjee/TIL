@@ -24,4 +24,12 @@ module.exports = {
   images: {
     disableStaticImages: true,
   },
+  // next export 명령을 실행할 때, exportPathMap 옵션 사용
+  exportPathMap: function () {
+    return {
+      '/page1': { page: '/page1' },
+      '/page2-hello': { page: '/page2', query: { text: 'hello' } }, // 쿼리 파라미터
+      '/page2-world': { page: '/page2', query: { text: 'world' } },
+    };
+  },
 };
