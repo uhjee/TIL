@@ -750,5 +750,250 @@ async function renderAndCache(req, res) {
 }
 ```
 
+### 8.4.5 페이지 미리 렌더링하기
 
+#### 자동으로 미리 렌더링하기
+
+- 페이지를 미리 렌더링하면 서버의 CPU 리소스를 절약할 수 있음
+- Next 에서 build 시, `getInitialProps` 함수가 없는 페이지는 자동으로 미리 렌더링
+  - 따라서 getInitialProps 함수는 꼭 필요한 경우에만 작성
+  - `_app.js` 파일에서 `getInitalProps` 함수를 정의하면, 모든 페이지가 미리 렌더링
+
+#### next export 로 미리 렌더링 하기
+
+- next에서는 `next export` 명령어를 통해 전체 페이지를 미리 렌더링할 수 있음
+
+- `next export` 명령어는 빌드 후에 실행해야 함
+
+  ```shell
+  npx next build && npx next export
+  ```
+
+- 명령어 실행 후, 프로젝트 루트에 **out 디렉토리** 생성
+
+- out 폴더만 있으면, 서버에서 넥스트를 실행하지 않고도, 정적 페이지 서비스 가능
+
+  server.js
+
+  ```js
+  const express = require('express');
+  const app = express();
+  
+  // out directory 하위 정적페이지
+  app.use(express.static('out'));
+  
+  const port = 3000;
+  
+  app.listen(port, err => {
+    if (err) throw err;
+  });
+  
+  ```
+
+#### Next 의 exportPathMap 옵션 사용하기
+
+next.config.js
+
+```js
+module.exports = {
+	// ...
+	// next export 명령을 실행할 때, exportPathMap 옵션 사용
+  exportPathMap: function () {
+    return {
+      '/page1': { page: '/page1' },
+      '/page2-hello': { page: '/page2', query: { text: 'hello' } }, // 쿼리 파라미터 
+      '/page2-world': { page: '/page2', query: { text: 'world' } },
+    };
+  },
+};
+
+```
+
+- `http://localhost:3333/page2-hello.html` 로 접근하면, hello를 쿼리 파라미터로 받는다.
+- 하지만 `http://localhost:3333/page2.html` 는 렌더링되지 않음 -> 정적 파일로 미리 만들어두지 않았기 때문
+
+#### 동적 페이지와 정적 페이지를 동시에 서비스하기
+
+동적 페이지를 서비스하기 위해 넥스트를 실행하면서, 미리 렌더링한 페이지도 동시에 서비스
+
+server.js
+
+```js
+const express = require('express');
+const next = require('next');
+
+// ...
+const fs = require('fs');
+
+const prerenderList = [
+  { name: 'page1', path: '/page1' },
+  { name: 'page2-hello', path: '/page2?text=hello' },
+  { name: 'page2-world', path: '/page2?text=world' },
+];
+
+const prerenderCache = {};
+
+// next export 는 production 모드에서만 사용
+// out 폴더에 있는 미리 렌더링된 HTML 파일을 읽어서 prerenderCache에 저장
+if (!dev) {
+  for (const info of prerenderList) {
+    const { name, path } = info;
+    const html = fs.readFileSync(`./out/${name}.html`, 'utf8');
+    prerenderCache[path] = html;
+  }
+}
+
+// SSR caching 기능 개발
+async function renderAndCache(req, res) {
+  const parsedUrl = url.parse(req.url, true);
+  const cacheKey = parsedUrl.path; // query parameter 가포함된 경로를 키로 사용
+  if (ssrCache.has(cacheKey)) {
+    console.log('캐시 사용');
+    res.send(ssrCache.get(cacheKey));
+    return;
+  }
+
+  if (prerenderCache.hasOwnProperty(cacheKey)) {
+    console.log('미리 렌더링한 HTML 사용');
+    res.send(prerenderCache[cacheKey]);
+    return;
+  }
+	// ...
+}
+```
+
+```sh
+npx next build && npx next export
+NODE_ENV=production node server.js
+```
+
+### 8.4.6 styled-components 사용하기
+
+- next는 `css-in-js` 방식으로 스타일 코드를 작성할 수 있는 `styled-jsx` 패키지를 내장
+- 다른 패키지를 사용해 `css-in-js` 방식을 사용하려면 몇 가지 설정해야함
+- `styled-components` 를 사용해보자
+
+
+
+- css-in-js 방식을 사용하기 위해선, 서버사이드 렌더링 시 스타일 코드를 추출해 HTML 파일에 삽입하는 과정 필요
+- styled-jsx 문법으로 작성한 스타일 코드를 추출하는 코드는 넥스트 내부의 **_document.js 파일**에 존재
+
+#### _document.js 파일 작성하기
+
+- pages/ 에 `_document.js` 파일 작성 가능
+  - 작성 시, 내장 `_document.js` 대신 우리가 작성한 파일 사용
+
+./pages/_document.js
+
+```js
+import Document from 'next/document';
+import { ServerStyleSheet } from 'styled-components';
+
+/**
+ * Next 내장 _document.js 가 아닌 직접 구현하는 _document.js
+ */
+// Next에 내장된 Document 상속
+export default class MyDocument extends Document {
+  // 내장 getInitialProps 함수에서는 styled-jsx 의 스타일 코드 추출
+  static async getInitialProps(ctx) {
+    const sheet = new ServerStyleSheet();
+    const originalRenderPage = ctx.renderPage;
+
+    try {
+      ctx.renderPage = () =>
+        originalRenderPage({
+          // styled-components 의 스타일 코드 추출
+          enhanceApp: App => props => sheet.collectStyles(<App {...props} />),
+        });
+
+      const initialProps = await Document.getInitialProps(ctx);
+
+      return {
+        ...initialProps,
+        styles: (
+          <>
+            {initialProps.styles}
+            {sheet.getStyleElement()} // 추출한 스타일 코드 반환값에 추가
+          </>
+        ),
+      };
+    } finally {
+      sheet.seal();
+    }
+  }
+}
+
+```
+
+./pages/page1.js
+
+```jsx
+import Head from 'next/head';
+import Link from 'next/link';
+
+import Icon from '../static/icon1.png';
+import { add } from '../src/util';
+
+import styled from 'styled-components';
+
+// styled-components 사용
+const MyP = styled.div`
+  color: blue;
+  font-size: 18px;
+`;
+
+function Page1() {
+  return (
+    <div>
+      <Link href="/page2">
+        <a>page2로 이동</a>
+      </Link>
+      <MyP>This is home page</MyP>
+      {/* 정적 파일 직접 import 후 사용- 캐싱 안됨 */}
+      <img src={Icon} />
+
+      <MyP>{`10 + 20 = ${add(10, 20)}`}</MyP>
+
+      {/* Next 제공 Head 컴포넌트 사용 
+          여러 개로 사용해도 이후 컴파일 시 하나로 합쳐짐
+      */}
+      <Head>
+        <title>page1</title>
+      </Head>
+      <Head>
+        <meta name="description" content="hello next" />
+      </Head>
+    </div>
+  );
+}
+
+export default Page1;
+
+```
+
+
+
+#### 서버와 클라이언트의 결괏값 일치시키기
+
+- styled-components 제공 바벨 플러그인 사용
+
+```sh
+npm install styled-components babel-plugin-styled-components
+```
+
+- Next 는 webpack 과 마찬가지로 babel 도 설정할 수 있다.
+
+./.babelrc
+
+```json
+{
+  "presets": ["next/babel"], // next/babel 프리셋 항상 포함시켜야함
+  "plugins": ["babel-plugin-styled-components"] // 플러그인 설정
+}
+```
+
+```sh
+npx next build && npx next export 
+N0DE_ENV=production node server.js
+```
 
