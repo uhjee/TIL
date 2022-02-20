@@ -150,3 +150,135 @@ width = 100;
 width = '100px';
 ```
 
+### 9.2.2 열거형 타입
+
+- 열거형 타입은 `enum` 키워드를 사용해서 정의
+
+```typescript
+enum Fruit {
+  Apple,
+  Banana,
+  Orange,
+}
+
+const v1: Fruit = Fruit.Apple;
+const v2: Fruit.Apple | Fruit.Banana = Fruit.Banana;
+```
+
+- 열거형 타입의 첫 번째 원소에 값을 할당하지 않으면 자동으로 0이 할당
+- 각 원소에 숫자 또는 문자열을 할당할 수 있음. 명시적으로 값을 입력하지 않으면, 이전 원소에서 1만큼 증가한 값 할당
+
+```typescript
+enum Fruit {
+  Apple,
+  Banana = 5,
+  Orange,
+}
+console.log(Fruit.Apple, Fruit.Banana, Fruit.Orange); // 0, 5, 6
+console.log(Fruit[5]); // Banana
+```
+
+- 열거형 타입은 객체이기 때문에 일반적인 객체처럼 다룰 수 있음
+- key와 숫자로 **양방향** 바인딩
+
+#### 열거형 타입의 값으로 문자열 할당하기
+
+```typescript
+enum Language {
+  Korean = 'ko',
+  English = 'en',
+  Japanese = 'jp',
+}
+```
+
+- 열거형 타입의 원소에 문자열을 할당하는 경우에는 **단방향**으로 매핑
+
+#### 열거형 타입을 위한 유틸리티 함수
+
+열거형 타입을 자주 사용할 때에는 유틸리티 함수를 만들어서 사용하는 게 편리
+
+- 열거형 타입의 원소 개수를 알려주는 함수
+
+  ```typescript
+  function getEnumLength(enumObject: any) {
+    const keys = Object.keys(enumObject);
+    // enum의 값이 숫자이면 두 개씩 들어가므로 문자열만 계산한다.
+    return keys.reduce(
+    	(acc, key) => (typeof enumObject[key] === 'string' ? acc + 1 : acc ),
+    )
+  }
+
+- 열거형 타입에 존재하는 값인지 검사하는 함수
+
+  - 서버로부터 받은 데이터를 검증할 때 유용하게 사용 가능
+
+  ```typescript
+  function isValidEnumValue(enumObject: any, value: number | string) {
+    if(typeof value === 'number') {
+      return !!enumObject[value];
+    } else {
+      return (
+      	Object.keys(enumObject)
+        	.filter(key => isNaN(Number(key)))
+        	.some(key => enumObject[key] === value)
+      );
+    }
+  }
+  ```
+
+- getEnumLength, isValidEnumValue 를 사용하는 함수
+
+  ```typescript
+  enum Fruit {
+  	Apple,
+    Banana,
+    Orange,
+  }
+  
+  enum Language {
+    Korean = 'ko',
+   	English = 'en',
+    Japanese = 'jp',
+  }
+  
+  console.log(getEnumLength(Fruit), getEnumLength(Language)); // 3, 3
+  console.log('1 in Fruit:', isValidEnumValue(Fruit, 1)); // true
+  console.log('5 in Fruit:', isValidEnumValue(Fruit, 5)); // false
+  console.log('ko in Language: ', isValidEnumValue(Language, 'ko')); // true
+  console.log('Korean in Language: ', isValidEnumValue(Language, 'Korean')); // false
+  ```
+
+#### 상수 열거형 타입
+
+- 열거형 타입은 컴파일 후에도 남아있기 때문에, 번들 파일 크기를 불필요하게 키울 수 있다.
+- **상수(const)** 열거형 타입을 사용하면 컴파일 결과에 열거형 타입의 객체를 남겨 놓지 않을 수 있음
+
+```typescript
+const enum Fruit {
+  Apple,
+  Banana,
+  Orange,
+}
+const fruit: Fruit = Fruit.Apple;
+
+const enum Language {
+  Korean = 'ko',
+  English = 'en',
+  Japanese = 'jp',
+}
+
+const lang: Language = Language.Korean;
+```
+
+- 상수 열거형 타입을 사용하는 경우, 열거형 타입의 객체를 사용할 수 없음
+
+```typescript
+const enum Fruit {
+	Apple,
+  Banana,
+  Orange,
+}
+
+console.log(getEnumLength(Fruit)); // type error
+```
+
