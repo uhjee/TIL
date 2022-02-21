@@ -282,3 +282,174 @@ const enum Fruit {
 console.log(getEnumLength(Fruit)); // type error
 ```
 
+### 9.2.3 함수 타입
+
+- 매개변수, 반환값의 타입을 지정해주어야 한다.
+
+  ```typescript
+  function getInfoText(next: string, age: number): string {
+    const nameText = name.substr(0, 10);
+    const ageText = age >= 35 ? 'senior' : 'junior';
+    return `name: ${nameText}, age: ${ageText}`;
+  }
+  
+  const v1: string = getInfoText('mike', 23);
+  const v2: string = getInfoText('mike', '23'); // parameter type error!
+  const v3: number = getInfoText('mike', 23);  // return type error!
+  ```
+
+  
+
+#### 변수를 함수 타입으로 정의하기
+
+```typescript
+const getInfoText: (name: string, age: number) => string = function(name, age) {
+  // ...
+};
+```
+
+#### 선택 매개변수
+
+```typescript
+// 세 번째 매개변수 language는 optional
+function getInfoText(name: string, age: number, language?: string): string {
+  const nameText = name.substr(0, 10);
+  const ageText = age >= 35 ? 'senior' : 'junior';
+  const languageText = language ? language.substr(0, 10) : '';
+}
+
+getInfoText('mike', 23, 'ko');
+getInfoText('mike', 23);
+getInfoText('mike', 23, 123); // 타입 에러
+```
+
+- 중간 매개변수에 optional 사용하기 => `undefined` 사용
+
+  ```typescript
+  function getInfoText(
+  	name: string,
+   	language: string | undefined,  // undefined 유니온 타입으로 묶기
+    age: number,
+  ): string {
+      // ...
+    }
+  ```
+
+#### 매개변수의 기본값 정의하기
+
+```typescript
+function getInfoText(
+	name: string,
+   age: number = 15,
+   language = 'korean', // 타입 추론 -> string
+): string {
+    // ...
+  }
+
+console.log(getInfoText('mike')); // 정상
+console.log(getInfoText('mike', 23)); // 정상
+console.log(getInfoText('mike', 35, 'english')); // 정상
+
+const f1: (
+	name: string,
+  age?: number,	// 기본값이 있는 매개변수는 optional!
+  language?: string, // 기본값이 있는 매개변수는 optional!
+) => string = getInfoText;
+```
+
+#### 나머지 매개변수
+
+```typescript
+function getInfoText(name: string, ...rest: string[]): string {
+  // ...
+}
+```
+
+#### 함수의 this 타입
+
+```typescript
+function getParam(this: string, index: number): string {
+  const params = this.splt(',') // 오타로 인한 타입 에러
+}
+```
+
+#### primitive type 에 메소드 추가하기 : interface 사용
+
+```typescript
+interface String {
+  getParam(this: string, index: number): string;
+}
+
+String.prototype.getParam= getParam; // prototype으로 등록
+console.log('asdf, 1234, ok'.getParam(1)); // 'asdf'
+```
+
+#### 함수 오버로드: 여러 개의 타입 정의하기
+
+`add` 라는 함수로 다음과 같은 일 처리하고자 할 때
+
+- 두 매개변수가 모두 string이면 string 반환
+- 두 매개변수가 모두 숫자면 숫자 반환
+- 두 매개변수를 서로 다른 타입으로 입력하면 X
+
+함수 오버로드 사용하지 않고 구현
+
+``` typescript
+function add(x: number | string, y: number | string): number | string {
+  if(typeof x === 'number' && typeof y === 'number') {
+    return x + y;
+  } else {
+    const result = Number(x) + Number(y);
+    return result.toString();
+  }
+}
+
+const v1: number = add(1, 2); // type error!
+console.log(add(1, '2')) // type error 발생 X -> 문제 발생
+```
+
+함수 오버로드 사용하고 구현
+
+```typescript
+function add(x: number, y: number): number;
+function add(x: string, y: string): string;
+function add(x: number | string, y: number | string): number | string {
+  // ...
+}
+
+const v1: number = add(1, 2); 
+console.log(add(1, '2')); 타입 에러 발생
+```
+
+#### 명명된 매개변수
+
+```typescript
+function getInfoText({
+  name,
+  age = 15,
+  language,
+}): {
+  name: string;
+  age?: number;
+  language?: string;
+}) : strring {
+  const nameText = name.substr(0, 10);
+  const ageText = age >= 35 ? 'senior' : 'junior';
+  return `name: ${nameText}, age: ${ageText}, language: ${language}`;
+}
+```
+
+명명된 매개변수의 타입을 다른 코드에서도 재사용 -> interface 사용
+
+```typescript
+interface Param {
+  name: string;
+  age?: number;
+  language?: string;
+}
+
+function getInfoText({ name, age = 15, language }: Param): string {
+  // ...
+}
+```
+
