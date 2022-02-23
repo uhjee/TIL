@@ -453,3 +453,117 @@ function getInfoText({ name, age = 15, language }: Param): string {
 }
 ```
 
+## 9.3 인터페이스
+
+- java에서 보다 다양한 것들을 정의하는 데 사용됨
+
+### 9.3.1 인터페이스로 객체 타입 정의하기
+
+```typescript
+// interface 정의
+interface Person {
+    name: string;
+    age: number;
+}
+
+const p1: Person = { name: 'nike', age: 23 };
+const p2: Person = { name: 'nike', age: 'twenty' }; // type error
+```
+
+#### 선택 속성 (optional property)
+
+- 객체에 없어도 되는 속성
+
+```typescript
+interface Person {
+    name: string;
+    age?: number;
+}
+
+const p1: Person = { name: 'mike' };
+```
+
+#### 읽기 전용 속성
+
+- 객체에서 읽기 전용 속성은 값이 변하지 않는 속성을 뜻함
+- **readonly** 키워드 사용
+
+``` typescript
+interface Person {
+    readonly name: string;
+    age?: number;
+}
+
+const p1: Person = {
+    name: 'mike',  // 변수를 정의하는 시점에는 값 할당 가능
+};
+
+p1.name = 'john'; // compile error
+```
+
+#### 정의되지 않은 속성값에 대한 처리
+
+- 보통은 객체가 interface에 정의되지 않은 property를 갖고 있어도 할당 가능
+- 단 객체 리터럴로 값을 초기화하는 경우에는 interface에 정의되지 않은 property가 있으면 타입 에러 발생
+
+```typescript
+interface Person {
+    readonly name: string;
+    age?: number
+}
+```
+
+```typescript
+const p1: Person = {
+    name: 'mike',
+    birthday: '1992-03-02', // type error
+}
+
+const p2 = {
+    name: 'john',
+    birthday: '1992-03-02', 
+}
+
+const p3: Person = p2; // error 발생 X
+```
+
+### 9.3.2 인터페이스로 정의하는 인덱스 타입
+
+- interface에서 속성 이름을 구체적으로 정의하지 않고, 값의 type 만 정의하는 것을 **index 타입**이라고 칭함
+
+```typescript
+interface Person {
+    readonly name: string;
+    age: number;
+    [key: string]: string | number; // index 타입
+}
+```
+
+```typescript
+const p1: Person = {
+    name: 'mike',
+    birthday: '1992-12-11', // type error 발생 X
+    age: 25,
+}
+```
+
+#### 여러 개의 인덱스를 정의하는 경우
+
+- javascript 에서는 객체의 속성 이름에 숫자 또는 문자열을 사용할 수 있다.
+
+```typescript
+interface YearPriceMap {
+    [year: number]: number;
+    [year: string]: string | number;
+}
+```
+
+```typescript
+const yearMap: YearPriceMap = {};
+
+yearMap[1988] = 1000;
+yaerMap[1994] = 'abc'; // type error
+yearMap['2000'] = 123;
+yearMap['2000'] = 'million';
+```
+
