@@ -567,3 +567,239 @@ yearMap['2000'] = 123;
 yearMap['2000'] = 'million';
 ```
 
+### 9.3.3 그 밖에 인터페이스로 할 수 있는 것
+
+#### 인터페이스로 함수 타입 정의하기
+
+```typescript
+// 정의
+interface GetInfoText {
+  (name: string, age: number): string;
+}
+
+// 생성
+const getInfoText: GetInfoText = function(name, age) {
+  const nameText = name.substr(0, 10);
+  const ageText = age >= 35 ? 'senior' : 'junior';
+  return `name: ${nameText}, age: ${ageText}`;
+}
+```
+
+####  인터페이스로 클래스 구현하기
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+  isYoungerThan(age: number): boolean;
+}
+
+// class implement
+class SomePerson implements Person {
+  name: string;
+  age: number;
+  
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+  
+  isYoungerThan(age: number) {
+    return this.age < age;
+  }
+}
+
+```
+
+#### 인터페이스 확장하기
+
+- java와 달리 다중 확장이 가능하다.
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface Programmer {
+  favoriteProgrammingLanguage: string;
+}
+
+// interface extend (multiple)
+interface Korean extends Person, Programmer {
+  isLiveInSeoul: boolean;
+}
+
+```
+
+#### 인터페이스 합치기
+
+- 교차 타입을 사용해 여러 인터페이스를 하나로 합칠 수 있다.
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface Product {
+  name: string;
+  price: number;
+}
+
+// 교차 타입 선언
+type PP = Person & Product;
+
+const pp: PP = {
+  name: 'a',
+  age: 23,
+  price: 1000,
+}
+```
+
+---
+
+## 9.4 타입 호환성
+
+- 어떤 타입을 다른 타입으로 취급해도 되는지 판단하는 것
+- 정적 타입 언어의 중요한 역할: **컴파일 타임**에 호환되지 않는 타입을 찾아내는 것
+
+### 9.4.1 숫자와 문자열의 타입 호환성
+
+- 서로 할당이 가능하지 않다
+
+```typescript
+function fun1(a: number, b: number | string) {
+  const v1: number | string = a;
+  const v2: number = b; // type error!
+}
+
+function func2(a: 1 | 2) {
+  const v1: 1 | 3 = a; // type error!
+  const v2: 1 | 2 | 3 = a;
+}
+```
+
+### 9.4.2 인터페이스 타입 호환성
+
+#### **덕 타이핑 | 구조적 타이핑**
+
+- typescript 는 값 자체의 타입보다는 값이 가진 내부 구조에 기반해서 타입 호환성 검사
+- interface A 가 interface B로 할당 가능한 조건
+  1. B에 있는 모든 필수 속성의 이름이 A에도 존재해야 함
+  2. 같은 속성 이름에 대해, A의 속성이 B의 속성에 할당 가능해야 한다.
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+}
+
+interface Product {
+  name: string;
+  age: number
+}
+
+const person: Person = { name: 'mike', age: 23 };
+const product: Product = person; // 같은 내부 구조를 가졌기 때문에 서로 할당 가능
+```
+
+#### 선택 속성이 타입 호환성에 미치는 영향
+
+- **선택 옵션**을 가진 `Person` 값의 집합은 `Product` 값의 집합보다 커진다.
+
+```typescript
+interface Person {
+  name: string;
+  age?: number; // optional
+}
+
+interface Product {
+  name: string;
+  age: number
+}
+
+const person: Person = { name: 'mike' };
+const product: Product = person; // type error!
+																	// Person 이 Product보다 크기 때문
+```
+
+```typescript
+interface Person {
+  name: string;
+  age?: number; // optional
+}
+
+interface Product {
+  name: string;
+  age: number
+}
+
+const product: Product = { name: 'computer', age: 2 };
+const person: Person = product; // 할당 가능 (위와 반대로 할당)
+																	// Person 이 Product보다 크기 때문
+```
+
+#### 추가 속성과 유니온 타입이 타입 호환성에 미치는 영향
+
+- **추가 속성**이 있으면 값의 집합은 더 작아진다.
+- **유니온 타입**이 있으면 값의 집합은 더 커진다.
+
+```typescript
+interface Person {
+  name: string;
+  age: number;
+  gender: string; // 추가 속성
+}
+
+interface Product {
+  name: string;
+  age: number | string; // union type
+}
+
+// Person이 Product 보다 집합이 작기 때문에 아래와 같이 할당 가능
+const person: Person = { name: 'jee', age: 3, gender: 'male' };
+const product: Product = person;
+```
+
+### 9.4.3 함수의 타입 호환성
+
+- 함수는 호출하는 시점에 문제가 없어야 할당 가능
+- 함수 타입 A가 함수 타입 B로 할당 가능하기 위한 조건  `b: B = a: A`
+  1. A의 매개변수 개수가 B의 매개변수 개수보다 적어야 한다.
+  2. 같은 위치의 매개변수에 대해 B의 매개변수가 A의 매개변수로 할당이 가능해야 한다.
+  3. A의 반환값은 B의 반환값으로 할당 가능해야 한다.
+
+```typescript
+type F1 = (a: number, b: string) => number;
+type F2 = (a: number) => number;
+type F3 = (a: number) => number | string;
+
+let f1: F1 = (a, b) => 1;
+let f2: F2 = a => 1;
+let f3: F3 = a => 1;
+
+f1 = f2;
+f2 = f1;  // type error - 조건 1 걸림
+f2 = f3; 	// type error - 조건 3 걸림
+```
+
+#### 배열의 map 메소드를 통해 살펴보는 함수의 타입 호환성
+
+```typescript
+function addOne(value: number) {
+  return value + 1;
+}
+
+const result = [1, 2, 3].map<number>(addOne); // generic은 매개변수 함수(addOne)의 반환 타입 의미
+```
+
+```typescript
+// map()이 입력받는 함수의 타입
+(value: number, index: number, array: number[]) => number
+```
+
+- 즉 addOne 함수가 map이 입력받는 함수에 할당
+  - 함수의 매개변수 개수 - 적음
+  - 같은 위치의 매개변수에 할당되어야 함 - 할당 가능
+  - 반환값 - 할당 가능
