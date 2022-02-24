@@ -803,3 +803,296 @@ const result = [1, 2, 3].map<number>(addOne); // generic은 매개변수 함수(
   - 함수의 매개변수 개수 - 적음
   - 같은 위치의 매개변수에 할당되어야 함 - 할당 가능
   - 반환값 - 할당 가능
+
+---
+
+## 9.5 타입스크립트 고급 기능
+
+타입을 정의하는 데 사용되는 고급 기능들
+
+- 제네릭
+- 맵드 타입
+- 조건부 타입
+
+### 9.5.1 제네릭
+
+: 타입 정보가 동적으로 결정되는 타입
+
+- 제네릭을 통해 같은 규칙을 여러 타입에 적용 가능 => 타입 코드 작성 시 중복 코드 제거 가능
+
+```typescript
+// 배열의 크기와 초깃값을 입력받아 배열을 생성하는 함수
+
+// 1. number Array
+function makeNumberArray(defaultValue: number, size: number): number[] {
+  const arr: number[] = [];
+  for(let i=0; i< size; i++) {
+    arr.push(defaultValue);
+  }
+  return arr;
+}
+
+// 2. string array
+function makeStringArray(defaultValue: string, size: number): sting[] {
+  const arr: string[] = [];
+  for(let i=0; i< size; i++) {
+    arr.push(defaultValue);
+  }
+  return arr;
+}
+
+const arr1 = makeNumberArray(1, 10);
+const arr2 = makeStringArray('empty', 10);
+```
+
+- 위의 코드는 중복코드가 많음
+
+#### 함수 오버로드로 개선
+
+```typescript
+// 함수 타입 정의
+function makeArray(default: number, size: number): number[];
+function makeArray(default: string, size: number): string[];
+```
+
+- 개선되었긴 하지만 타입을 추가할 때마다 코드도 추가해야 함
+- 타입의 종류가 많아지면 가독성이 떨어짐
+
+#### 제네릭으로 문제 해결
+
+```typescript
+// generic function 생성: T는 호출시점에 결정됨
+function makeArray<T>(defaultValue: T, size: number): T[] {
+  const arr: T[] = [];
+  for(let i=0; i< size; i++) {
+    arr.push(defaultValue);
+  }
+  return arr;
+}
+
+const arr1 = makeArray<number>(1, 10);
+const arr2 = makeArray<string>('empty', 10);
+
+const arr3 = makeArray(1, 10);
+const arr4 = makeArray('empty', 10);
+```
+
+#### 제네릭으로 스택 구현하기
+
+- generic은 데이터 타입의 다양성을 부여할 수 있기 때문에 자료구조에 많이 사용됨
+
+```typescript
+// Stack class 생성
+class Stack<D> {
+  private items: D[] = [];
+  
+  push(item: D) {
+    this.items.push(item);
+  }
+  
+  pop() {
+    return this.items.pop();
+  }
+}
+
+// stack 인스턴스 생성 및 메소드 호출
+const numberStack = new Stack<number>();
+numberStack.push(10);
+const v1 = numberStack.pop(); // 10
+
+const stringStack = new Stack<string>();
+stringStack.push('a');
+const v2 = stringStack.pop(); // 'a'
+
+// 변수 선언
+let myStack: Stack<number>;
+myStack = numberStack;
+myStack = stringStack; // type error!
+
+
+```
+
+#### extends 키워드로 제네릭 타입 제한하기
+
+```typescript
+function identity<T extends number | string>(p1: T): T {
+  return p1;
+}
+
+identity(1);
+identity('a');
+identity([]); // type error
+```
+
+```typescript
+interface Person {
+  name: String;
+  age: number;
+}
+
+// interface 확장
+interface Korean extends Person {
+  liveInSeoul: boolean;
+}
+
+function swapProperty<T extends Person, K extends keyof Person> (
+		p1: T,
+  	p2: T,
+    name: K,
+): void {
+			const temp = p1[name];
+      p1[name] = p2[name];
+      p2[name] = temp;
+}
+
+const p1: Korean = {
+  name: '홍길동',
+  age: 23,
+  liveInSeoul: true,
+};
+
+const p2: Korean = {
+  name: '김삿갓',
+  age: 31,
+  liveInSeoul: false,
+};
+
+swapProperty(p1, p2, 'age');
+```
+
+- keyof 키워드: 인터페이스의 모든 속성 이름을 유니온 타입으로 만들어줌
+
+
+
+### 9.5.2 맵드 타입
+
+: 몇 가지 규칙으로 새로운 인터페이스를 만들 수 있다.
+
+- 기존 인터페이스의 모든 속성을 선택 속성 또는 읽기 전용으로 만들 때 주로 사용
+
+ ```typescript
+ interface Person {
+   name: string;
+   age: number;
+ }
+ interface PersonOptional {
+   name?: string;
+   age?: number;
+ }
+ interface PersonReadOnly {
+   readonly name: string;
+   readonly age: number;
+ }
+ ```
+
+두 개의 속성을 boolean 타입으로 만드는 mapped type
+
+```typescript
+type T1 = { [K in 'prop1' | 'prop2']:boolean };
+// 위의 mapped type으로 만든 실제 결과: { prop1: boolean; prop2: boolean; }
+```
+
+- in 키워드 오른쪽에는 문자열의 유니온 타입이 올 수 있음
+
+입력된 인터페이스의 모든 속성을 boolean 타입 및 선택 속성으로 만들어주는 mapped type
+
+```typescript
+type makeBoolean<T> = { [P in keyof T]?: boolean };
+
+const pMap: MakeBoolean<Person> = {};
+pMap.name = true;
+pMap.age = false;
+```
+
+#### Record 내장 타입
+
+: 타입스크립트 내장 타입인 `Record` 는 입력된 모든 속성을 같은 타입으로 만들어주는 mapped type
+
+```typescript
+type Record<K extends string, T> = { [P in K]: T };
+
+type T1 = Record<'p1' | 'p2', Person>;
+// 위의 결과:  type T1 = { p1: Person; p2: Person; };
+```
+
+#### 열거형 타입과 맵드 타입
+
+- 맵드 타입을 사용하면 열거형 타입의 활용도를 높일 수 있음
+
+```typescript
+enum Fruit {
+  Apple,
+  Banana,
+  Orange,
+}
+
+const FRIUT_PRICE = {
+  [Friut.Apple]: 1200,
+  [Friut.Banana]: 2000,
+  [Friut.Orange]: 3000,
+}
+```
+
+아래와 같이 맵드 타입 사용
+
+- 모든 원소를 속성으로 가질 수 있도록 보장한다.
+
+```typescript
+enum Fruit {
+  Apple,
+  Banana,
+  Orange,
+}
+
+const FRUIT_PRCIE: { [key in Fruit]: number } = { // type error 발생 : Orange 추가해야 함
+  [Friut.Apple]: 1200,
+  [Friut.Banana]: 2000,
+}
+```
+
+### 9.5.3 조건부 타입
+
+: 입력된 제네릭 타입에 따라 타입을 결정할 수 있는 기능
+
+- `extends` 키워드와 `?` 기호를 사용해 정의 (삼항 연산자)
+
+  ```typescript
+  T extends U ? X: Y
+  ```
+
+```typescript
+// 입력된 제네릭이 문자열인지 여부에 따라 타입 결정
+type IsStringType<T> = T extends string ? 'yes' : 'no';
+type T1 = IsStringType<string>; // 'yes'
+type T2 = IsStringType<number>; // 'no'
+```
+
+조건부 타입에 유니온 타입을 사용하면 유용한 유틸리티 타입 생성 가능
+
+```typescript
+type T1 = IsStringType<string | number>; // 'yes' | 'no'
+type T2 = IsStringType<string> | IsStringType<number>; // 'yes' | 'no'
+```
+
+#### Exclude, Extract 내장 타입
+
+- Exclude : U의 sub타입 제거
+
+```typescript
+type T1 = number | string | never; 
+
+// U의 sub타입을 제거하는 유틸리티 타입
+type Exclude<T, U> = T extends U ? never : T; 
+
+type T2 = Exclude<1 | 3 | 5 | 7, 1 | 5 | 9>; // 3 | 7
+type T2 = Exclued<string | number | (() => void), Function>; // string | number
+```
+
+- Extract: U의 sub타입이 아닌 타입 제거
+
+```typescript
+// U의 sub타입이 아닌 타입을 제거하는 유틸리티 타입
+type Extract<T, U> = T extends U ? T : never;
+type T4 = Extract<1 | 3 | 5 | 7, 1 | 5 | 9>; // 1 | 5
+```
+
