@@ -1096,3 +1096,104 @@ type Extract<T, U> = T extends U ? T : never;
 type T4 = Extract<1 | 3 | 5 | 7, 1 | 5 | 9>; // 1 | 5
 ```
 
+#### ReturnType 내장 타입
+
+조건부 타입으로 만들어진 ReturnType 내장 타입은 함수의 반환 타입을 추출
+
+```typescript
+type ReturnType<T> = T extends (...args: any[]) => infer R ? R : any;
+
+type T1 = ReturnType<() => string>; // string
+function f1(s: string): number {
+    return s.length;
+}
+
+type T2 = ReturnType<typeof f1>; // numebr
+```
+
+- infer 키워드 
+
+  - 조건부 타입을 정의할 때, extends 키워드 뒤에 사용
+
+  - 함수의 반환 타입을 R이라는 변수에 담을 수 있다.
+
+    ```typescript
+    type Unpacked<T> = T extends (infer U)[]
+    	? U
+    	: T extends (...args: any[]) => infer U
+    		? U
+    		: T extends Promise<infer U> ? U : T;
+    
+    type T0 = Unpacked<string>; // string 
+    type T1 = Unpacked<string[]>; // string
+    type T2 = Unpacked<() => string>; // string
+    type T3 = Unpacked<Promise<string>>; // string
+    type T4 = Unpacked<Promise<string>[]>; // Promise<string>
+    type T5 = Unpacked<Unpacked<Promise<string>[]>>; // string
+    ```
+
+    - 타입 T가 U의 배열이면 U
+    - 함수라면 반환 타입 사용
+    - 프로미스라면 프로미스에 입력된 제네릭 타입 사용
+    - 아무것도 만족하지 않는다면 자기 자신 타입
+
+#### 조건부 타입으로 직접 만들어 보는 유틸리티 타입
+
+1. 인터페이스에서 문자열 속성만 추출해서 사용하는 두 개의 유틸리티 타입
+
+   ```typescript
+   // 타입 T에서 값이 문자열인 모든 속성의 이름을 유니온 타입으로 만들어주는 유틸리티 타입
+   type StringPropertyNames<T> = {
+       [K in keyof T]: T[K] extends String ? K : never
+   }[keyof T]; // [keyof T]: 인터페이스에서 모든 속성의 타입을 유니온으로 추출(never 타입 제거)
+   
+   // 인터페이스 문자열인 모든 속성 추출
+   type StringProperties<T> = Pick<T, StringPropertyNames<T>>;
+   ```
+
+   사용예제
+
+   ```typescript
+   interface Person {
+       name: string;
+       age: number;
+       nation: string;
+   }
+   
+   type T1 = StringPropertyNames<Person>; // 'name' | 'nation'
+   type T2 = StringProperties<Person>; // { name: string; nation: string; }
+   ```
+
+   
+
+2. 일부 속성만 제거해주는 유틸리티 타입
+
+   ```typescript
+   type Omit<T, U extends keyof T> = Pick<T, Exclude<keyof T, U>>;
+   ```
+
+   사용 예제
+
+   ```typescript
+   interface Person {
+       name: string;
+       age: number;
+       nation: string;
+   }
+   
+   type T1 = Omit<Person, 'nation' | 'age'>;
+   
+   const p: T1 = {
+       name: 'mike',
+   }
+   ```
+
+---
+
+## 9.6 생산성을 높이는 타입스크립트 기능
+
+- 타입 추론
+- 타입 가드: 타입 단언(type assertion) 코드 최소화 가능
+
+### 9.6.1 타입 추론
+
