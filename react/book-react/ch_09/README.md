@@ -1197,3 +1197,239 @@ type T2 = ReturnType<typeof f1>; // numebr
 
 ### 9.6.1 타입 추론
 
+명시적으로 타입 코드를 작성하지 않아도 타입스크립트가 타입을 추론할 수 있는 경우가 많음 -> 타입 안정성 유지
+
+#### let 변수의 타입 추론
+
+- `let` 변수는 재할당이 가능하기 때문에 유연하게 타입이 결정
+
+```typescript
+let v1 = 123;
+let v2 = 'abc';
+v1 = 'a'; // type error
+v2  456; // type error
+```
+
+#### const 변수의 타입 추론
+
+- `const` 변수는 리터럴 자체가 타입이 됨
+
+```typescript
+const v1 = 123;
+const v2 = 'abc';
+
+let v3: typeof v1 | typeof v2; // 123 | 'abc'
+```
+
+#### 배열과 객체의 타입 추론
+
+```typescript
+const arr1 = [10, 20, 30];  // number[]
+const [n1, n2, n3] = arr1;
+arr1.push('a'); // type error
+
+const arr2 = { id: 'abcd', age: 123, language: 'korean' };
+// const arr2: { id: string; age: number; language: string; }
+
+const { id, age, language } = arr2;
+console.log(id === age); // type error - 문자와 숫자열 비교 
+```
+
+- 여러 가지 타입으로 구성된 배열 타입 추론
+
+  ```typescript
+  interface Person {
+    namge: string;
+    age: number;
+  }
+  
+  interface Korean extends Person {
+    liveInSeoul: boolean;
+  }
+  interface Japanese extends Person {
+    liveInTokyo: boolean;
+  }
+  
+  const p1: Person = { name: 'mike', age: 23 };
+  const p2: Korean = { name: 'mike', age: 14, liveInSeoul: true };
+  const p3: Japanese = { name: 'mike', age: 14, liveInTokyo: false };
+  
+  const arr1 = [p1, p2, p3]; // Person[]
+  const arr2 = [p2, p3]; // (Korean, Japanese)[]
+  ```
+
+
+
+#### 함수의 매개변수와 반환값에 대한 타입 추론
+
+```typescript
+// 파라미터 기본값 넣어준 경우
+function func1(a = 'abc', b =10) {
+	return `${a} ${b}`;
+}
+// (a: string, b: number): string 
+
+func1(3, 6); // 타입 에러
+const v1: number = func1('a', 1); // 타입 에러
+```
+
+```typescript
+function func2(value: number) {
+  return value < 10 
+    ? value
+  	: `${value} is too big.`
+}
+// (value: number): number | string 
+```
+
+### 9.6.2 타입 가드
+
+- 조건문을 이용해 타입의 범위를 좁히는 기능
+- 타입 가드를 잘 활용하면 불필요한 타입 단언(assertion) 코드를 피할 수 있음
+
+- 타입 가드를 활용하지 않은 코드
+
+  ```typescript
+  function print(value: number | string) {
+    if (typeof value === 'number') {
+      console.log((value as number).toFixed(2));
+    } else {
+      console.log((value as string).trim());
+    }
+  }
+  ```
+
+  - `typeof` 키워드를 사용해 value가 숫자인지 확인
+  - `as` 키워드를 사용해 타입 단언 - typescript에 타입을 직접 알려줌
+
+#### typeof 키워드
+
+```typescript
+function print(value: number | string) {
+  if (typeof value === 'number') {
+    console.log(value.toFixed(2)); // typeof 키워드로 인해 value를 숫자로 인식
+  }else {
+    console.log(value.trim()); // typeof 키워드로 인해 value를 문자열로 인식
+  }
+}
+```
+
+
+
+#### instanceof 키워드
+
+- 클래스의 경우에는 `instanceof` 키워드가 타입 가드로 사용된다.
+
+- 인터페이스의 경우에는 `instanceof` 키워드 사용 불가 -> `instanceof` 오른쪽에는 **생성자 함수**만 올 수 있음
+
+```typescript
+class Person {
+  name: string;
+  age: number;
+  
+  constructor(name: string, age: number) {
+    this.name = name;
+    this.age = age;
+  }
+}
+
+class Product {
+  name: string;
+  price: number;
+  
+  constructor(name: string, price: number) {
+    this.name = name;
+    this.price = price;
+  }
+}
+
+function print(value: Person | Product) {
+  console.log(value.name);
+  
+  if(value instanceof Person) {
+    console.log(value.age); // Person 으로 인식
+  } else {
+    console.log(value.price); // Product 로 인식
+  }
+}
+```
+
+
+
+#### 식별 가능한 유니온 타입
+
+- 인터페이스 구별하기 위한 한 가지 방법 ->  식별 가능한 유니온 타입 이용
+- 식별 가능한 유니온 타입: 같은 이름의 속성을 정의하고 속성의 타입은 모두 겹치지 않도록 정의
+
+```typescript
+interface Person {
+  type: 'person'; // 식별 속성
+  name: string;
+  age: number;
+}
+
+interface Product {
+  type: 'product'; // 식별 속성
+  name: string;
+  price: number;
+}
+```
+
+```typescript
+// if문 사용 분기처리
+function print(value: Person | Product) {
+  if(value.type === 'person') { // interface type 속성으로 분기 처리
+    console.log(value.age);
+  } else {
+    console.log(value.price);
+  }
+}
+```
+
+```typescript
+// switch문 사용 분기처리
+function print(value: Person | Product) { 
+  switch (value.type) { // interface type 속성으로 분기 처리
+			case 'person': 
+      	console.log(value.age);
+      	break;
+			case 'product': 
+      	console.log(value.price); 
+      	break;
+	}
+}
+```
+
+
+
+#### 타입을 검사하는 함수
+
+```typescript
+function isPerson(x: any): x is Person { // is 키워드
+  return (x as Person).age !== undefined; // age 속성이 있으면 Person 으로 타입 판단
+}
+
+function print(value: Person | Product) {
+  if (isPerson(value)) {
+    console.log(value.age);
+  } else {
+    console.log(value.price);
+  }
+}
+```
+
+- `is` 키워드 왼쪽에는 매개변수 이름, 오른쪽에는 타입 이름
+
+#### in 키워드
+
+```typescript
+function print(value: Person | Product) {
+  if ('age' in value) { // in 키워드 사용
+    console.log(value.age); // 타입 가드 동작
+  } else {
+    console.log(value.price);
+  }
+}
+```
+
+- `in` 키워드 : 단순히 age 속성이 있는지 검사
