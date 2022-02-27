@@ -1433,3 +1433,53 @@ function print(value: Person | Product) {
 ```
 
 - `in` 키워드 : 단순히 age 속성이 있는지 검사
+
+## 9.7 react-typescript 환경 구축
+
+### 9.7.1 create-react-app 과 Next.js 에서 typescript 사용하기
+
+#### create-react-app, typescript 사용
+
+- react-script 2.1 버전부터 typescript 정식 지원
+
+- 다음 명령어 입력 시 typescript 개발 환경 구축
+
+  ```shell
+  npx create-react-app my-cra --template typescript
+  ```
+
+#### next.js 에서 typescript 사용하기
+
+- 프로젝트 루트에 `tsconfig.json` 파일이 있으면 타입스크립트 개발 환경 인식
+
+  ```sh
+  touch tsconfig.json
+  ```
+
+  ```sh
+  npx next
+  ```
+
+  - Next.js가  tsconfig.json 파일에 몇 가지 설정을 자동으로 추가
+
+### 9.7.2 프레임워크를 사용하지 않고 타입스크립트 환경 구축
+
+```sh
+npm install typescript react react-dom
+npm install @types/react @types/react-dom
+npx tsc --init
+```
+
+- `tsc --init` 명령어 실행하면, tsconfig.json 파일 생성
+
+####  tsconfig.json
+
+```json
+{
+  // ...
+  "jsx" : "react",  // JSX 문법으로 작성된 코드가 React.createElment 함수 호출로 변환
+  "outDir" : "./dist", // 컴파일된 결과 파일이 dist 폴더에 생성하도록
+  // ...
+}
+```
+
