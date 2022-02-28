@@ -1483,3 +1483,118 @@ npx tsc --init
 }
 ```
 
+src/App.tsx
+
+```tsx
+import React from 'react';
+
+function App({ name, age }: { name: string; age: number }) {
+  return (
+    <div>
+      <p>{name}</p>
+      <p>{age}</p>
+    </div>
+  );
+}
+
+export default App;
+```
+
+src/index.tsx
+
+```tsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(<App age={20} name="happy" />, document.getElementById('root'));
+
+```
+
+### 9.7.3 기타 환경 설정하기
+
+#### javascript와  typescript 같이 사용
+
+tsconfig.json
+
+```json
+    /* JavaScript Support */
+    "allowJs": true,                                  /* Allow JavaScript files to be a part of your program. Use the `checkJS` option to get errors from these files. */
+    // "checkJs": true,                                  /* Enable error reporting in type-checked JavaScript files. */
+    // "maxNodeModuleJsDepth": 1,                        /* Specify the maximum folder depth used for checking JavaScript files from `node_modules`. Only applicable with `allowJs`. */
+
+```
+
+#### 외부 패키지 사용
+
+lodash
+
+- IDE가  typescript를 지원한다면, 매개변수의 타입과 반환 타입을 알 수 있어 유용
+
+```shell
+npm install lodash @types/lodash
+```
+
+#### javascript가 아닌 모듈 사용
+
+```tsx
+import Icon from './icon.png'; // png 모듈
+
+export default function ({ name, age }: { name: string; age: number }) {
+  // ...
+  return (
+    <div>
+      <img src={Icon} />
+      // ...{' '}
+    </div>
+  );
+}
+```
+
+- typescript 는 컴파일 시, png 모듈의 타입을 몰라서 에러 발생
+
+- 이미지 모듈의 타입 정의
+
+  ```ts
+  declare module '*.png' {
+    const content: string;
+    export default content;
+  }
+  ```
+
+#### window 객체에 속성 추가하기
+
+```tsx
+window.myValue = 123; // window 객체에 속성 추가
+
+export default function ({ name, age }: { name: string; age: number }) {
+  // ...
+  return (
+    <div>
+      // ...{' '}
+    </div>
+  );
+}
+```
+
+기존에 정의된 window 타입에 우리가 작성한 속성 추가
+
+```typescript
+interface Window {
+  myValue: number
+}
+```
+
+#### 자바스크립트 최신 문법 사용
+
+tsconfig.json
+
+```typescript
+{
+  "compilerOptions" : {
+    "lib" : ["dom", "es5", "scripthost", "es2017"],  // "es2017" 추가
+      // ...
+  }
+}
+```
+
