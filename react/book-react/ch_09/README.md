@@ -1598,3 +1598,111 @@ tsconfig.json
 }
 ```
 
+
+
+## 9.8 리액트에 타입 적용하기
+
+- 리액트 : @types/react, @types/react-dom
+- 리덕스: @types/react-redux
+
+### 9.8.1 리액트 컴포넌트에서 타입 정의하기
+
+#### 이벤트 객체와 이벤트 처리 함수의 타입
+
+```typescript
+import React from 'react';
+type EventObject<T = HTMLElement> = React.SyntheicEvent<T>; // 리액트에서 발생하는 대부분의 이벤트 객체
+type EventFunc<T = HTMLElement> = (e: EventObject<T>) => void; // 대부분의 이벤트 처리 함수
+```
+
+#### 함수형 컴포넌트의 타입 정의하기
+
+```tsx
+import React from 'react';
+
+interface Props {
+  name: string;
+  age?: number;
+}
+
+// 최상단 Props 타입을 사용해 속성값 타입 입력
+export default function MyComponent({name, age = 23}: Props) {
+  return (
+    <div>
+      <p>{ name }</p>
+      <p>{ age.substr(0) }</p> {/* type error */}
+    </div>
+  )
+}
+
+// react의 FunctionComponent 사용
+const MyComponent: React.FunctionComponent<Props> = function({ name, age = 23 }) {
+  return (
+  	<div>
+      	<p>{ name }</p>
+      	<p>{ age.substr(0) }</p> {/* type error */}   
+    </div>
+  )
+}
+```
+
+
+
+#### 클래스형 컴포넌트 타입 정의하기
+
+```tsx
+import React, { createRef } from 'react';
+
+interface Props {
+  containerStyle: React.CSSProperties; // dom 요소에 입력하는 스타일 객체의 타입
+  theme: string; // 기본값이 있는 속성값 (optional X)
+}
+
+const defaultProps = {
+  theme: 'dark',
+}
+
+interface State {
+  name: string;
+  age?: number;
+}
+
+// React.Component 제네릭 사용
+class MyComponent extends React.Component<Props, State> {
+	// 초기 상탯값
+  state: State = { 
+    name: 'mike',
+  };
+  
+  static defaultProps = defaultProps;
+  pRef = createRef<HTMLParagraphElement>();
+
+  onClick1 = (e: EventObject) => {
+    console.log(e.currentTarget.dataset.food);
+  };
+  
+  onClick2 = (e: React.MouseEvent<HTMLButtonElement>) => {
+    console.log(`${e.clientX}, ${e.clientY}`);
+  }
+  
+  render() {
+    const { containerStyle, theme } = this.props; 
+    const { name, age } = this.state;
+    
+    return (
+      <div style={containerStyle}>
+        <p ref={this.pRef}>{name}</p>
+        <p>{`${name} ${age}`}</p>
+        <p>{`theme is ${theme.substr(1)}`}</p>
+        <button data-food="soup" onClick={this.onClick1}>
+        	버튼1
+        </button>
+        <button onClick={this.onClick2}>
+        	버튼2
+        </button>
+      </div>
+    )
+  }
+}
+```
+
