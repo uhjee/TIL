@@ -1706,3 +1706,56 @@ class MyComponent extends React.Component<Props, State> {
 }
 ```
 
+### 9.8.2 리덕스에서 타입 정의하기
+
+#### 환경 구축
+
+```sh
+npx create-react-app ts-redux —template typescript
+npm install react react-dom redux react-redux immer
+npm install @types/react @types/react-dom @types/react-redux
+```
+
+#### useSelector 훅 사용
+
+person/component/Person.tsx
+
+```tsx
+import React from 'react';
+import { ReduxState } from '../../common/store';
+import { actions } from '../state/action';
+import { useSelector, useDispatch } from 'react-redux';
+
+interface Props {
+  birthday: string;
+}
+
+export default function Person({ birthday }: Props) {
+
+  // 첫 번째 generic: 리덕스 상탯값, 두 번째 generic 매개변수로 입력된 함수의 반환값
+  const name = useSelector<ReduxState, string>(state => state.person.name);
+  const age = useSelector<ReduxState, number>(state => state.person.age);
+
+  const dispatch = useDispatch();
+
+  function onClick() {
+    dispatch(actions.setName('mike'));
+    dispatch(actions.setAge(23));
+  }
+
+  return (
+    <div>
+      <p>{name}</p>
+      <p>{age}</p>
+      <p>{birthday}</p>
+      <button onClick={onClick}>정보 추가하기</button>
+    </div>
+  );
+}
+```
+
+common/useTypedSelector.ts
+
+```typescript
+```
+
