@@ -1828,3 +1828,123 @@ export function createReducer<S, T extends string, A extends TypedAction<T>>(
 }
 ```
 
+#### createAction 함수 사용하기
+
+person/state/action.ts
+
+```typescript
+import { createAction } from '../../common/redux';
+
+export enum ActionType {
+  SetName = 'person_setName',
+  SetAge = 'person_setAge',
+}
+
+export const actions = {
+  setName: (name: string) => createAction(ActionType.SetName, { name }),
+  setAge: (age: number) => createAction(ActionType.SetAge, { age }),
+};
+
+```
+
+#### createReducer 함수 사용하기
+
+person/state/reducer.ts
+
+```typescript
+import { ActionType, actions } from './action';
+import { createReducer } from '../../common/redux';
+
+// interface로 상탯값의 타입 정의
+export interface StatePerson {
+  name: string;
+  age: number;
+}
+
+// 초기 상탯값 정의
+const INITIAL_STATE = {
+  name: 'empty',
+  age: 0,
+};
+
+// ReturnType 내장 타입 이용해 모든 액션 객체의 타입을 유니온 타입으로 만듦
+type Action = ReturnType<typeof actions[keyof typeof actions]>;
+
+// 세 번째 제네릭: 모든 액션 객체의 유니온 타입 입력
+export default createReducer<StatePerson, ActionType, Action>(INITIAL_STATE, {
+  // typescript는 action.payload 가 SetName 액션 객체의 데이터라는 것을 알고 있음
+  [ActionType.SetName]: (state, action) => (state.name = action.payload.name),
+  [ActionType.SetAge]: (state, action) => (state.age = action.payload.age),
+});
+
+```
+
+#### 프로젝트 마무리
+
+common/store.ts
+
+```typescript
+import { createStore } from 'redux';
+import { combineReducers } from 'redux';
+import person, { StatePerson } from '../person/state/reducer';
+// import product, { StateProduct } from '../product/state/reducer';
+
+/**
+ * TODO:
+ * product 폴더 밑에 있는 파일의 코드는 독자의 숙제로 남겨 두겠다.
+ * product / component / Product.tsx 파일에서는 mapDispatchToProps 함수를 작성해 보자.
+ * 그리고 product / state / action.ts 파일에서는 payload가 없는 액션 생성자 함수를 작성해 보자.
+ */
+
+// 모든 리듀서의 상탯값 타입을 모은다.
+export interface ReduxState {
+  person: StatePerson;
+  // product: StateProduct;
+}
+
+// 제네릭으로 ReduxState
+const reducer = combineReducers<ReduxState>({
+  person,
+  // product,
+});
+
+export const store = createStore(reducer);
+
+```
+
+App.tsx
+
+```tsx
+import React from 'react';
+import { Provider } from 'react-redux';
+import { store } from './common/store';
+import Person from './person/component/Person';
+// import Product from './product/component/Product';
+
+function App() {
+  return (
+    <div className="App">
+      <Provider store={store}>
+        <div>
+          <Person birthday="2015-01-03" />
+        </div>
+      </Provider>
+    </div>
+  );
+}
+
+export default App;
+
+```
+
+index.tsx
+
+```tsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+ReactDOM.render(<App />, document.getElementById('root'));
+Ï
+```
+
