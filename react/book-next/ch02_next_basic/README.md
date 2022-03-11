@@ -177,5 +177,153 @@ const App = () => {
 }
 ```
 
+## 2.3 서버로부터 데이터 불러오기
 
+- 기본적으로 Next.js는 모든 페이지를 미리 렌더링
+
+- 두 가지의 사전 렌더링 존재
+
+  1. 정적 생성
+
+     - 빌드 시에 페이지를 HTML로 만들어 요청 시 바로 제공
+     - 외부 데이터를 필요로 하지 않는 경우(API를 요청하지 않는 페이지)
+
+     
+
+  2. 서버 사이드 렌더링
+
+     - 페이지 요청 시 서버 사이드 렌더링을 통해 HTML 제공
+     - 외부 데이터를 필요로 하는 경우(API 요청 시)
+
+  ### 2.3.1 getServerSideProps
+
+  - 페이지 데이터를 서버로부터 제공받는 기본 API
+  - 서버에서 데이터를 패치하여 초기 데이터를 전달하도록 구성
+
+  #### 서버 데이터를 패치하기 위한 isomorphic-unfetch 모듈 설치
+
+  ```sh
+  yarn add isomorphic-unfetch
+  ```
+
+  #### git hub api 중 유저 정보를 받아오는 api
+
+  ```tex
+  https://api.github.com/users/username
+  ```
+
+  pages/index.jsx
+
+  ```jsx
+  import fetch from 'isomorphic-unfetch';
+  
+  const index = ({ user }) => {
+    const username = user && user.name;
+    const htmlURL = user && user.html_url;
+    const bio = user && user.bio;
+  
+    return (
+      <div>
+        <a href={htmlURL}>{username}</a>
+        <p>{bio}</p>
+      </div>
+    );
+  };
+  
+  // next의 페이지 데이터를 서버로부터 제공받는 api
+  export const getServerSideProps = async () => {
+    try {
+      const res = await fetch('https://api.github.com/users/uhjee');
+      if (res.status === 200) {
+        const user = await res.json();
+        console.log({ user });
+        return { props: { user } };
+      }
+      return { props: {} };
+    } catch (error) {
+      console.log(error);
+      return { props: {} };
+    }
+  };
+  
+  export default index;
+  
+  ```
+
+  
+
+#### param을 받아 동적으로 데이터 요청
+
+pages/User02.jsx
+
+```jsx
+import React, { useState } from 'react';
+import Link from 'next/link';
+
+const User02 = () => {
+  const [username, setUsername] = useState('');
+  return (
+    <div>
+      <label htmlFor="">
+        username
+        <input
+          type="text"
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+        />
+      </label>
+      <p>{username} 깃허브 검색하기 </p>
+      <Link href={`/users/${username}`}>
+        <a>검색하기</a>
+      </Link>
+    </div>
+  );
+};
+
+export default User02;
+
+```
+
+pages/users/[username].jsx
+
+```jsx
+import fetch from 'isomorphic-unfetch';
+
+const Username = ({ user }) => {
+  const username = user && user.name;
+  const htmlURL = user && user.html_url;
+  const bio = user && user.bio;
+
+  return (
+    <div>
+      {user && (
+        <div>
+          <a href={htmlURL}>{username}</a>
+          <p>{bio}</p>
+        </div>
+      )}
+      {!user && <div>해당 유저는 없습니다.</div>}
+    </div>
+  );
+};
+
+// query 객체에서 query param 추출
+export const getServerSideProps = async ({ query }) => {
+  const { username } = query;
+  try {
+    const res = await fetch(`https://api.github.com/users/${username}`);
+    if (res.status === 200) {
+      const user = await res.json();
+      console.log({ user });
+      return { props: { user } };
+    }
+    return { props: {} };
+  } catch (error) {
+    console.log(error);
+    return { props: {} };
+  }
+};
+
+export default Username;
+```
 
