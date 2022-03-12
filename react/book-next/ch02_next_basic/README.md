@@ -250,6 +250,47 @@ const App = () => {
   
   ```
 
+  console.log 결과
+
+  ```json
+  {
+    user: {
+      login: 'uhjee',
+      id: 51398029,
+      node_id: 'MDQ6VXNlcjUxMzk4MDI5',
+      avatar_url: 'https://avatars.githubusercontent.com/u/51398029?v=4',
+      gravatar_id: '',
+      url: 'https://api.github.com/users/uhjee',
+      html_url: 'https://github.com/uhjee',
+      followers_url: 'https://api.github.com/users/uhjee/followers',
+      following_url: 'https://api.github.com/users/uhjee/following{/other_user}',
+      gists_url: 'https://api.github.com/users/uhjee/gists{/gist_id}',
+      starred_url: 'https://api.github.com/users/uhjee/starred{/owner}{/repo}',
+      subscriptions_url: 'https://api.github.com/users/uhjee/subscriptions',
+      organizations_url: 'https://api.github.com/users/uhjee/orgs',
+      repos_url: 'https://api.github.com/users/uhjee/repos',
+      events_url: 'https://api.github.com/users/uhjee/events{/privacy}',
+      received_events_url: 'https://api.github.com/users/uhjee/received_events',
+      type: 'User',
+      site_admin: false,
+      name: 'uhjee',
+      company: 'watchtek',
+      blog: '',
+      location: 'Seoul, Korea',
+      email: null,
+      hireable: null,
+      bio: '씹다 보면 단맛이 나는 인생. 쓰다고 뱉지 않겠습니다.',
+      twitter_username: null,
+      public_repos: 16,
+      public_gists: 0,
+      followers: 5,
+      following: 9,
+      created_at: '2019-06-05T07:06:13Z',
+      updated_at: '2022-01-20T09:32:03Z'
+    }
+  }
+  ```
+
   
 
 #### param을 받아 동적으로 데이터 요청
@@ -326,4 +367,207 @@ export const getServerSideProps = async ({ query }) => {
 
 export default Username;
 ```
+
+### 2.3.2 getStaticProps
+
+- `getServerSideProps` 와 다르게 빌드 시에 데이터를 불러와 결과를 json으로 저장하여 사용
+- 따라서 일관된 정적인 데이터
+
+```jsx
+const staticPage = ({ time }) => {
+  return (
+    <div>
+      <h2>getStaticProps</h2>
+      {time}
+    </div>
+  );
+};
+
+// 빌드 시에 호출 후 정적으로 데이터 제공
+export const getStaticProps = async () => {
+  return { props: { time: new Date().toISOString() }, revalidate: 3 };
+};
+
+export default staticPage;
+```
+
+- `revalidate`: 데이터 재요청 interval
+
+yarn build 후, .next/server/pages/static.html
+
+```html
+// ...
+<script id="__NEXT_DATA__" type="application/json">
+      {
+        "props": {
+          "pageProps": { "time": "2022-03-12T00:22:19.486Z" },
+          "__N_SSG": true
+        },
+        "page": "/static",
+        "query": {},
+        "buildId": "fUUKIHoCFEAo2rvX1aQIS",
+        "isFallback": false,
+        "gsp": true,
+        "scriptLoader": []
+      }
+    </script>
+// ...
+```
+
+- 내부에 pageProps 데이터가 빌드 시각으로 세팅되어 있음
+
+#### 동적 페이지 내부에서 getStaticProps 사용
+
+```jsx
+import fetch from 'isomorphic-unfetch';
+
+const Username = ({ user }) => {
+  const username = user && user.name;
+  const htmlURL = user && user.html_url;
+  const bio = user && user.bio;
+
+  return (
+    <div>
+      {user && (
+        <div>
+          <a href={htmlURL}>{username}</a>
+          <p>{bio}</p>
+        </div>
+      )}
+      {!user && <div>해당 유저는 없습니다.</div>}
+    </div>
+  );
+};
+
+// build 시 static data 세팅
+export const getStaticProps = async ({ params }) => {
+  try {
+    const res = await fetch(`https://api.github.com/users/${params.name}`);
+
+    const user = await res.json();
+    if (res.status === 200) {
+      return { props: { user, time: new Date().toISOString() } };
+    }
+    return { props: { time: new Date().toISOString() } };
+  } catch (e) {
+    console.log(e);
+    return { props: { time: new Date().toISOString() } };
+  }
+};
+
+export async function getStaticPaths() {
+  return {
+    paths: [{ params: { name: 'uhjee' } }],
+    fallback: true,
+  };
+}
+
+export default Username;
+```
+
+- getServerSideProps 와 다르게 `query` 대신 `params` 사용
+- getStaticPaths 사용
+  - 페이지의 path가 외부 데이터에 의존할 때 사용
+  - params를 미리 지정
+  - fallback :  false   => 이외의 경로는 404 에러 페이지
+
+### 2.3.3 getInitialProps
+
+- 9.3 버전 이전 부터 SSR 데이터 패치를 위해 사용하던 함수
+- 9.3 버전 이상은 `getServerSideProps`와 `getStaticProps` 사용 권장
+
+#### getServerSideProps 와 차이점
+
+- 최초 렌더링 시에는 서버에서 데이터 호출
+- 이후 클라이언트 라우팅을 통해 접근 시에는 클라이언트에서 데이터호출
+
+```jsx
+import fetch from 'isomorphic-unfetch';
+
+const Username = ({ user }) => {
+  const username = user && user.name;
+  const htmlURL = user && user.html_url;
+  const bio = user && user.bio;
+
+  return (
+    <div>
+      {user && (
+        <div>
+          <a href={htmlURL}>{username}</a>
+          <p>{bio}</p>
+        </div>
+      )}
+      {!user && <div>해당 유저는 없습니다.</div>}
+    </div>
+  );
+};
+
+// component 함수에 메소드를 추가하는 방식으로 사용
+Username.getInitialProps = async ({ query }) => {
+  const { username } = query;
+  try {
+    const res = await fetch(`https://api.github.com/users/${username}`);
+    if (res.status === 200) {
+      const user = await res.json();
+      return { user }; // getServerSideProps의 props 속성 없이 return
+    }
+    return { props: {} };
+  } catch (error) {
+    console.log(error);
+    return {};
+  }
+};
+
+export default Username;
+```
+
+## 2.4 styled-jsx 
+
+- 넥스트에서 기본으로 제공하는 CSS-in-JS 라이브러리
+- css 캡슐화 및 범위 지정
+- nesting은 지원하지 않음
+
+```jsx
+import fetch from 'isomorphic-unfetch';
+import css from 'styled-jsx/css';
+
+// Styled-jsx 작성
+const style = css`
+  h2 {
+    margin-left: 20px;
+    background-color: orange;
+    color: #fff;
+  }
+  .user-bio {
+    margin-top: 12px;
+    font-style: italic;
+  }
+`;
+
+const Username = ({ user }) => {
+  const username = user && user.name;
+  const htmlURL = user && user.html_url;
+  const bio = user && user.bio;
+
+  return (
+    <>
+      {user && (
+        <div>
+          <h2>
+            <a href={htmlURL}>{username}</a>
+          </h2>
+          <p>{bio}</p>
+        </div>
+      )}
+      {!user && <div>해당 유저는 없습니다.</div>}
+      {/* styled-jsx 적용 */}
+      <style jsx>{style}</style>
+    </>
+  );
+};
+```
+
+
+
+#### git hub 데이터 스타일링
 

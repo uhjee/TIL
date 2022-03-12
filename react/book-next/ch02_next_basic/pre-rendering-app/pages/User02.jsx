@@ -14,10 +14,17 @@ const User02 = () => {
         />
       </label>
       <p>{username} 깃허브 검색하기 </p>
-      {/* query param으로 전달 */}
-      <Link href={`/users/${username}`}>
-        <a>검색하기</a>
-      </Link>
+      <div>
+        {/* query param으로 전달 */}
+        <Link href={`/users/${username}`}>
+          <a>검색하기 (getServerSideProps)</a>
+        </Link>
+      </div>
+      <div>
+        <Link href={`/initialProps/${username}`}>
+          <a>검색하기 (getInitialProps)</a>
+        </Link>
+      </div>
     </div>
   );
 };

@@ -1,18 +1,4 @@
 import fetch from 'isomorphic-unfetch';
-import css from 'styled-jsx/css';
-
-// Styled-jsx 작성
-const style = css`
-  h2 {
-    margin-left: 20px;
-    background-color: orange;
-    color: #fff;
-  }
-  .user-bio {
-    margin-top: 12px;
-    font-style: italic;
-  }
-`;
 
 const Username = ({ user }) => {
   const username = user && user.name;
@@ -20,36 +6,32 @@ const Username = ({ user }) => {
   const bio = user && user.bio;
 
   return (
-    <>
+    <div>
       {user && (
         <div>
-          <h2>
-            <a href={htmlURL}>{username}</a>
-          </h2>
+          <a href={htmlURL}>{username}</a>
           <p>{bio}</p>
         </div>
       )}
       {!user && <div>해당 유저는 없습니다.</div>}
-      {/* styled-jsx 적용 */}
-      <style jsx>{style}</style>
-    </>
+    </div>
   );
 };
 
-// query 객체에서 query param 추출
-export const getServerSideProps = async ({ query }) => {
+// component 함수에 메소드를 추가하는 방식으로 사용
+Username.getInitialProps = async ({ query }) => {
   const { username } = query;
   try {
     const res = await fetch(`https://api.github.com/users/${username}`);
     if (res.status === 200) {
       const user = await res.json();
       console.log({ user });
-      return { props: { user } };
+      return { user }; // getServerSideProps의 props 속성 없이 return
     }
     return { props: {} };
   } catch (error) {
     console.log(error);
-    return { props: {} };
+    return {};
   }
 };
 
