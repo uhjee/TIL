@@ -1,52 +1,50 @@
 import fetch from 'isomorphic-unfetch';
+import Profile from '../../components/Profile';
+import Repositories from '../../components/Repository';
 import css from 'styled-jsx/css';
 
-// Styled-jsx 작성
 const style = css`
-  h2 {
-    margin-left: 20px;
-    background-color: orange;
-    color: #fff;
-  }
-  .user-bio {
-    margin-top: 12px;
-    font-style: italic;
+  .user-contents-wrapper {
+    display: flex;
+    padding: 20px;
   }
 `;
 
-const Username = ({ user }) => {
-  const username = user && user.name;
-  const htmlURL = user && user.html_url;
-  const bio = user && user.bio;
-
+const Username = ({ user, repos }) => {
   return (
-    <>
-      {user && (
-        <div>
-          <h2>
-            <a href={htmlURL}>{username}</a>
-          </h2>
-          <p>{bio}</p>
-        </div>
-      )}
-      {!user && <div>해당 유저는 없습니다.</div>}
-      {/* styled-jsx 적용 */}
+    <div className="user-contents-wrapper">
+      {/* PROFILE */}
+      <Profile user={user} />
+      {/* REPOSITORY */}
+      <Repositories user={user} repos={repos} />
       <style jsx>{style}</style>
-    </>
+    </div>
   );
 };
 
 // query 객체에서 query param 추출
 export const getServerSideProps = async ({ query }) => {
-  const { username } = query;
+  const { username, page } = query;
   try {
-    const res = await fetch(`https://api.github.com/users/${username}`);
-    if (res.status === 200) {
-      const user = await res.json();
+    let user;
+    let repos;
+
+    // user info
+    const userRes = await fetch(`https://api.github.com/users/${username}`);
+    if (userRes.status === 200) {
+      user = await userRes.json();
       console.log({ user });
-      return { props: { user } };
     }
-    return { props: {} };
+
+    // user repositories
+    const reposRes = await fetch(
+      `https://api.github.com/users/${username}/repos?sort=updated&page=${page}&per_page=10`,
+    );
+    if (reposRes.status === 200) {
+      repos = await reposRes.json();
+      console.log({ repos });
+    }
+    return { props: { user, repos } };
   } catch (error) {
     console.log(error);
     return { props: {} };

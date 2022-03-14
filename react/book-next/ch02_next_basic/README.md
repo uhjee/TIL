@@ -571,3 +571,313 @@ const Username = ({ user }) => {
 
 #### git hub 데이터 스타일링
 
+pages/users/[username].jsx
+
+```jsx
+import fetch from 'isomorphic-unfetch';
+import css from 'styled-jsx/css';
+
+// Styled-jsx 작성
+const style = css`
+  .profile-box {
+    width: 25%;
+    max-width: 272px;
+    margin-right: 26px;
+  }
+
+  .profile-image-wrapper {
+    width: 100%;
+    border: 1px solid #e1e4e8;
+  }
+  .profile-image-wrapper .profile-image {
+    display: block;
+    width: 100%;
+  }
+  .profile-username {
+    margin: 0;
+    padding-top: 16px;
+    font-size: 26px;
+  }
+  .profile-user-login {
+    margin: 0;
+    font-size: 20px;
+  }
+  .profile-user-bio {
+    margin: 0;
+    padding-top: 16px;
+    font-size: 14px;
+  }
+`;
+
+const Username = ({ user }) => {
+  if (!user) {
+    return null;
+  }
+  const { name: username, html_url: htmlURL, bio } = user;
+
+  return (
+    <>
+      <div className="profile-box">
+        <div className="profile-image-wrapper">
+          <img
+            src={user.avatar_url}
+            alt={`${user.name} profile image`}
+            className="profile-image"
+          />
+        </div>
+        <h2 className="profile-username">{username}</h2>
+        <p className="profile-user-login">{user.login}</p>
+        <p className="profile-user-bio">{bio}</p>
+      </div>
+      <style jsx>{style}</style>
+    </>
+  );
+};
+
+// query 객체에서 query param 추출
+export const getServerSideProps = async ({ query }) => {
+  const { username } = query;
+  try {
+    const res = await fetch(`https://api.github.com/users/${username}`);
+    if (res.status === 200) {
+      const user = await res.json();
+      console.log({ user });
+      return { props: { user } };
+    }
+    return { props: {} };
+  } catch (error) {
+    console.log(error);
+    return { props: {} };
+  }
+};
+
+export default Username;
+```
+
+### 2.4.2 아이콘 사용하기
+
+```sh
+npm install react-icons
+```
+
+```jsx
+// ...
+import { GoLink, GoLocation, GoMail } from 'react-icons/go';
+
+// Styled-jsx 작성
+const style = css`
+	// ...
+  .profile-user-info {
+    display: flex;
+    align-items: center;
+    margin: 4px 0 0;
+  }
+  .profile-user-info-text {
+    margin-left: 6px;
+  }
+`;
+
+const Username = ({ user }) => {
+	// ...
+        <p className="profile-user-info">
+          <GoLocation size={16} color="#6a737d" />
+          {user.location ? (
+            <span className="profile-user-info-text">{user.location}</span>
+          ) : (
+            <span>no-location</span>
+          )}
+        </p>
+        <p className="profile-user-info">
+          <GoMail size={16} color="#6a737d" />
+          {user.email ? (
+            <span className="profile-user-info-text">{user.email}</span>
+          ) : (
+            <span>no-email</span>
+          )}
+        </p>
+        <p className="profile-user-info">
+          <GoLink size={16} color="#6a737d" />
+          {user.blog ? (
+            <span className="profile-user-info-text">{user.blog}</span>
+          ) : (
+            <span>no-blog</span>
+          )}
+        </p>
+      </div>
+      <style jsx>{style}</style>
+    </>
+  );
+};
+// ...
+
+export default Username;
+
+```
+
+### 2.4.3 github repository list styling
+
+pages/user/[username].jsx
+
+```jsx
+import fetch from 'isomorphic-unfetch';
+import Profile from '../../components/Profile';
+import css from 'styled-jsx/css';
+
+const style = css`
+  .user-contents-wrapper {
+    display: flex;
+    padding: 20px;
+  }
+
+  .repos-wrapper {
+    width: 100%;
+    height: 100vh;
+    overflow: scroll;
+    padding: 0px 16px;
+  }
+
+  .repos-header {
+    padding: 16px 0;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #e1e4e8;
+  }
+
+  .repos-count {
+    display: inline-block;
+    padding: 2px 5px;
+    margin-left: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+    color: #586069;
+    background-color: rgba(27, 31, 35, 0.08);
+    border-radius: 20px;
+  }
+
+  .repository-wrapper {
+    width: 100%;
+    border-bottom: 1px solid #e1e4e8;
+    padding: 24px 0;
+  }
+  .repository-description {
+    padding: 12px 0;
+  }
+  a {
+    text-decoration: none;
+  }
+  .repository-name {
+    margin: 0;
+    color: #ec8543;
+    font-size: 20px;
+    display: inline-block;
+    cursor: pointer;
+  }
+  .repository-name:hover {
+    text-decoration: underline;
+  }
+  .repository-description {
+    margin: 0;
+    font-size: 14px;
+    color: #888;
+  }
+  .repository-language {
+    margin: 0;
+    font-size: 14px;
+  }
+  .repository-updated-at {
+    margin-left: 20px;
+  }
+`;
+
+const Username = ({ user, repos }) => {
+  return (
+    <div className="user-contents-wrapper">
+      {/* PROFILE */}
+      <Profile user={user} />
+      	{/* REPOSITORY */}
+      <div className="repos-wrapper">
+        <div className="repos-header">
+          Repositories
+          <span className="repos-count">{user.public_repos}</span>
+        </div>
+        {user &&
+          repos &&
+          repos.map(repo => (
+            <div key={repo.id} className="repository-wrapper">
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://github.com/${user.login}/${repo.name}`}
+              >
+                <h2 className="repository-name">{repo.name}</h2>
+              </a>
+              <p className="repository-description">{repo.description}</p>
+              <p className="repository-language">
+                {repo.language}
+                <span className="repository-updated-at">{repo.updated_at}</span>
+              </p>
+            </div>
+          ))}
+      </div>
+      <style jsx>{style}</style>
+    </div>
+  );
+};
+
+// query 객체에서 query param 추출
+export const getServerSideProps = async ({ query }) => {
+  const { username } = query;
+  try {
+    let user;
+    let repos;
+
+    // user info
+    const userRes = await fetch(`https://api.github.com/users/${username}`);
+    if (userRes.status === 200) {
+      user = await userRes.json();
+      console.log({ user });
+    }
+
+    // user repositories
+    const reposRes = await fetch(
+      `https://api.github.com/users/${username}/repos?sort=updated&page=1&per_page=10`,
+    );
+    if (reposRes.status === 200) {
+      repos = await reposRes.json();
+      console.log({ repos });
+    }
+    return { props: { user, repos } };
+  } catch (error) {
+    console.log(error);
+    return { props: {} };
+  }
+};
+
+export default Username;
+```
+
+### 2.4.4 날짜 출력 (date-fns)
+
+- moment 보다 가벼워서 자주 사용
+
+```sh
+npm install date-fns
+```
+
+pages/user/[username].jsx
+
+```jsx
+import formatDistance from 'date-fns/formatDistance';
+
+// ...
+<span className="repository-updated-at">
+    {formatDistance(new Date(repo.updated_at), new Date(), {
+      addSuffix: true,
+    })}
+  </span>
+// ...
+```
+
+### 2.4.5 pagination
+
