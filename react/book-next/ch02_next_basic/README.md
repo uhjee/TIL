@@ -881,3 +881,124 @@ import formatDistance from 'date-fns/formatDistance';
 
 ### 2.4.5 pagination
 
+- 서버 데이터 받아오기 getServerSideProps() - `[username].jsx`
+
+```jsx
+// query 객체에서 query param 추출
+export const getServerSideProps = async ({ query }) => {
+  const { username, page } = query;  // page param 추가 
+  try {
+    let user;
+    let repos;
+
+    // user info
+    const userRes = await fetch(`https://api.github.com/users/${username}`);
+    if (userRes.status === 200) {
+      user = await userRes.json();
+      console.log({ user });
+    }
+
+    // user repositories
+    const reposRes = await fetch(
+      `https://api.github.com/users/${username}/repos?sort=updated&page=${page}&per_page=10`,
+    ); // page parameter 추가
+    if (reposRes.status === 200) {
+      repos = await reposRes.json();
+      console.log({ repos });
+    }
+    return { props: { user, repos } };
+  } catch (error) {
+    console.log(error);
+    return { props: {} };
+  }
+};
+```
+
+- 페이지- `Repository.jsx`
+
+  ```jsx
+  const Repositories = ({ user, repos }) => {
+    const router = useRouter();
+    const { page } = router.query;
+    return (
+      <>
+        {/* REPOSITORY */}
+        // ...
+          <div className="repository-pagination">
+            <Link href={`/users/${user.login}?page=${Number(page) - 1}`}>
+              <a>
+                <button type="button" disabled={page && page === '1'}>
+                  Previous
+                </button>
+              </a>
+            </Link>
+            <Link
+              href={`/users/${user.login}?page=${!page ? '2' : Number(page) + 1}`}
+            >
+              <a>
+                <button type="button" disabled={repos.length < 10}>
+                  Next
+                </button>
+              </a>
+            </Link>
+          </div>
+        </div>
+        <style jsx>{style}</style>
+      </>
+    );
+  };
+  ```
+
+  ---
+
+## 2.5 공통 페이지 만들기
+
+dir tree
+
+```tex
+pages
+├── _app.jsx *
+├── api
+│   └── hello.js
+├── index.jsx
+└── users
+    └── [username].jsx
+```
+
+
+
+### 2.5.1 _app.jsx 파일
+
+- `pages` dir 하위에 위치
+- App 컴포넌트는 모든 페이지의 공통 페이지 역할
+  1. 페이지들의 공통된 레이아웃
+  2. 페이지를 탐색할 때 상태 유지
+  3. 추가 데이터를 페이지에 주입
+  4. 글로벌 CSS 추가
+
+### global CSS 적용
+
+- _app.jsx
+
+```jsx
+const MyApp = ({ Component, pageProps }) => {
+  return (
+    <>
+      <Component {...pageProps} />
+      <style jsx global>
+        {`
+          body {
+            margin: 0;
+          }
+        `}
+      </style>
+    </>
+  );
+};
+
+export default MyApp;
+
+```
+
+### 2.5.2 공통 헤더 만들기
+
