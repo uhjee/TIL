@@ -970,11 +970,19 @@ pages
 ### 2.5.1 _app.jsx 파일
 
 - `pages` dir 하위에 위치
+
 - App 컴포넌트는 모든 페이지의 공통 페이지 역할
+
   1. 페이지들의 공통된 레이아웃
   2. 페이지를 탐색할 때 상태 유지
   3. 추가 데이터를 페이지에 주입
   4. 글로벌 CSS 추가
+
+- _app.jsx 파일의 Component 자리에 동적으로 pages의 컴포넌트 렌더링
+
+  - `pageProps` 파라미터 해당 컴포넌트들의 props 값 존재
+
+    e.g. `const Username = ({ user, repos }) => {` 의 user, repos 값
 
 ### global CSS 적용
 

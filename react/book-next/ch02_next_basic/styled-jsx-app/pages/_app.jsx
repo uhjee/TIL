@@ -1,7 +1,10 @@
+import Header from '../components/Header';
+
 const MyApp = ({ Component, pageProps }) => {
+  console.log({ pageProps });
   return (
     <>
-      공통이냐?
+      <Header />
       <Component {...pageProps} />
       <style jsx global>
         {`
