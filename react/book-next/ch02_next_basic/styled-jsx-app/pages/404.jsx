@@ -1,0 +1,9 @@
+/**
+ * 404 에러 커스텀 페이지
+ * @returns 
+ */
+const NotFound = () => {
+  return <p>안녕하세요. 404 페이지 입니다.</p>;
+};
+
+export default NotFound;

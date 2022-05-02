@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import css from 'styled-jsx/css';
 import { IoLogoGithub } from 'react-icons/io';
 
@@ -45,12 +46,22 @@ const MENU = [
 
 const Header = () => {
   const [username, setUsername] = useState('');
+  const router = useRouter();
 
+  /**
+   * form 엘레먼트의 submit 이벤트 핸들러
+   * @param {*} e 이벤트 객체
+   */
+  const onSubmit = e => {
+    e.preventDefault();
+    router.push(`/users/${username}`);
+    setUsername('');
+  };
   return (
     <div>
       <div className="header-wrapper">
         <IoLogoGithub color="white" size={36} />
-        <form className="header-search-form">
+        <form className="header-search-form" onSubmit={onSubmit}>
           <input value={username} onChange={e => setUsername(e.target.value)} />
         </form>
         <nav className="header-navagation">

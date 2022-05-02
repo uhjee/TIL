@@ -11,7 +11,7 @@ const style = css`
   }
 `;
 
-const index = () => {
+const Index = () => {
   const [username, setUsername] = useState('');
   return (
     <div className="container">
@@ -37,4 +37,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;
