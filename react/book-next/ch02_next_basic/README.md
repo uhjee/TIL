@@ -951,7 +951,7 @@ export const getServerSideProps = async ({ query }) => {
 
   ---
 
-## 2.5 공통 페이지 만들기
+## 2.5 공통 페이지 만들기 (`_app.jsx`)
 
 dir tree
 
@@ -1009,4 +1009,209 @@ export default MyApp;
 ```
 
 ### 2.5.2 공통 헤더 만들기
+
+_app.jsx
+
+```jsx
+import Header from '../components/Header';
+
+const MyApp = ({ Component, pageProps }) => {
+  console.log({ pageProps });
+  return (
+    <>
+      <Header /> // 공통 헤더 컴포넌트
+      <Component {...pageProps} />
+      {/* 전역 스타일  */}
+      <style jsx global>
+        {`
+          body {
+            margin: 0;
+          }
+        `}
+      </style>
+    </>
+  );
+};
+
+export default MyApp;
+
+```
+
+Header.jsx
+
+```jsx
+import React, { useState } from 'react';
+import { useRouter } from 'next/router';
+import css from 'styled-jsx/css';
+import { IoLogoGithub } from 'react-icons/io';
+
+const HeaderCss = css`
+  .header-wrapper {
+    padding: 14px 14px;
+    background-color: #24292e;
+    line-height: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .header-search-form input {
+    margin: 0px 16px;
+    background-color: hsla(0, 0%, 100%, 0.125);
+    width: 300px;
+    height: 28px;
+    border: none;
+    border-radius: 5px;
+    outline: none;
+    color: white;
+    padding: 0px 12px;
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .header-navagation a {
+    color: white;
+    margin-right: 16px;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+`;
+
+const GITHUB_URL = 'https://github.com';
+
+const MENU = [
+  { text: 'Pull request', path: `${GITHUB_URL}/pulls` },
+  { text: 'Issues', path: `${GITHUB_URL}/issues` },
+  { text: 'Marketplace', path: `${GITHUB_URL}/marketplace` },
+  { text: 'Explore', path: `${GITHUB_URL}/explore` },
+];
+
+const Header = () => {
+  const [username, setUsername] = useState('');
+  const router = useRouter();
+
+  /**
+   * form 엘레먼트의 submit 이벤트 핸들러
+   * @param {*} e 이벤트 객체
+   */
+  const onSubmit = e => {
+    e.preventDefault();
+    router.push(`/users/${username}`);
+    setUsername('');
+  };
+  return (
+    <div>
+      <div className="header-wrapper">
+        <IoLogoGithub color="white" size={36} />
+        <form className="header-search-form" onSubmit={onSubmit}>
+          <input value={username} onChange={e => setUsername(e.target.value)} />
+        </form>
+        <nav className="header-navagation">
+          {MENU &&
+            MENU.map(i => (
+              <a href={i.path} key={i.text}>
+                {i.text}
+              </a>
+            ))}
+        </nav>
+      </div>
+      <style jsx> {HeaderCss}</style>
+    </div>
+  );
+};
+
+export default Header;
+```
+
+## 2.6 공통 문서 만들기 (`_document.jsx`)
+
+### _document.jsx
+
+```tex
+pages
+├── _app.jsx
+├── _document.jsx   *****
+├── api
+│   └── hello.js
+├── index.jsx
+└── users
+    └── [username].jsx
+```
+
+
+
+- 사용자 정의 Document는 `<html>`, `<body>` 태그를 보완하기 위해 사용
+- `<title>`,` <description>`,` <meta>` 등 프로그램의 정보를 제공하는 HTML 코드 작성 가능
+- 폰트, 외부 api, cdn 등 불러오는 기존 index.html 의 기능 그대로 설정 가능
+- CSS-in-JS의 서버 사이드 렌더링을 위한 설정 가능
+
+### 2.6.1 CDN 폰트 적용하기
+
+pages/_document.jsx
+
+```jsx
+import Document, { Html, Head, Main, NextScript } from 'next/document';
+
+class MyDocument extends Document {
+  render() {
+    return (
+      <Html lang="ko">
+        <Head>
+          <meta name="title" content="Github repository" />
+          <meta name="description" content="깃허브 레파지토리 리스트입니다." />
+          {/* GOOGLE FONTS */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin />
+          <link
+            href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap"
+            rel="stylesheet"
+          />
+        </Head>
+        <body>
+          <Main />
+          <NextScript />
+        </body>
+      </Html>
+    );
+  }
+}
+
+export default MyDocument;
+```
+
+
+
+## 2.7 에러 페이지 만들기 (_error.jsx)
+
+### 2.7.1 custom 500 페이지
+
+pages/_error.jsx
+
+```jsx
+/**
+ * 500 에러 커스텀 페이지
+ * @returns
+ */
+const Error = () => {
+  return <p>에러가 발생했습니다.</p>;
+};
+
+export default Error;
+
+```
+
+### 2.7.2 custom 404 페이지
+
+```jsx
+/**
+ * 404 에러 커스텀 페이지
+ * @returns 
+ */
+const NotFound = () => {
+  return <p>안녕하세요. 404 페이지 입니다.</p>;
+};
+
+export default NotFound;
+
+```
 
