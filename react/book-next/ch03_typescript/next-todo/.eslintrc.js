@@ -21,7 +21,7 @@ module.exports = {
     'jsx-ally/control-has-associated-label': 'off', // 상호 작용 엘리먼트에 label을 넣는다
     'react/no-array-index-key': 'off', // key 값으로 index 사용 가능 여부
     'comma-dangle': 'on', // 마지막에 , 넣어주기 여부
-    'arrow-body-style': 'off', // 화살표 함수안에 return 사용 가능
+    'arrow-body-style': 'as-needed', // 화살표 함수안에 return 사용 가능
     'react/no-unescaped-entities': 'off', // 문자열 내에서 " ' > } 허용 여부
     'react/prop-types': 'off', // proptypes를 사용하지 않는다
     'object-curly-neline': 'off', // 다음 줄 바꿈 강제 사용 X
@@ -56,6 +56,10 @@ module.exports = {
     ],
   },
   settings: {
-
+    'import/resolver': {
+      node: {
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.d.ts'],
+      },
+    },
   },
 };
