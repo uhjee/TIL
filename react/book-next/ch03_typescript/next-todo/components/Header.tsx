@@ -7,6 +7,7 @@ const Container = styled.div`
   width: 100%;
   height: 52px;
   padding: 0 12px;
+  /* 변수처럼 사용 가능 */
   border-bottom: 1px solid ${palette.gray};
   /* 네스팅 가능 */
   h1 {

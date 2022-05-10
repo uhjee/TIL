@@ -1,25 +1,50 @@
 import { NextPage } from 'next';
 import React from 'react';
-import styled from 'styled-components';
+import TodoList from '../components/TodoList';
+import { TodoType } from '../types/todo';
 
-const Container = styled.div`
-  padding: 20px;
-  background-color: beige;
-`;
+// dummy datas
+const todos: TodoType[] = [
+  {
+    id: 1,
+    text: '책을 읽자',
+    color: 'red',
+    checked: false,
+  },
+  {
+    id: 2,
+    text: '피자를 먹자',
+    color: 'yellow',
+    checked: false,
+  },
+  {
+    id: 3,
+    text: '산책을 하자',
+    color: 'blue',
+    checked: true,
+  },
+  {
+    id: 4,
+    text: '똑바로 누워서 자자',
+    color: 'orange',
+    checked: true,
+  },
+  {
+    id: 5,
+    text: '골반 교정을 하자',
+    color: 'navy',
+    checked: false,
+  },
+  {
+    id: 6,
+    text: '쓰레기는 쓰레기통에 버리자',
+    color: 'green',
+    checked: false,
+  },
+];
 
 const Index: NextPage = () => {
-  return (
-    <Container>
-      <h1>hello TS1!</h1>
-      <h1>hello TS2!</h1>
-      <p>hello styled-components</p>
-      <ul>
-        <li>123</li>
-        <li>456</li>
-      </ul>
-      <a>hello styled</a>
-    </Container>
-  );
+  return <TodoList todos={todos} />;
 };
 
 export default Index;
