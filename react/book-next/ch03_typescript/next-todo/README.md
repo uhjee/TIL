@@ -2,6 +2,9 @@
 
 typescript + next : TodoList
 
+- figma 화면설계
+  - https://www.figma.com/file/DG0lfZ1an3xM0AcssQsXJZ/Untitled?node-id=0%3A1
+
 ## 3.1. Environment
 
 next 환경
@@ -595,3 +598,165 @@ export default TodoList;
 
 ```
 
+### todolist 작성
+
+pages/TodoList.tsx
+
+```tsx
+import React, { useCallback, useMemo } from 'react';
+import styled from 'styled-components';
+import palette from '../styles/palette';
+import { TodoType } from '../types/todo';
+
+interface IProps {
+  todos: TodoType[];
+}
+
+type ObjectIndexType = {
+  [key: string]: number | undefined;
+};
+
+const Container = styled.div`
+  width: 100%;
+	// ...
+
+  /* 투두 리스트 스타일 */
+  .todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 52px;
+    border-bottom: 1px solid ${palette.gray};
+
+    .todo-left-side {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+
+      .todo-color-block {
+        width: 12px;
+        height: 100%;
+      }
+
+      .checked-todo-text {
+        color: ${palette.gray};
+        text-decoration: line-through;
+      }
+
+      .todo-text {
+        margin-left: 12px;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .todo-right-side {
+    display: flex;
+    margin-right: 12px;
+
+    .todo-button {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid ${palette.gray};
+      background-color: transparent;
+      outline: none;
+    }
+  }
+`;
+
+// React.FC 타입에 Generics으로 interface 세팅
+const TodoList: React.FC<IProps> = ({ todos }) => {
+	// ...
+  return (
+    <Container>
+			{/* ... */}
+      {/* 투두리스트 */}
+      <ul className="todo-list">
+        {todos &&
+          todos.map(todo => (
+            <li className="todo-item" key={todo.id}>
+              <div className="todo-left-side">
+                <div className={`todo-color-block bg-${todo.color}`}></div>
+                <p
+                  className={`todo-text ${
+                    todo.checked ? 'checked-todo-text' : ''
+                  }`}
+                >
+                  {todo.text}
+                </p>
+              </div>
+              <div className="todo-right-side">
+                {!todo.checked && (
+                  <button
+                    type="button"
+                    className="todo-button"
+                    onClick={() => {}}
+                  ></button>
+                )}
+              </div>
+            </li>
+          ))}
+      </ul>
+    </Container>
+  );
+};
+
+export default TodoList;
+
+```
+
+---
+
+## 5.3 아이콘 다운로드 받기
+
+```tex
+iconmonstr
+```
+
+- svg 로 다운 받고 다음에 위치
+
+```tex
+public
+└── statics
+    └── svg
+        ├── check_mark.svg
+        └── trash_can.svg
+```
+
+---
+
+## 5.4 svg 컴포넌트 사용하기
+
+svg를 리액트 안 컴포넌트로 사용하기 위한 바벨 플러그인
+
+```sh
+npm i babel-plugin-inline-react-svg -D
+```
+
+.babelrc
+
+```json
+{
+  "presets": ["next/babel"],
+  "plugins": [["styled-components", { "ssr": true }], "inline-react-svg"]
+}
+
+```
+
+pages/TodoList.tsx
+
+```tsx
+import TrashCanIcon from '../public/statics/svg/trash_can.svg';
+import CheckMarkIcon from '../public/statics/svg/check_mark.svg';
+```
+
+types/image.d.ts
+
+- `*.svg` 파일 이미지 선언
+
+```typescript
+declare module '*.svg';
+```

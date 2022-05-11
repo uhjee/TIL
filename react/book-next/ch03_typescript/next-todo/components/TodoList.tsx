@@ -2,6 +2,8 @@ import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import palette from '../styles/palette';
 import { TodoType } from '../types/todo';
+import TrashCanIcon from '../public/statics/svg/trash_can.svg';
+import CheckMarkIcon from '../public/statics/svg/check_mark.svg';
 
 interface IProps {
   todos: TodoType[];
@@ -18,6 +20,7 @@ const Container = styled.div`
     margin-left: 12px;
   }
 
+  /* 헤더 스타일 */
   .todo-list-header {
     padding: 12px;
     position: relative;
@@ -51,6 +54,68 @@ const Container = styled.div`
           border-radius: 50%;
         }
       }
+    }
+  }
+
+  /* 투두 리스트 스타일 */
+  .todo-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 52px;
+    border-bottom: 1px solid ${palette.gray};
+
+    .todo-left-side {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+
+      .todo-color-block {
+        width: 12px;
+        height: 100%;
+      }
+
+      .checked-todo-text {
+        color: ${palette.gray};
+        text-decoration: line-through;
+      }
+
+      .todo-text {
+        margin-left: 12px;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .todo-right-side {
+    display: flex;
+    margin-right: 12px;
+
+    svg {
+      &:first-child {
+        margin-right: 16px;
+      }
+    }
+
+    .todo-trash-can {
+      width: 16px;
+      path {
+        fill: ${palette.deep_red};
+      }
+    }
+    .todo-check-mark {
+      fill: ${palette.deep_green};
+    }
+
+    .todo-button {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 1px solid ${palette.gray};
+      background-color: transparent;
+      outline: none;
     }
   }
 
@@ -98,6 +163,7 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
 
   return (
     <Container>
+      {/* 헤더 */}
       <div className="todo-list-header">
         <p className="todo-list-last-todo">
           남은 TODO <span>{todos.length}개</span>
@@ -112,6 +178,40 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
           ))}
         </div>
       </div>
+
+      {/* 투두리스트 */}
+      <ul className="todo-list">
+        {todos &&
+          todos.map(todo => (
+            <li className="todo-item" key={todo.id}>
+              <div className="todo-left-side">
+                <div className={`todo-color-block bg-${todo.color}`}></div>
+                <p
+                  className={`todo-text ${
+                    todo.checked ? 'checked-todo-text' : ''
+                  }`}
+                >
+                  {todo.text}
+                </p>
+              </div>
+              <div className="todo-right-side">
+                {todo.checked && (
+                  <>
+                    <TrashCanIcon className="todo-trash-can" />
+                    <CheckMarkIcon className="todo-check-mark" />
+                  </>
+                )}
+                {!todo.checked && (
+                  <button
+                    type="button"
+                    className="todo-button"
+                    onClick={() => {}}
+                  ></button>
+                )}
+              </div>
+            </li>
+          ))}
+      </ul>
     </Container>
   );
 };
