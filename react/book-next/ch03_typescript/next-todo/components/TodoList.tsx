@@ -100,7 +100,6 @@ const Container = styled.div`
     }
 
     .todo-trash-can {
-      width: 16px;
       path {
         fill: ${palette.deep_red};
       }
