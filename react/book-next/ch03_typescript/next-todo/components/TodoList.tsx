@@ -1,9 +1,11 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import palette from '../styles/palette';
 import { TodoType } from '../types/todo';
 import TrashCanIcon from '../public/statics/svg/trash_can.svg';
 import CheckMarkIcon from '../public/statics/svg/check_mark.svg';
+import { checkTodoAPI } from '../lib/api/todos';
+import { useRouter } from 'next/router';
 
 interface IProps {
   todos: TodoType[];
@@ -140,6 +142,9 @@ const Container = styled.div`
 
 // React.FC 타입에 Generics으로 interface 세팅
 const TodoList: React.FC<IProps> = ({ todos }) => {
+  const router = useRouter();
+
+  const [localTodos, setLocalTodos] = useState(todos);
   /**
    * param todos 의 color에 따른 개수를 반환
    * getTodoColorCounts의 반환값
@@ -149,7 +154,7 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
   const todoColorCounts = useMemo(() => {
     const colors: ObjectIndexType = {};
 
-    todos.forEach(todo => {
+    localTodos.forEach(todo => {
       const value = colors[todo.color];
       if (!value) {
         colors[todo.color] = 1;
@@ -160,12 +165,39 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
     return colors;
   }, [todos]);
 
+  /**
+   * id에 해당하는 todo 데이터의 checked 속성 업데이트
+   * @param id
+   */
+  const checkTodo = async (id: number) => {
+    try {
+      await checkTodoAPI(id);
+      console.log('check complete');
+      // 업데이트된 리스트 다시 불러오기 방법 01 - API 요청 (전체 reload)
+      // router.reload();
+
+      // 업데이트된 리스트 다시 불러오기 방법 02. client 네비게이션을 이용해 setServerSideProps 를 실행 시켜 데이터 다시 받아오기 - API 요청
+      // router.push('/');
+
+      // 방법 03. 업데이트 리스트 다시 불러오지 않고 리렌더링
+      const newTodos = localTodos.map(todo => {
+        if (todo.id === id) {
+          return { ...todo, checked: !todo.checked };
+        }
+        return todo;
+      });
+      setLocalTodos(newTodos);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <Container>
       {/* 헤더 */}
       <div className="todo-list-header">
         <p className="todo-list-last-todo">
-          남은 TODO <span>{todos.length}개</span>
+          남은 TODO <span>{localTodos.length}개</span>
         </p>
         <div className="todo-list-header-colors">
           {Object.keys(todoColorCounts).map((color, index) => (
@@ -180,8 +212,8 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
 
       {/* 투두리스트 */}
       <ul className="todo-list">
-        {todos &&
-          todos.map(todo => (
+        {localTodos &&
+          localTodos.map(todo => (
             <li className="todo-item" key={todo.id}>
               <div className="todo-left-side">
                 <div className={`todo-color-block bg-${todo.color}`}></div>
@@ -204,7 +236,7 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
                   <button
                     type="button"
                     className="todo-button"
-                    onClick={() => {}}
+                    onClick={() => checkTodo(todo.id)}
                   ></button>
                 )}
               </div>

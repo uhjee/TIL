@@ -1083,3 +1083,245 @@ export default axios;
   ```
 
   
+
+---
+
+## 6.5 Todo 체크하기
+
+- PATCH method의 api 생성
+
+pages/api/todos/[id].ts
+
+- NextApiRequest.query 로 데이터를 받아온다
+
+```typescript
+import { NextApiRequest, NextApiResponse } from 'next';
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    if (req.method === 'PATCH') {
+      console.log(req.query);
+      res.statusCode = 200;
+      return res.end();
+    }
+  } catch (e) {
+    res.statusCode = 500;
+    console.log(e);
+    return res.send(e);
+  }
+  res.statusCode = 405;
+  return res.end();
+};
+```
+
+### 데이터 관리를 위해 리팩토링
+
+lib/data/todo.ts
+
+- exist 함수 추가: 해당하는 id의  todo가 있는지 확인
+
+```typescript
+/**
+ *  파일에 TODO 데이터를 관리하는 함수 정의
+ */
+
+import { readFileSync } from 'fs';
+import { TodoType } from '../../types/todo';
+
+/**
+ * file styem으로 데이터를 가져온다.
+ * @return  {TodoType[]}  [return description]
+ */
+const getList = (): TodoType[] => {
+  const todosBuffer: Buffer = readFileSync('data/todos.json');
+  const todosString = todosBuffer.toString();
+
+  if (!todosString) return [];
+
+  const todos: TodoType[] = JSON.parse(todosString);
+  return todos;
+};
+
+/**
+ * 해당 ID 에 해당하는 데이터가 있는지 확인한다.
+ * @param   {number}   id  [id description]
+ * @return  {boolean}      [return description]
+ */
+const exist = ({ id }: { id: number }): boolean => {
+  const todos = getList();
+  const isExistTodo = todos.some(i => i.id === id);
+  return isExistTodo;
+};
+
+export default {
+  getList,
+  exist,
+};
+
+```
+
+lib/data/index.ts
+
+```typescript
+import todo from './todo';
+
+const Data = { todo };
+
+export default Data;
+
+```
+
+pages/api/todos/[id].ts
+
+- todos 리스트 조회 및 checked 변경
+- todos 데이터 업데이트
+
+```typescript
+import { NextApiRequest, NextApiResponse } from 'next';
+import Data from '../../../lib/data';
+
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  if (req.method === 'PATCH') {
+    try {
+      const todoId = Number(req.query.id);
+      // 데이터가 있는지 확인
+      const isExist = Data.todo.exist({ id: todoId });
+      if (!isExist) {
+        res.statusCode = 404;
+        res.end();
+      }
+
+      // todos 리스트 조회 및 checked 변경
+      const todos = await Data.todo.getList();
+      const changedTodos = todos.map(todo => {
+        if (todo.id === todoId) {
+          return { ...todo, checked: !todo.checked };
+        }
+        return todo;
+      });
+
+      // todos 데이터 업데이트
+      Data.todo.write(changedTodos);
+      res.statusCode = 200;
+      res.end();
+      
+    } catch (e) {
+      res.statusCode = 500;
+      console.log(e);
+      return res.send(e);
+    }
+
+    res.statusCode = 405;
+    return res.end();
+  }
+};
+Ï
+```
+
+lib/data/todo.ts
+
+```typescript
+// ...
+
+/**
+ * todo.json 데이터를 업데이트한다.
+ *
+ * @param   {TodoType[]}  todos  [todos description]
+ * @return  {[]}                 [return description]
+ */
+const write = async (todos: TodoType[]) => {
+  writeFileSync('data/todos.json', JSON.stringify(todos));
+};
+
+export default {
+  getList,
+  exist,
+  write,
+};
+```
+
+- test
+
+  ```sh
+  curl -X PATCH http://localhost:3000/api/todos/1
+  ```
+
+  
+
+components/TodoList.tsx
+
+- update API 요청 후, 새로운 데이터 다시 렌더링하는 방법
+  1. useRouter() 의 반환값 NextRouter 인스턴스의 reload() 사용 -> 전체 reload
+     - server 측의 API 요청
+  2. useRouter() 의 반환값 NextRouter 인스턴스의  push('/') 사용 -> 변화가 있는 컴포넌트 불러오기
+     - 서버의 setServerSideProps 호출해 새 데이터 받아오기
+     - server 측의 API 요청
+  3. state 로 관리하며, 컴포넌트 내부적으로 업데이트
+     - API 요청  X
+     - 내 생각인데 서버와의 데이터 정합성 문제 있을지도...
+
+```typescript
+// ...
+import { checkTodoAPI } from '../lib/api/todos';
+
+// ...
+
+// React.FC 타입에 Generics으로 interface 세팅
+const TodoList: React.FC<IProps> = ({ todos }) => {
+	// ...
+  const router = useRouter();
+
+  
+  /**
+   * id에 해당하는 todo 데이터의 checked 속성 업데이트
+   * @param id
+   */
+  const checkTodo = async (id: number) => {
+    try {
+      await checkTodoAPI(id);
+      console.log('check complete');
+      // 업데이트된 리스트 다시 불러오기 방법 01 - API 요청
+      // router.reload();
+
+      // 업데이트된 리스트 다시 불러오기 방법 02. client 네비게이션을 이용해 setServerSideProps 를 실행 시켜 데이터 다시 받아오기 - API 요청
+      // router.push('/');
+
+      // 방법 03. 업데이트 리스트 다시 불러오지 않고 리렌더링
+      const newTodos = localTodos.map(todo => {
+        if (todo.id === id) {
+          return { ...todo, checked: !todo.checked };
+        }
+        return todo;
+      });
+      setLocalTodos(newTodos);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  return (
+    <Container>
+   			// ...
+              <div className="todo-right-side">
+                {todo.checked && (
+                  <>
+                    <TrashCanIcon className="todo-trash-can" />
+                    <CheckMarkIcon className="todo-check-mark" />
+                  </>
+                )}
+                {!todo.checked && (
+                  <button
+                    type="button"
+                    className="todo-button"
+                    onClick={() => checkTodo(todo.id)}
+                  / ></button>
+                )}
+		//...
+    </Container>
+  );
+};
+
+export default TodoList;
+
+```
+
