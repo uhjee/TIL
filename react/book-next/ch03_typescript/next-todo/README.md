@@ -1567,3 +1567,199 @@ export const addTodoAPI = (body: AddTodoAPIBody) =>
 
 ```
 
+---
+
+## 6.7 Todo 삭제하기
+
+pages/api/todos/[id].ts
+
+```typescript
+import { NextApiRequest, NextApiResponse } from 'next';
+import Data from '../../../lib/data';
+
+/**
+ * TODO.json 데이터 중 해당하는 id의 todo 데이터의 checked 속성을 변경한다.
+ *
+ * @param   {NextApiRequest}   req  [req description]
+ * @param   {NextApiResponse}  res  [res description]
+ *
+ * @return  {[type]}                [return description]
+ */
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+
+  // ...
+  
+  /**
+   *  id의 Todo를 삭제한다.
+   */
+  if (req.method === 'DELETE') {
+    try {
+      const todoId = Number(req.query.id);
+      const todos = Data.todo.getList();
+      const filteredTodos = todos.filter(todo => todo.id !== todoId);
+
+      Data.todo.write(filteredTodos);
+      res.statusCode = 200;
+      res.end();
+    } catch (e) {
+      console.log(e);
+      res.statusCode = 500;
+      res.send(e);
+    }
+  }
+};
+
+```
+
+lib/api/todos.ts
+
+```typescript
+import axios from '.';
+import { TodoType } from '../../types/todo';
+
+/**
+ * id에 해당하는 Todo 삭제
+ *
+ * @param   {number}  id               [id description]
+ */
+export const deleteTodoAPI = (id: number) => axios.delete(`api/todos/${id}`);
+
+```
+
+components/TodoList.tsx
+
+```tsx
+
+
+// React.FC 타입에 Generics으로 interface 세팅
+const TodoList: React.FC<IProps> = ({ todos }) => {
+  const router = useRouter();
+
+  const [localTodos, setLocalTodos] = useState(todos);
+
+  // ...
+
+  /**
+   * id 에 해당하는 todo 데이터 삭제 
+   * @param id 
+   */
+  const deleteTodo = async (id: number) => {
+    try {
+      await deleteTodoAPI(id);
+      const newTodos = localTodos.filter(todo => todo.id !== id);
+      setLocalTodos(newTodos);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  return (
+    <Container>
+				// ...
+                  <>
+                    <TrashCanIcon
+                      className="todo-trash-can"
+                      onClick={() => deleteTodo(todo.id)}
+                    />
+                    <CheckMarkIcon
+                      className="todo-check-mark"
+                      onClick={() => checkTodo(todo.id)}
+                    />
+                  </>
+         // ...
+    </Container>
+  );
+};
+
+export default TodoList;
+
+```
+
+---
+
+6.8 Footer 만들기
+
+components/Footer.tsx
+
+```tsx
+import { useRouter } from 'next/router';
+import styled from 'styled-components';
+import palette from '../styles/palette';
+
+const Container = styled.footer`
+  width: 100%;
+  height: 53px;
+  position: fixed;
+  bottom: 0;
+  border-top: 1px solid ${palette.gray};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fff;
+
+  .footer-button {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 5px;
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    padding: 0;
+    line-height: 0;
+    outline: none;
+  }
+`;
+
+const Footer: React.FC = () => {
+  const router = useRouter();
+
+  // TodoList 화면인지 확인
+  const isMain = router.pathname === '/';
+
+  return (
+    <Container>
+      <button
+        type="button"
+        className="footer-button"
+        onClick={() => router.push(isMain ? '/todo/add' : '/')}
+      >
+        {isMain ? '+' : '-'}
+      </button>
+    </Container>
+  );
+};
+
+export default Footer;
+
+```
+
+
+
+pages/_app.tsx
+
+```tsx
+import App, { AppProps, AppContext, AppInitialProps } from 'next/app';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
+import GlobalStyle from '../styles/GlobalStyle';
+
+// AppProps 타입 : 컴포넌트의 props
+const app = ({ Component, pageProps }: AppProps) => {
+  return (
+    <>
+      {/* 글로벌 스타일 적용 */}
+      <GlobalStyle />
+      <Header />
+      <Component {...pageProps} />
+      <Footer />
+    </>
+  );
+};
+
+export default app;
+
+```
+

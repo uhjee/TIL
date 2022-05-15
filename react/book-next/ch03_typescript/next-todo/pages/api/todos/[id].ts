@@ -10,6 +10,9 @@ import Data from '../../../lib/data';
  * @return  {[type]}                [return description]
  */
 export default async (req: NextApiRequest, res: NextApiResponse) => {
+  /**
+   * id의 Todo checked 속성을 변경한다.
+   */
   if (req.method === 'PATCH') {
     try {
       const todoId = Number(req.query.id);
@@ -41,5 +44,26 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     res.statusCode = 405;
     return res.end();
+  }
+
+  /**
+   *  id의 Todo를 삭제한다.
+   */
+  if (req.method === 'DELETE') {
+    try {
+      const todoId = Number(req.query.id);
+      console.log(req.query.id);
+      const todos = Data.todo.getList();
+      const filteredTodos = todos.filter(todo => todo.id !== todoId);
+      console.log({ filteredTodos });
+
+      Data.todo.write(filteredTodos);
+      res.statusCode = 200;
+      res.end();
+    } catch (e) {
+      console.log(e);
+      res.statusCode = 500;
+      res.send(e);
+    }
   }
 };

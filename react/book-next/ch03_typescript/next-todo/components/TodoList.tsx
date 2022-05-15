@@ -4,7 +4,7 @@ import palette from '../styles/palette';
 import { TodoType } from '../types/todo';
 import TrashCanIcon from '../public/statics/svg/trash_can.svg';
 import CheckMarkIcon from '../public/statics/svg/check_mark.svg';
-import { checkTodoAPI } from '../lib/api/todos';
+import { checkTodoAPI, deleteTodoAPI } from '../lib/api/todos';
 import { useRouter } from 'next/router';
 
 interface IProps {
@@ -29,10 +29,21 @@ const Container = styled.div`
     border-bottom: 1px solid ${palette.gray};
 
     .todo-list-last-todo {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       font-size: 14px;
       margin: 0 0 8px;
       span {
         margin-left: 12px;
+      }
+      .todo-list-add-button {
+        padding: 4px 8px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background-color: #fff;
+        outline: none;
+        font-size: 14px;
       }
     }
 
@@ -192,13 +203,36 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
     }
   };
 
+  /**
+   * id 에 해당하는 todo 데이터 삭제 
+   * @param id 
+   */
+  const deleteTodo = async (id: number) => {
+    try {
+      await deleteTodoAPI(id);
+      const newTodos = localTodos.filter(todo => todo.id !== id);
+      setLocalTodos(newTodos);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   return (
     <Container>
       {/* 헤더 */}
       <div className="todo-list-header">
-        <p className="todo-list-last-todo">
-          남은 TODO <span>{localTodos.length}개</span>
-        </p>
+        <div className="todo-list-last-todo">
+          <div>
+            남은 TODO <span>{localTodos.length}개</span>
+          </div>
+          <button
+            type="button"
+            className="todo-list-add-button"
+            onClick={() => router.push('/todo/add')}
+          >
+            추가하기
+          </button>
+        </div>
         <div className="todo-list-header-colors">
           {Object.keys(todoColorCounts).map((color, index) => (
             <div className="todo-list-header-color-count" key={index}>
@@ -228,8 +262,14 @@ const TodoList: React.FC<IProps> = ({ todos }) => {
               <div className="todo-right-side">
                 {todo.checked && (
                   <>
-                    <TrashCanIcon className="todo-trash-can" />
-                    <CheckMarkIcon className="todo-check-mark" />
+                    <TrashCanIcon
+                      className="todo-trash-can"
+                      onClick={() => deleteTodo(todo.id)}
+                    />
+                    <CheckMarkIcon
+                      className="todo-check-mark"
+                      onClick={() => checkTodo(todo.id)}
+                    />
                   </>
                 )}
                 {!todo.checked && (

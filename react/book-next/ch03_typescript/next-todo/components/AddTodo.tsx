@@ -18,13 +18,20 @@ const Container = styled.div`
     justify-content: space-between;
     align-items: center;
 
-    .add-todo-submit-button {
-      padding: 4px 8px;
-      border: 1px solid black;
-      border-radius: 5px;
-      background-color: #fff;
-      outline: none;
-      font-size: 14px;
+    .button-box {
+      .add-todo-submit-button {
+        padding: 4px 8px;
+        border: 1px solid black;
+        border-radius: 5px;
+        background-color: #fff;
+        outline: none;
+        font-size: 14px;
+        margin-right: 4px;
+
+        &:last-child {
+          margin: 0;
+        }
+      }
     }
   }
 
@@ -126,13 +133,22 @@ const AddTodo: React.FC = () => {
     <Container>
       <div className="add-todo-header">
         <h1 className="add-todo-header-title">Add Todo</h1>
-        <button
-          type="button"
-          className="add-todo-submit-button"
-          onClick={addTodo}
-        >
-          추가하기
-        </button>
+        <div className="button-box">
+          <button
+            type="button"
+            className="add-todo-submit-button"
+            onClick={addTodo}
+          >
+            추가하기
+          </button>
+          <button
+            type="button"
+            className="add-todo-submit-button"
+            onClick={() => router.push('/')}
+          >
+            취소
+          </button>
+        </div>
       </div>
       <div className="add-todo-colors-wrapper">
         <div className="add-todo-color-list">

@@ -29,3 +29,10 @@ interface AddTodoAPIBody {
  */
 export const addTodoAPI = (body: AddTodoAPIBody) =>
   axios.post('api/todos', body);
+
+/**
+ * id에 해당하는 Todo 삭제
+ *
+ * @param   {number}  id               [id description]
+ */
+export const deleteTodoAPI = (id: number) => axios.delete(`api/todos/${id}`);
