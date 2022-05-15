@@ -15,3 +15,17 @@ export const getTodosAPI = () => axios.get<TodoType[]>('api/todos');
  * @return  {[type]}              [return description]
  */
 export const checkTodoAPI = (id: number) => axios.patch(`api/todos/${id}`);
+
+interface AddTodoAPIBody {
+  text: string;
+  color: TodoType['color'];
+}
+
+/**
+ * 새로운 todo를 추가하는 API 요청
+ *
+ * @param   {AddTodoAPIBody}  body  [body description]
+ * @return  {[type]}                [return description]
+ */
+export const addTodoAPI = (body: AddTodoAPIBody) =>
+  axios.post('api/todos', body);

@@ -1325,3 +1325,245 @@ export default TodoList;
 
 ```
 
+---
+
+## 6.6 Todo 추가하기
+
+- 투두 추가하는 새로운 뷰 생성
+
+pages/todo/add.tsx
+
+```tsx
+import { NextPage } from 'next';
+import AddTodo from '../../components/AddTodo';
+
+const todo: NextPage = () => {
+  return <AddTodo />;
+};
+
+export default todo;
+
+```
+
+components/AddTodo.tsx
+
+```tsx
+import styled from 'styled-components';
+import palette from '../styles/palette';
+import BrushIcon from '../public/statics/svg/brush.svg';
+import { useState } from 'react';
+import { TodoType } from '../types/todo';
+
+const Container = styled.div`
+  padding: 16px;
+
+  .add-todo-header-title {
+    font-size: 21px;
+  }
+
+  .add-todo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .add-todo-submit-button {
+      padding: 4px 8px;
+      border: 1px solid black;
+      border-radius: 5px;
+      background-color: #fff;
+      outline: none;
+      font-size: 14px;
+    }
+  }
+
+  .add-todo-colors-wrapper {
+    width: 100%;
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+
+    .add-todo-color-list {
+      display: flex;
+      button {
+        width: 24px;
+        height: 24px;
+        margin-right: 16px;
+        border: 0;
+        outline: 0;
+        border-radius: 50%;
+        &:last-child {
+          margin: 0;
+        }
+      }
+
+      .add-todo-selected-color {
+        border: 2px solid #999 !important;
+        transform: scale(1.2);
+      }
+    }
+  }
+
+  textarea {
+    width: 100%;
+    border-radius: 5px;
+    height: 300px;
+    border-color: ${palette.gray};
+    margin-top: 12px;
+    resize: none;
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .bg-blue {
+    background-color: ${palette.blue};
+  }
+  .bg-green {
+    background-color: ${palette.green};
+  }
+  .bg-navy {
+    background-color: ${palette.navy};
+  }
+  .bg-orange {
+    background-color: ${palette.orange};
+  }
+  .bg-red {
+    background-color: ${palette.red};
+  }
+  .bg-yellow {
+    background-color: ${palette.yellow};
+  }
+`;
+
+interface AddTodoProps {}
+
+const colors: ReadonlyArray<TodoType['color']> = [
+  'red',
+  'orange',
+  'yellow',
+  'green',
+  'blue',
+  'navy',
+];
+
+const AddTodo: React.FC = () => {
+  const [text, setText] = useState('');
+
+  // useState 함수에 generic으로 state의 타입 지정
+  const [selectedColor, setSelectedColor] = useState<TodoType['color']>();
+
+  return (
+    <Container>
+      <div className="add-todo-header">
+        <h1 className="add-todo-header-title">Add Todo</h1>
+        <button
+          type="button"
+          className="add-todo-submit-button"
+          onClick={() => {}}
+        >
+          추가하기
+        </button>
+      </div>
+      <div className="add-todo-colors-wrapper">
+        <div className="add-todo-color-list">
+          {colors.map((color, index) => (
+            <button
+              key={index}
+              type="button"
+              className={`bg-${color} add-todo-color-button ${
+                color === selectedColor ? 'add-todo-selected-color' : ''
+              }`}
+              // 타입 단언을 통해 타입 명시
+              onClick={() => setSelectedColor(color as TodoType['color'])}
+            />
+          ))}
+        </div>
+        <BrushIcon />
+      </div>
+      <textarea
+        value={text}
+        onChange={e => setText(e.currentTarget.value)}
+        placeholder="할 일을 입력해주세요."
+      />
+    </Container>
+  );
+};
+
+export default AddTodo;
+
+```
+
+pages/api/todos/index.ts
+
+```typescript
+import fs from 'fs';
+import { readFile } from 'fs/promises';
+import { NextApiRequest, NextApiResponse } from 'next';
+import Data from '../../../lib/data';
+import { TodoType } from '../../../types/todo';
+
+/**
+ * Todo.json 데이터를 조회한다.
+ *
+ * @param   {NextApiRequest}   req  [req description]
+ * @param   {NextApiResponse}  res  [res description]
+ *
+ * @return  {[type]}                [return description]
+ */
+export default async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+		// ...
+
+    /**
+     * [POST] todo 추가
+     */
+    if (req.method === 'POST') {
+      // 값을 받았는지 확인
+      const { text, color } = req.body;
+      if (!text || !color) {
+        res.statusCode = 400;
+        return res.send('text 혹은 color가 없습니다.');
+      }
+      // index 구하기
+      const todos = Data.todo.getList();
+      let todoId: number =
+        todos.length > 0 ? todos[todos.length - 1].id + 1 : 1;
+
+      const newTodo: TodoType = {
+        id: todoId,
+        text,
+        color,
+        checked: false,
+      };
+      console.log({ newTodo });
+      Data.todo.write([...todos, newTodo]);
+      res.statusCode = 200;
+      res.end();
+    }
+  } catch (e) {
+    console.log(e);
+    res.statusCode = 500;
+    res.end(e);
+  }
+};
+
+```
+
+lib/api/todos.ts
+
+```typescript
+import axios from '.';
+import { TodoType } from '../../types/todo';
+
+// ...
+
+/**
+ * 새로운 todo를 추가하는 API 요청
+ *
+ * @param   {AddTodoAPIBody}  body  [body description]
+ * @return  {[type]}                [return description]
+ */
+export const addTodoAPI = (body: AddTodoAPIBody) =>
+  axios.post('api/todos', body);
+
+```
+

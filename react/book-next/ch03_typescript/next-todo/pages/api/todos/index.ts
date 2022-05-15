@@ -14,8 +14,11 @@ import { TodoType } from '../../../types/todo';
  */
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    // 요청 method가 GET인지 확인
+    /**
+     * [GET] todo 조회
+     */
     if (req.method === 'GET') {
+      console.log('[GET] api/todos');
       // // readFile 은 비동기 함수이기 때문에 Promise 사용해 파일 불러오는 것 대기
       // const todos: TodoType[] = await new Promise<TodoType[]>(
       //   (resolve, reject) => {
@@ -41,6 +44,33 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       res.statusCode = 200;
       return res.send(todos);
+    }
+
+    /**
+     * [POST] todo 추가
+     */
+    if (req.method === 'POST') {
+      // 값을 받았는지 확인
+      const { text, color } = req.body;
+      if (!text || !color) {
+        res.statusCode = 400;
+        return res.send('text 혹은 color가 없습니다.');
+      }
+      // index 구하기
+      const todos = Data.todo.getList();
+      let todoId: number =
+        todos.length > 0 ? todos[todos.length - 1].id + 1 : 1;
+
+      const newTodo: TodoType = {
+        id: todoId,
+        text,
+        color,
+        checked: false,
+      };
+      console.log({ newTodo });
+      Data.todo.write([...todos, newTodo]);
+      res.statusCode = 200;
+      res.end();
     }
   } catch (e) {
     console.log(e);
