@@ -12,6 +12,7 @@ interface MyAction extends Action {
 }
 
 const reducer = (state: any, action: MyAction) => {
+  // const reducer = (state: any, action: MyAction) => {
   // Hydrate: 서버에서 생성된 리덕스 스토어를 클라이언트에서 사용할 수 있도록 전달
   if (action.type === HYDRATE) {
     const nextState = {
@@ -43,5 +44,5 @@ const initStore = () => {
   return createStore(reducer, bindMiddleware([]));
 };
 
-// App 컴포넌트에서 wrapper로 사용하기 위해 wrapper
+// 컴포넌트에서 wrapper로 사용하기 위해 wrapping
 export const wrapper = createWrapper(initStore);

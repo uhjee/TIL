@@ -147,3 +147,51 @@ export const wrapper = createWrapper(initStore);
 
 ```
 
+---
+
+## 7.3 Redux 사용하기
+
+- TodoList 의 getTodos 로직
+
+  - AS-IS
+
+    - server : `getServerSideProps()` 에서 API로 Todolist 데이터를 받아 페이지에 props로 전달
+
+  - TO-BE
+
+    1. 서버 사이드에서 API로 받아온 Todolist를 Redux store에 저장
+
+    2. 저장된 store를 client로 전달
+
+​	pages/index.tsx
+
+- `wrapper` 객체의 `getServerSideProps`로 감싸서 선언
+- store의 dispatch() 사용
+  - 파라미터로 액션 전달(액션 생성자 함수 호출)
+
+```tsx
+import { wrapper } from '../store';
+import { todoActions } from '../store/todo';
+// ...
+
+// wrapper 객체로 감싸서 store 사용 가능
+export const getServerSideProps = wrapper.getServerSideProps(
+  store => async () => {
+    try {
+      const { data } = await getTodosAPI();
+
+      // action 생성자 함수 호출(액션 반환)을 파라미터로 dispatch() 호출
+      store.dispatch(todoActions.setTodo(data));
+      return { props: { todos: data } };
+    } catch (e) {
+      console.log(e);
+
+      return { props: { todos: [] } };
+    }
+  },
+);
+
+export default Index;
+
+```
+
