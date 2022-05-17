@@ -195,3 +195,107 @@ export default Index;
 
 ```
 
+---
+
+## 7.4 Redux Toolkit
+
+### RTK
+
+- Redux 앱을 만들기에 필수적인 package와 함수들 포함
+- devtool 포함
+- Redux의 다음 문제 해결을 목적
+  1. 리덕스 저장소 구성이 매우 복잡
+  2. 리덕스가 유용한 작업을 수행하기 위해서는 많은 패키지를 추가해야 가능
+  3. 리덕스에는 상용구 코드가 많이 필요
+
+### 설치
+
+```sh
+yarn add @reduxjs/toolkit
+```
+
+store/todo.ts
+
+- createSlice 함수 사용
+  - Slice 객체 반환
+    - property: actions, reducer, getIntialState 등
+
+```typescript
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { TodoType } from '../types/todo';
+
+// todo store의 타입
+interface TodoReduxState {
+  todos: TodoType[];
+}
+
+//! 초기 값
+const initialState: TodoReduxState = {
+  todos: [],
+};
+
+// createSlice 함수 호출 - 액션 및 reducer 선언 후 생성해줌 Slice 반환
+// Slice 인터페이스는 actions, reducer, getInitailState 등을 속성으로 갖는다.
+const todo = createSlice({
+  name: 'todo',
+  initialState,
+  reducers: {
+    // payload를 갖는 Action 타입 - generic으로 payload 타입 지정
+    setTodo(state, action: PayloadAction<TodoType[]>) {
+      state.todos = action.payload;
+    },
+  },
+});
+
+// Action 맵 export
+export const todoActions = { ...todo.actions };
+
+export default todo;
+```
+
+store/index.ts
+
+```typescript
+import { configureStore } from '@reduxjs/toolkit';
+import { createWrapper, HYDRATE } from 'next-redux-wrapper';
+
+import { Action, combineReducers } from 'redux';
+import todo from './todo';
+
+const rootReducer = combineReducers({
+  todo: todo.reducer,
+});
+
+interface MyAction extends Action {
+  [key: string]: any;
+}
+
+const reducer = (state: any, action: MyAction) => {
+  // const reducer = (state: any, action: MyAction) => {
+  // Hydrate: 서버에서 생성된 리덕스 스토어를 클라이언트에서 사용할 수 있도록 전달
+  if (action.type === HYDRATE) {
+    const nextState = {
+      ...state,
+      ...action.payload,
+    };
+    if (state.count) nextState.count = state.count;
+    return nextState;
+  }
+  return rootReducer(state, action);
+};
+
+// 스토어의 타입
+export type RootState = ReturnType<typeof rootReducer>;
+
+const initStore = () => {
+  // configureStore 로 store 설정
+  return configureStore({
+    reducer,
+    devTools: true, // devtool option on
+  });
+};
+
+export const wrapper = createWrapper(initStore);
+Ï
+```
+
