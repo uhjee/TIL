@@ -1,5 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { createWrapper, HYDRATE } from 'next-redux-wrapper';
+import {
+  TypedUseSelectorHook,
+  useSelector as useReduxSelector,
+} from 'react-redux';
 
 import { Action, combineReducers } from 'redux';
 import todo from './todo';
@@ -38,3 +42,10 @@ const initStore = () => {
 };
 
 export const wrapper = createWrapper(initStore);
+
+// 타입 지원하는 useSelector로 커스텀 하기
+export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
+
+// declare module 'react-redux' {
+//   interface DefaultRootState extends RootState {}
+// }

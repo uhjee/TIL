@@ -299,3 +299,88 @@ export const wrapper = createWrapper(initStore);
 Ï
 ```
 
+---
+
+## 7.5 useSelector 사용하기
+
+api로 받아온 데이터를 redux에 저장하기 때문에 페이지 props로 전달하지 않아도 됨
+
+pages/index.tsx
+
+```tsx
+// ...
+
+// wrapper 객체로 감싸서 store 사용 가능
+export const getServerSideProps = wrapper.getServerSideProps(
+  store => async () => {
+    try {
+      const { data } = await getTodosAPI();
+
+      // action 생성자 함수 호출(액션 반환)을 파라미터로 dispatch() 호출
+      store.dispatch(todoActions.setTodo(data));
+      return { props: {} };
+    } catch (e) {
+      console.log(e);
+
+      return { props: {} };
+    }
+  },
+);
+
+export default Index;
+```
+
+components/TodoList.tsx
+
+```tsx
+// ...
+
+// React.FC 타입에 Generics으로 interface 세팅
+const TodoList: React.FC<IProps> = () => {
+  const router = useRouter();
+
+  // redux 데이터 가져오기 (state의 타입은 RootState)
+  const todos = useSelector((state: RootState) => state.todo.todos);
+
+  const [localTodos, setLocalTodos] = useState(todos);
+  
+// ...
+```
+
+### 7.5.1 useSelector 타입 커스텀
+
+store/index.ts
+
+```typescript
+import {
+  TypedUseSelectorHook,
+  useSelector as useReduxSelector,
+} from 'react-redux';
+// ...
+
+// 타입 지원하는 useSelector로 커스텀 하기
+export const useSelector: TypedUseSelectorHook<RootState> = useReduxSelector;
+```
+
+또는
+
+```typescript
+declare module 'react-redux' {
+  interface DefaultRootState extends RootState {}
+}
+```
+
+---
+
+## 7.6 useDispatch
+
+- 액션 호출
+
+  ```typescript
+  import { useDispatch } from 'react-redux';
+  
+  const dispatch = useDispatch();
+  dispatch(action);
+  ```
+
+  

@@ -36,11 +36,11 @@ export const getServerSideProps = wrapper.getServerSideProps(
 
       // action 생성자 함수 호출(액션 반환)을 파라미터로 dispatch() 호출
       store.dispatch(todoActions.setTodo(data));
-      return { props: { todos: data } };
+      return { props: {} };
     } catch (e) {
       console.log(e);
 
-      return { props: { todos: [] } };
+      return { props: {} };
     }
   },
 );
