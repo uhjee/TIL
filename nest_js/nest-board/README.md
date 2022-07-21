@@ -61,6 +61,12 @@ static mehtod인 create()는 `INestApplication` 이라는 인터페이스의 어
 
 `@Controller()` 라는 데코레이터를 사용합니다. 파라미터는 route 경로를 받습니다.
 
+## 01-4. Providers
+
+## 01-5. Modules
+
+**모듈**은 `@Module()` 데코레이터가 명시된 클래스입니다. `@Module()` 데코레이터는 Nest.js가 해당 클래스를 사용해 application structure를 구성할 수 있게 해줍니다.
+
 # Project Tree
 
 ```

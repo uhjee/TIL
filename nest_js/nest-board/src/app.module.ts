@@ -1,4 +1,9 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { BoardsModule } from './boards/boards.module';
 import { LoggerMiddleware } from './common/middleware/log.middleware';
 
@@ -9,6 +14,11 @@ import { LoggerMiddleware } from './common/middleware/log.middleware';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(LoggerMiddleware).forRoutes('boards');
+    // middleware 적용 대상
+    consumer.apply(LoggerMiddleware).forRoutes({
+      // path: 'boards',
+      path: 'boa*ds', // route path wildcard 사용
+      method: RequestMethod.GET,
+    });
   }
 }
