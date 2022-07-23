@@ -1,0 +1,33 @@
+<h2>upload.single 사용</h2>
+<form action="/upload/single" method="post" enctype="multipart/form-data">
+  <div>
+    <input type="file" name="image" />
+  </div>
+  <div>
+    <input type="text" name="title" />
+  </div>
+  <button type="submit">업로드</button>
+</form>
+<h2>upload.arrays 사용</h2>
+<form action="/upload/multiple" method="post" enctype="multipart/form-data">
+  <div>
+    <input type="file" name="many" multiple />
+  </div>
+  <div>
+    <input type="text" name="title" />
+  </div>
+  <button type="submit">업로드</button>
+</form>
+<h2>upload.fileds 사용</h2>
+<form action="/upload/fields" method="post" enctype="multipart/form-data">
+  <div>
+    <input type="file" name="image1" />
+  </div>
+  <div>
+    <input type="file" name="image2" />
+  </div>
+  <div>
+    <input type="text" name="title" />
+  </div>
+  <button type="submit">업로드</button>
+</form>
