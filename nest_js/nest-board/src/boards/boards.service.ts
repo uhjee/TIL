@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { Board, BoardStatus } from './board.model';
 import { v1 as uuid } from 'uuid';
-import CreateBoardDto from './dto/CreateBoard.dto';
+import CreateBoardDto from './dto/create-board.dto';
 
 @Injectable()
 export class BoardsService {
   private boards: Board[] = Array.from(Array(10), (_, i) => ({
     id: uuid(),
     title: `title ${i}`,
-    descript: `test ${i}`,
+    description: `test ${i}`,
     status: i % 2 === 0 ? BoardStatus.PRIVATE : BoardStatus.PUBLIC,
   }));
 
@@ -21,11 +21,11 @@ export class BoardsService {
   }
 
   createBoard(createBoardDto: CreateBoardDto): Board {
-    const { title, descript } = createBoardDto;
+    const { title, description } = createBoardDto;
     const newBoard: Board = {
       id: uuid(),
       title,
-      descript,
+      description,
       status: BoardStatus.PUBLIC,
     };
     this.boards = [...this.boards, newBoard];
@@ -33,12 +33,18 @@ export class BoardsService {
   }
 
   getBoardById(id): Board {
-    return this.boards.find((b) => b.id === id);
+    const found = this.boards.find((b) => b.id === id);
+
+    // 특정 게시물이 없을 경우, nest의 예외 인스턴스 발생
+    if (!found) {
+      throw new NotFoundException(`Can't find Board With Id ${id}`);
+    }
+    return found;
   }
 
   deleteBoard(id): void {
-    if (!this.getBoardById(id)) throw new Error();
-    this.boards = this.boards.filter((b) => b.id !== id);
+    const found = this.getBoardById(id);
+    this.boards = this.boards.filter((b) => b.id !== found.id);
   }
 
   updateBoardStatus(id: string, status: BoardStatus): void {
