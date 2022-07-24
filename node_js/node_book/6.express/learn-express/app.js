@@ -8,6 +8,7 @@ const fs = require('fs');
 const multer = require('multer');
 
 dotenv.config();
+
 const app = express();
 
 // 실행될 포트 설정 (app 에 세팅)
@@ -99,14 +100,13 @@ app.post(
   },
 );
 
-// GET 요청
-app.get('/', (req, res) => {
-  // express에서는 res.write(),  res.end() 대신 res.send() 사용
-  // res.send('Hello, Express');
+app.use((req, res, next) => {
+  res.status(404).send('Not Found');
+});
 
-  // html 파일 (path 모듈 사용해야 함)
-  res.cookie('session-cookie', 123);
-  res.sendFile(path.join(__dirname, '/index.html'));
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(500).send(err.message);
 });
 
 // listen 핸들러는 http 모듈과 동일
