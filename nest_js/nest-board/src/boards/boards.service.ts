@@ -8,6 +8,7 @@ import { Board } from './board.entity';
 
 @Injectable()
 export class BoardsService {
+  // 생성자 함수로 DI
   constructor(private boardRepository: BoardRepository) {}
 
   async getAllBoards(): Promise<Board[]> {
