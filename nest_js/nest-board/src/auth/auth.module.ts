@@ -6,16 +6,18 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { UserRepository } from './user.repository';
+import * as config from 'config';
 
+const jwtConfig = config.get('jwt');
 @Module({
   imports: [
     PassportModule.register({
       defaultStrategy: 'jwt',
     }),
     JwtModule.register({
-      secret: 'Secret1234', // token을 만들 때 사용하는 secret 텍스트
+      secret: process.env.JWT_SECRET || jwtConfig.secret, // token을 만들 때 사용하는 secret 텍스트
       signOptions: {
-        expiresIn: 60 * 60, // 1Hour
+        expiresIn: jwtConfig.expiresIn, // 1Hour
       },
     }),
     TypeOrmExModule.forCustomRepository([UserRepository]),
