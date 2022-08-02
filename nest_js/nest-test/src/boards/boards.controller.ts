@@ -11,29 +11,28 @@ import {
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { ResponseStatus } from 'src/common/dto/response.status';
 import { ResponseEntity } from 'src/common/dto/test.response.dto';
-import { CreateUserDto } from './dto/create.user.dto';
-import { GetUserDto } from './dto/get.user.dto';
-import { UpdateUserDto } from './dto/update.user.dto';
-import { User } from './user.entity';
-import { UsersService } from './users.service';
+import { Board } from './board.entity';
+import { BoardsService } from './boards.service';
+import { CreateBoardDto } from './dto/create.board.dto';
+import { UpdateBoardDto } from './dto/update.board.dto';
 
-@ApiTags('User')
-@Controller('api/users')
-export class UsersController {
-  private readonly logger = new Logger('USERS');
+@ApiTags('Boards')
+@Controller('api/boards')
+export class BoardsController {
+  private readonly logger = new Logger('BOARDS');
 
-  constructor(private usersService: UsersService) {}
+  constructor(private boardsService: BoardsService) {}
 
   @ApiOkResponse({
-    type: ResponseEntity<GetUserDto | string>,
+    type: ResponseEntity<Board | string>,
   })
   @Get('/:id')
-  async getUser(
+  async getBoard(
     @Param('id') id: number,
-  ): Promise<ResponseEntity<User | string>> {
+  ): Promise<ResponseEntity<Board | string>> {
     try {
-      const user = await this.usersService.getUser(id);
-      return ResponseEntity.OK_WITH(user);
+      const board = await this.boardsService.getBoard(id);
+      return ResponseEntity.OK_WITH(board);
     } catch (error) {
       this.logger.debug(error);
 
@@ -45,33 +44,33 @@ export class UsersController {
   }
 
   @Get()
-  async getAllUsers(): Promise<ResponseEntity<User[]>> {
-    return ResponseEntity.OK_WITH(await this.usersService.getAllUsers());
+  async getAllBoards(): Promise<ResponseEntity<Board[]>> {
+    return ResponseEntity.OK_WITH(await this.boardsService.getAllBoards());
   }
 
   @Post()
-  async createUser(
-    @Body() createUserDto: CreateUserDto,
+  async createBoard(
+    @Body() createBoardDto: CreateBoardDto,
   ): Promise<ResponseEntity<string>> {
     try {
-      await this.usersService.createUser(createUserDto);
+      await this.boardsService.createBoard(createBoardDto);
       return ResponseEntity.OK();
     } catch (error) {
       this.logger.debug(error);
       return ResponseEntity.ERROR_WITH(
-        '유저를 생성하지 못했습니다.',
+        '게시물을 생성하지 못했습니다.',
         ResponseStatus.SERVER_ERROR,
       );
     }
   }
 
   @Patch('/:id')
-  async updateUser(
+  async updateBoard(
     @Param('id') id: number,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateBoardDto: UpdateBoardDto,
   ): Promise<ResponseEntity<string>> {
     try {
-      await this.usersService.updateUser(id, updateUserDto);
+      await this.boardsService.updateBoard(id, updateBoardDto);
       return ResponseEntity.OK();
     } catch (error) {
       this.logger.debug(error);
@@ -80,9 +79,9 @@ export class UsersController {
   }
 
   @Delete('/:id')
-  async deleteUser(@Param('id') id: number): Promise<ResponseEntity<string>> {
+  async deleteBoard(@Param('id') id: number): Promise<ResponseEntity<string>> {
     try {
-      await this.usersService.deleteUser(id);
+      await this.boardsService.deleteBoard(id);
       return ResponseEntity.OK();
     } catch (error) {
       this.logger.debug(error);

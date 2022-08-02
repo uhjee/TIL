@@ -13,7 +13,12 @@ export class UsersService {
   ) {}
 
   async getUser(id: number): Promise<User> {
-    const found = await this.userRepository.findOneBy({ id });
+    const found = await this.userRepository.findOne({
+      where: { id },
+      relations: {
+        boards: true,
+      },
+    });
     if (!found) throw new NotFoundException('이런 유저는 없어요');
     return found;
   }

@@ -1,5 +1,6 @@
+import { Board } from 'src/boards/board.entity';
 import { BaseTimeEntity } from 'src/common/entity/base.time.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User extends BaseTimeEntity {
@@ -17,4 +18,7 @@ export class User extends BaseTimeEntity {
 
   @Column({ type: 'bool', default: false })
   isDied: boolean;
+
+  @OneToMany((type) => Board, (board) => board.user)
+  boards: Board[];
 }
