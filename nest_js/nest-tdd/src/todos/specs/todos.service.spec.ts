@@ -39,5 +39,22 @@ describe('TodosService', () => {
         mockTodo,
       );
     });
+
+    it('TodoRepository가 예외를 던지면, 별도의 처리없이 처리없이 던져야 한다.', async () => {
+      jest.spyOn(todoRepository, 'createTodo').mockRejectedValue(new Error());
+
+      await expect(
+        todoService.createTodo(makeMockCreateTodoDto()),
+      ).rejects.toThrow(new Error());
+    });
+
+    it('정상적으로 todo를 생성하면, todo를 반환해야 한다.', async () => {
+      const mockReturned = makeMockTodo();
+      jest.spyOn(todoRepository, 'createTodo').mockResolvedValue(mockReturned);
+
+      const response = await todoService.createTodo(makeMockCreateTodoDto());
+
+      expect(response).toEqual(mockReturned);
+    });
   });
 });

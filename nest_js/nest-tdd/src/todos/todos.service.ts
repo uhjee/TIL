@@ -8,7 +8,6 @@ export class TodosService {
     @Inject(TodoRepository)
     private readonly todoRepository: TodoRepository,
   ) {}
-
   async createTodo(createTodoDto: CreateTodoDto) {
     return await this.todoRepository.createTodo(createTodoDto);
   }
