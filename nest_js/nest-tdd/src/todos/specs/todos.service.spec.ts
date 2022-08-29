@@ -3,6 +3,7 @@ import { TodosService } from '../todos.service';
 import { TodoRepository } from '../todo.repository';
 import { makeMockTodo, makeMockCreateTodoDto } from './mock-todo';
 
+// todoRepository의 Mocking class
 class MockTodoRepository {
   createTodo = jest.fn();
 }
@@ -46,6 +47,17 @@ describe('TodosService', () => {
       await expect(
         todoService.createTodo(makeMockCreateTodoDto()),
       ).rejects.toThrow(new Error());
+    });
+
+    it("파라미터로 받는 createTodoDto의 속성에 값이 빈 문자열일 경우, '[key[, key]]가 없습니다.'라는 메세지를 가진 에러를 발생시켜야 한다.", async () => {
+      const invalidCreateTodoDto = {
+        content: '',
+        status: '',
+      };
+      jest.spyOn(todoRepository, 'createTodo').mockRejectedValue(new Error());
+      await expect(
+        todoService.createTodo(invalidCreateTodoDto),
+      ).rejects.toThrowError('content, status가 없습니다.');
     });
 
     it('정상적으로 todo를 생성하면, todo를 반환해야 한다.', async () => {
