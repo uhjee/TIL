@@ -77,11 +77,11 @@ describe('Test for Class "Queue"', () => {
       const queue = new Queue();
       expect(typeof queue.size()).toEqual('number');
     });
-    it('stack의 items에 데이터가 없는 경우, 0을 반환해야 한다', () => {
+    it('queue의 items에 데이터가 없는 경우, 0을 반환해야 한다', () => {
       const queue = new Queue();
       expect(queue.size()).toBe(0);
     });
-    it('stack의 items 개수를 반환해야 한다', () => {
+    it('queue의 items 개수를 반환해야 한다', () => {
       const queue = new Queue();
       Reflect.set(queue, 'items', [1, 2, 3]);
       expect(queue.size()).toBe(3);
