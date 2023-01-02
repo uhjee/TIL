@@ -35,15 +35,27 @@ export default class PriorityQueue<T> {
     }
   }
 
-  dequeue() {}
+  dequeue() {
+    return this.items.shift();
+  }
 
-  front() {}
+  front() {
+    return this.items[0];
+  }
 
-  isEmpty() {}
+  isEmpty() {
+    return this.items.length === 0;
+  }
 
-  clear() {}
+  clear() {
+    this.items = [];
+  }
 
-  size() {}
+  size() {
+    return this.items.length;
+  }
 
-  print() {}
+  print() {
+    console.log(this.items.toString());
+  }
 }
