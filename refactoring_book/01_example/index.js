@@ -1,12 +1,8 @@
-const { plays, invoices } = require('./datas');
-const { statement } = require('./functions');
+import { plays, invoices } from './datas.js';
+import { htmlStatement } from './statement.js';
 
-const run = () => {
+export const run = () => {
   invoices.forEach((invoice) => {
-    console.log(statement(invoice, plays));
+    console.log(htmlStatement(invoice, plays));
   });
-};
-
-module.exports = {
-  run,
 };

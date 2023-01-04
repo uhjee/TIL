@@ -1,4 +1,4 @@
-const { run } = require('./01_example');
+import { run } from './01_example/index.js';
 
 const app = () => {
   run();
