@@ -1,4 +1,4 @@
-import { run } from './01_example/index.js';
+import { run } from './02_example/index.js';
 
 const app = () => {
   run();
