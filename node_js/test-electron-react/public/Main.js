@@ -12,8 +12,8 @@ function createWindow() {
     height: 1080 * 0.7,
 
     webPreferences: {
-      // preload 기능 활성화
       enableRemoteModule: true,
+      // preload 기능 활성화 - react app 과 electron 간의 ipc 통신하도록 설정
       preload: __dirname + '/preload.js',
     },
   });
