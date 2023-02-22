@@ -1,3 +1,5 @@
+import { Producer } from './Producer.js';
+
 export class Province {
   // from json doc
   constructor(doc) {
@@ -6,7 +8,7 @@ export class Province {
     this._totalProduction = 0;
     this._demand = doc.demand;
     this.price = doc.price;
-    doc.producers.forEach(d => this.addProducer(new Producer(this, d)));
+    doc.producers.forEach((d) => this.addProducer(new Producer(this, d)));
   }
 
   addProducer(arg) {
@@ -63,20 +65,19 @@ export class Province {
   }
 
   get satisfiedDemand() {
-    return Math.min(this._demand, this.totalProduction)
+    return Math.min(this._demand, this.totalProduction);
   }
 
   get demandCost() {
     let remainingDemand = this.demand;
     let result = 0;
-    this.producers.sort((a, b) => a.cost - b.cost)
-      .forEach(p => {
+    this.producers
+      .sort((a, b) => a.cost - b.cost)
+      .forEach((p) => {
         const contribution = Math.min(remainingDemand, p.production);
         remainingDemand -= contribution;
         result += contribution * p.cost;
       });
     return result;
   }
-
-
 }
