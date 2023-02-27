@@ -69,7 +69,7 @@ describe('no producers', function () { // 생산자가 없는 경우
 });
 
 
-describe('string for producers', function () {
+describe('string for producers', function () { // 의도적 에러 발생
   it('', function () {
     const data = {
       name: 'String producers',
