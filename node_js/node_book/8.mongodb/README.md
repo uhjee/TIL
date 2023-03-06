@@ -26,7 +26,7 @@
 - db 생성
   ```shell
     use nodejs
-    ```
+  ```
 
 - collection 생성
     ```shell
@@ -84,3 +84,32 @@
   ```js
     db.users.find().limit(1).skip(1)
   ```
+
+
+
+### Update
+
+```js
+db.users.update({name: 'zee'}, {$set: {comment: '업데이트 되었나요?'}})
+```
+
+
+
+### Delete
+
+```js
+db.users.remove({ name: 'naa' })
+```
+
+
+
+---
+
+
+
+## ## mongoose 몽구스
+
+- node.js와 mongoDB 사이를 연결해주는 역할
+- 제공하는 기능
+  - Schema: 자유롭게 데이터를 입력할 수 있는 mongodb에 입력 전에 필터링하는 역할
+  - populate: r-dbms의 join 기능 비슷하게 구현

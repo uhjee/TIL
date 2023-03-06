@@ -186,10 +186,10 @@
 ## 4.6 경계 조건 검사하기 (경계선 테스트)
 
 - 문제가 생길 가능성이 있는 경계 조건을 생각해보고 그 부분을 집중적으로 테스트
-  - 컬렉션이 empty일 경우
-  - 숫자형 값이 0일 경우
-  - 숫자형 값이 음수일 경우
-  - 숫자형 데이터에 문자열이 들어갈 경우(javascript)
+    - 컬렉션이 empty일 경우
+    - 숫자형 값이 0일 경우
+    - 숫자형 값이 음수일 경우
+    - 숫자형 데이터에 문자열이 들어갈 경우(javascript)
 
 # 06. 기본적인 리팩토링
 
@@ -201,8 +201,8 @@
 
 - 반대 리팩터링: [함수 인라인하기](#62-함수-인라인하기)
 - 함수
-  - OOP의 메소드
-  - 프로시저, 서브루틴
+    - OOP의 메소드
+    - 프로시저, 서브루틴
 
 ## 6.2 함수 인라인하기
 
@@ -234,7 +234,7 @@
 ## 6.6 변수 캡슐화하기
 
 - 데이터를 재구성하는 것은 함수를 재구성하는 것보다 어렵다.
-  - 호출할 수 있는 유효범위가 넓기 때문에
+    - 호출할 수 있는 유효범위가 넓기 때문에
 - `private` 접근제한자, `getter`, `setter` 메소드를 통해 캡슐화하여 '데이터 재구성'을 '함수 재구성'으로 변환하는 작업
 - 데이터 불변성을 위해 `getter` 에서 deep clone하여 반환
 
@@ -249,27 +249,39 @@
 ## 6.8 매개변수 객체 만들기
 
 ```js
-function amountInvoiced(startDate, endDate) {...}
-function amountReceived(startDate, endDate) {...}
-function amountOverdue(startDate, endDate) {...}
+function amountInvoiced(startDate, endDate) {...
+}
+
+function amountReceived(startDate, endDate) {...
+}
+
+function amountOverdue(startDate, endDate) {...
+}
 ```
 
 =>
 
 ```js
-function amountInvoiced(aDateRange) {...}
-function amountReceived(aDateRange) {...}
-function amountOverdue(aDateRange) {...}
+function amountInvoiced(aDateRange) {...
+}
+
+function amountReceived(aDateRange) {...
+}
+
+function amountOverdue(aDateRange) {...
+}
 ```
 
 ```js
 class DateRange {
   constructor(startDate, max) {
-    this._data = { startDate: startDate, endDate: endDate };
+    this._data = {startDate: startDate, endDate: endDate};
   }
+
   get startDate() {
     return this._data.startDate;
   }
+
   get endDate() {
     return this._data.endDate;
   }
@@ -279,16 +291,48 @@ class DateRange {
 - 데이터 여러 항목이 파라미터로 묶여 다니는 경우, 객체로 묶어 줌(주로 class 사용)
 
 ## 6.9 여러 함수를 클래스로 묶기
+
 - 클래스는 데이터와 함수를 하나의 공유 환경으로 묶은 후, 다른 요소와 어우러질 수 있도록 그 중 일부를 외부에 공개
 - 여러 메소드가 공통된 파라미터를 사용하는 경우, 클래스로 묶는다.
 - 중첩 함수로 묶어도 되지만, 테스트가 어렵기 때문에 class로 묶는 것 선호
 - 함수들이 공유하는 공통 데이터 레코드를 캡슐화 ([매개변수 객체 만들기](#68-매개변수-객체-만들기))
-  - 이 후, 해당 class 내부에 중복으로 호출되는 함수를 이동
+    - 이 후, 해당 class 내부에 중복으로 호출되는 함수를 이동
 
 ## 6.10 여러 함수를 변환 함수로 묶기
+
 - 변환 함수(transform func): 원본 데이터를 입력받아 필요한 정보를 모두 도출한 뒤, 각각을 출력 데이터의 필드에 넣어 반환
-  - 내부에서는 불변성을 위해 원본 데이터는 deep clone해서 사용
-  - 원본 데이터를 직접 가공, 수정해야할 필요가 있다면, [여러 함수를 클래스로 묶기](#69-여러-함수를-클래스로-묶기) 사용
+    - 내부에서는 불변성을 위해 원본 데이터는 deep clone해서 사용
+    - 원본 데이터를 직접 가공, 수정해야할 필요가 있다면, [여러 함수를 클래스로 묶기](#69-여러-함수를-클래스로-묶기) 사용
 - 변환함수의 네이밍
-  - `enrichA`: 본질은 같고 부가 정보만 덧붙이는 변환함수의 네이밍
-  - `transformA` :  형태가 변할 때의 네이밍
+    - `enrichA`: 본질은 같고 부가 정보만 덧붙이는 변환함수의 네이밍
+    - `transformA` :  형태가 변할 때의 네이밍
+
+## 6.11 단계 쪼개기
+
+```js
+const orderData = orderString.split(/\s+/);
+const productPrice = priceList[orderData[0].split('-')[1]];
+const orderPrice = parseInt(orderData[1]) * productPrice;
+```
+
+=>
+
+```js
+const orderRecord = parseOrder(order);
+const orderPrice = price(orderRecord, priceList);
+
+function parseOrder(aString) {
+  const values = aString.split(/\s+/);
+  return ({
+    productID: values[0].split("-")[1],
+    quantity: parseInt(values[1]);
+  });
+}
+
+function price(order, priceList) {
+  return order.quantity * priceList[order.productID];
+}
+```
+
+- 한 코드 안에서 서로 다른 두 대상을 다루는 코드가 있을 경우, 모듈 별로 나눈다.
+- 각 모듈에서는 각 단계 별로 집중에해야 할 로직만 수행한다. 
