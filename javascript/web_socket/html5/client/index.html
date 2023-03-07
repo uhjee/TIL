@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>html5 web socket example</title>
+  </head>
+  <body>
+    <div id="text-container"></div>
+
+    <input id="chat-input" type="text" />
+    <button id="send-btn">send</button>
+    <script>
+      // global websocket instance
+      const ws = new WebSocket('ws://localhost:7777');
+
+      const render = (aString) => {
+        if (aString) {
+          const pEl = document.createElement('p');
+          pEl.textContent = aString;
+          const containerEl = document.querySelector('#text-container');
+          containerEl.appendChild(pEl);
+        }
+      };
+
+      // socket open handler
+      ws.onopen = function (event) {
+        const text = '[Client] message: anybody out there?';
+        ws.send(text);
+        render(text);
+      };
+
+      // socket reception handler
+      ws.onmessage = function (event) {
+        if (event?.data) {
+          render(`[Server] message: ${event.data}`);
+        }
+      };
+
+      // socker error handler
+      ws.onerror = function (event) {
+        if (event?.data) {
+          render(`[ERROR] ${event.data}`);
+        }
+      };
+
+      const sendBtn = document.querySelector('#send-btn');
+      sendBtn.addEventListener('click', function () {
+        const chatInputEl = document.querySelector('#chat-input');
+        const messageToSend = chatInputEl.value;
+        render(`[Client] message: ${messageToSend}`);
+        ws.send(messageToSend);
+        chatInputEl.value = '';
+      });
+    </script>
+  </body>
+</html>
