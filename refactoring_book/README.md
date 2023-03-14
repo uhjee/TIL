@@ -338,6 +338,7 @@ function price(order, priceList) {
 - 각 모듈에서는 각 단계 별로 집중에해야 할 로직만 수행한다.
 
 ---
+
 # 07. 캡슐화
 
 모듈을 분리하는 가장 큰 기준: 외부로 노출할 것을 제외하고 얼마나 잘 숨기는지 여부
@@ -360,26 +361,109 @@ function price(order, priceList) {
   - javascript의 객체 리터럴로 선언된 경우
   - Hash, Map, HashMap, Dictionary, associative array(유사 배열)을 사용한 경우
 
-
 ## 7.2 컬렉션 캡슐화하기
+
 - 내부 컬렉션을 직접 수정하지 못하도록 처리
   - 컬렉션의 getter에 deep copy를 사용해 복제본 반환
   - `add()`, `remove()` 함수 생성 및 사용
 
 ## 7.3 기본형을 객체로 바꾸기
+
 ```js
-orders.filter(o => 'high' === o.priority
-              || 'rush' === o.priority);
+orders.filter((o) => 'high' === o.priority || 'rush' === o.priority);
 ```
-->  (priority: string) 프로퍼티를 객체화
+
+-> (priority: string) 프로퍼티를 객체화
+
 ```js
-orders.filter(o => o.priority.higherThan(new Priority('normal')));
+orders.filter((o) => o.priority.higherThan(new Priority('normal')));
 ```
 
 - 추후에 해당 값을 사용한 추가 로직 개발 시, 용이
 
 ## 7.4 임시 변수를 질의 함수로 바꾸기
+
 - 함수 안에서 어떤 코드의 결과값을 뒤에서 다시 참조할 목적으로 임시 변수를 사용
 - 이를 함수로 만들어 사용하는 편이 나을 때가 있다.
 - 클래스 안에서 적용할 때 효과가 큼
   - 클래스는 추출할 메소드들에 공유 컨텍스트를 제공하기 때문
+
+## 7.5 클래스 추출하기
+
+- 반대 리팩토링: 클래스 인라인하기
+- 클래스는 반드시 명확하게 추상화하고 '소수'의 주어진 역할만 수행해야 한다.
+- 한 클래스가 너무 큰 역할과 책임을 갖고 있는 경우, 클래스 추출
+
+## 7.6 클래스 인라인하기
+
+- 반대 리팩터링: 클래스 추출하기
+- 너무 역할과 책임이 작은 클래스는 인라인 처리
+- 또 두 개의 클래스의 기능을 재분배할 때에도 일단 하나의 클래스로 합친 뒤에 새로운 클래스로 추출
+
+## 7.7 위임 숨기기
+
+- 반대 리팩토링: 중개자 제거하기
+
+```js
+manager = aPerson.department.manager;
+```
+
+->
+
+```js
+manager = aPerson.manager;
+
+class Person {
+  get manager() {
+    return this.department.manager;
+  }
+}
+```
+
+- 캡슐화는 단순히 필드를 숨기는 것이 아님
+- 구현부에 위임 메소드를 만들어서 위임 객체의 존재를 호출부에 숨긴다.
+
+## 7.8 중개자 제거하기
+
+```js
+manager = aPerson.manager;
+```
+
+->
+
+```js
+manager = aPerson.department.manager;
+```
+
+- 반대 리팩터링: 위임 숨기기
+- 구현부(서버 클래스)가 다수의 위임 메소드를 갖고 있어, 서버 클래스가 그저 중개자 역할만 하는 경우
+
+## 7.9 알고리즘 교체하기
+
+```js
+const foundPerson = (people) => {
+  for (let i = 0; i < people.length; i++) {
+    if (people[i] === 'Don') {
+      return 'Don';
+    }
+    if (people[i] === 'John') {
+      return 'John';
+    }
+    if (people[i] === 'Kent') {
+      return 'Kent';
+    }
+  }
+  return '';
+};
+```
+
+->
+
+```js
+const foundPerson = (people) => {
+  const candidates = ['Don', 'John', 'Kent'];
+  return people.find((p) => candidates.includes(p)) || '';
+};
+```
+
+- 거대하고 복잡한 알고리즘을 교체하기는 어렵기 때문에 알고리즘을 간소화하는 작업부터 진행
