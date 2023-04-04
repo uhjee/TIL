@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "module": "commonjs", // browser: amd or node.js : commonjs
+    "esModuleInterop": true, // amd 방식을 전제로 하는 라이브러리를 동작시키기 위한 플래그
+    "target": "es5", // 트랜스파일할 대상의 js version(보통 es5)
+    "moduleResolution": "node", // module이 commonjs : node or amd : classic
+    "outDir": "dist", // 트랜스파일된 es5 js파일이 저장되는 디렉토리
+    "baseUrl": ".", // 트랜스파일 후 디렉토리, tsconfig.json 파일 존재 디렉토리 기준
+    "sourceMap": true, // 트랜스파일 디렉토리에 ".js.map" 파일 생성. 디버깅 용
+    "downlevelIteration": true, // Generator 동작을 위한 플래그
+    "noImplicitAny": false, // type을 지정하지 않으면 any 타입으로 간주하는 지 여부
+    "paths": {
+      "*": ["node_modules/*"],
+      "@/*": ["src/*"],
+      "@utils/*": ["src/utils/*"]
+    }, // module -import 시 참조할 경로, 외부 패키지인 경우도 포함시키기 위해 node_modules 포함
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*", "index.ts"]
+}
