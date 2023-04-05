@@ -1,4 +1,5 @@
 module.exports = class Person {
+  // typescripts는 필드를 반드시 선언해야 함(ES6 class와의 차이점)
   private firstName: string;
   private lastName: string;
 

@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs", // browser: amd or node.js : commonjs
+    "module": "ESNext", // browser: amd or node.js : commonjs
     "esModuleInterop": true, // amd 방식을 전제로 하는 라이브러리를 동작시키기 위한 플래그
     "target": "es5", // 트랜스파일할 대상의 js version(보통 es5)
     "moduleResolution": "node", // module이 commonjs : node or amd : classic
