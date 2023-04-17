@@ -28,3 +28,9 @@
   ```shell
     $ npx sequelize db:create
   ```
+
+## 9-3. 로그인 - passport 모듈
+- 세션, 쿠키 등 처리를 위해 passport package 사용
+  ```shell
+    $ npm i passport passport-local passport-kakao bcrypt
+  ```
