@@ -9,7 +9,7 @@ const passport = require('passport');
 
 dotenv.config();
 const pageRouter = require('./routes/page');
-const {sequelize} = require('./models');
+const { sequelize } = require('./models');
 const passportConfig = require('./passport');
 
 const app = express();
@@ -21,31 +21,37 @@ nunjucks.configure('views', {
   watch: true,
 });
 
-sequelize.sync({force: false}).then(() => {
-  console.log('데이터베이스 연결 성공');
-}).catch((e) => {
-  console.log(e);
-})
+sequelize
+  .sync({ force: false })
+  .then(() => {
+    console.log('데이터베이스 연결 성공');
+  })
+  .catch((e) => {
+    console.log(e);
+  });
 
 app.use(morgan('dev'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 // req.session 객체 생성
-app.use(session({
-  resave: false,
-  saveUninitialized: false,
-  secret: process.env.COOKIE_SECRET,
-  cookie: {
-    httpOnly: true,
-    secure: false,
-  },
-}));
+app.use(
+  session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+      httpOnly: true,
+      secure: false,
+    },
+  })
+);
 
 app.use(passport.initialize()); // req 객체에 passport 설정 세팅
 app.use(passport.session()); // req.session 객체에 passport 정보 저장
 
+// url router
 app.use('/', pageRouter);
 
 // 404 응답 미들웨어
