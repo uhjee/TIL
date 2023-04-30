@@ -9,6 +9,7 @@ const passport = require('passport');
 
 dotenv.config();
 const pageRouter = require('./routes/page');
+const authRouter = require('./routes/auth');
 const { sequelize } = require('./models');
 const passportConfig = require('./passport');
 
@@ -53,6 +54,7 @@ app.use(passport.session()); // req.session 객체에 passport 정보 저장
 
 // url router
 app.use('/', pageRouter);
+app.use('/auth', authRouter);
 
 // 404 응답 미들웨어
 app.use((req, res, next) => {

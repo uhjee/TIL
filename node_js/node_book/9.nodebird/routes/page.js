@@ -6,7 +6,6 @@ const router = express.Router();
 // 하위 router로 흘러가기 전에 미리 실행(순차 실행)
 router.use((req, res, next) => {
   res.locals.user = req.user;
-  res.locals.user = null;
   res.locals.followerCount = 0;
   res.locals.followingCount = 0;
   res.locals.followerIdList = [];

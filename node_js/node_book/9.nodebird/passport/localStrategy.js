@@ -11,10 +11,10 @@ module.exports = () => {
         usernameField: 'email',
         passwordField: 'password',
       },
-      // 첫번째, 두번째 매개변수는 위 options에서 설정한 프로퍼티, 세번째 매개변수는 passport.authenticate의 콜백함수
+      // 첫번째, 두번째 매개변수는 위 options에서 설정한 프로퍼티, 세번째 매개변수는 로그인 라우트의 passport.authenticate의 콜백함수
       async (email, password, done) => {
         try {
-          const exUser = await User.findOne({ where: id });
+          const exUser = await User.findOne({ where: { email } });
           if (exUser) {
             const result = await bcrypt.compare(password, exUser.password);
             if (result) {

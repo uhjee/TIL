@@ -12,7 +12,7 @@ const router = express.Router();
 router.post('/join', isNotLoggedIn, async (req, res, next) => {
   const { email, nick, password } = req.body;
   try {
-    const exUser = await User.findOne({ where: email });
+    const exUser = await User.findOne({ where: { email } });
     if (exUser) return res.redirect('/join?error=exist');
     // create user
     const hashPassword = await bcrypt.hash(password, 12);
@@ -28,6 +28,9 @@ router.post('/join', isNotLoggedIn, async (req, res, next) => {
   }
 });
 
+/**
+ * 로그인__local
+ */
 router.post('/login', isNotLoggedIn, (req, res, next) => {
   // passport.authenticate => middleware
   passport.authenticate('local', (authError, user, info) => {
@@ -54,5 +57,32 @@ router.get('/logout', isLoggedIn, (req, res) => {
   req.session.destroy(); // 세션 객체 내용 제거
   res.redirect('/');
 });
+
+/**
+ * 카카오 로그인
+ */
+router.get('/kakao', passport.authenticate('kakao'));
+
+/**
+ * 카카오 로그인 콜백 라우트 (카카오 인증 서버 => 현 node 서버)
+ */
+router.get(
+  '/kakao/callback',
+  passport.authenticate('kakao', {
+    // kakao login은 내부적으로 req.login 호출
+    failureRedirect: '/',
+  }),
+  (req, res) => {
+    res.redirect('/');
+  }
+);
+
+// router.get('/kakao/clear', async (req, res) => {
+//   try {
+//     const ACCESS_TOKEN = res.locals.user.accessToken;
+//   } catch (e) {
+//
+//   }
+// })
 
 module.exports = router;
