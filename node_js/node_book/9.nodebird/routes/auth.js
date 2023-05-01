@@ -53,9 +53,10 @@ router.post('/login', isNotLoggedIn, (req, res, next) => {
 });
 
 router.get('/logout', isLoggedIn, (req, res) => {
-  req.logout();
-  req.session.destroy(); // 세션 객체 내용 제거
-  res.redirect('/');
+  req.logout(() => {
+    // req.session.destroy(); // 세션 객체 내용 제거
+    res.redirect('/');
+  });
 });
 
 /**

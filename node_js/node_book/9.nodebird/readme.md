@@ -38,10 +38,10 @@
 ### 로그인 요청 흐름
 1. 라우터를 통해 로그인 요청 들어옴
 2. 라우터에서 `passport.authenticate` 메소드 호출
-3. 로그인 전략 수행
-4. 로그인 성공 시, 사용자 정보 객체와 함께 req.login 호출
-5. req.login 메소드가 passport.serializeUser 호출
-6. req.session에 사용자 id 저장
+3. 로그인 전략 수행 - strategy의 verify 함수 호출: callback으로 성공 여부 반환
+4. 로그인 성공 시, 사용자 정보 객체와 함께 `req.login` 호출
+5. `req.login` 메소드가 `passport.serializeUser` 호출
+6. `req.session`에 사용자 id 저장
 7. 로그인 완료
 
 ### 인증이 필요한 요청 흐름
@@ -55,3 +55,10 @@
 passport는 로그인 시 인증을 수행할 동작을 전략 *strategy* 용어 사용
 
 1. 로컬 로그인: `passport-local` 모듈 사용
+2. kakao 로그인: 'passport-kakao' 모듈 사용
+
+## 9-4. multer package:: Image Upload
+nodebird에서 이미지 업로드 방식
+1. FE에서 input 태그를 통해 이미지 선택할 때 바로 업로드 진행
+2. image는 server disk에 저장, 이후 DB에는 해당 file path만 저장
+

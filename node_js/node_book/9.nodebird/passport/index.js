@@ -12,7 +12,17 @@ module.exports = () => {
   // 매 요청시마다 실행, passport.session 미들웨어가 호출
   passport.deserializeUser((id, done) => {
     // serializeUser에서 세팅한 데이터가 첫 번째 파라미터
-    User.findOne({ where: { id } })
+    User.findOne({
+      where: { id },
+      include: [
+        { model: User, attributes: ['id', 'nick'], as: 'Followers' },
+        {
+          model: User,
+          attributes: ['id', 'nick'],
+          as: 'Followings',
+        },
+      ],
+    })
       .then((user) => done(null, user)) // req.user에 세팅
       .catch((err) => done(err));
   });
