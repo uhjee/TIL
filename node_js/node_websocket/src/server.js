@@ -1,3 +1,5 @@
+import http from 'http';
+import WebSocket from 'ws';
 import express from 'express';
 
 const app = express();
@@ -11,4 +13,39 @@ app.get('*', (req, res) => res.redirect('/'))
 
 const port = 3000;
 const handleListen = () => console.log(`Listening on http://localhost:${port}`);
-app.listen(port, handleListen);
+
+const server = http.createServer(app);
+
+const sockets = [];
+
+const wss = new WebSocket.Server({server}); // http server에  ws server 심기
+
+wss.on('connection', (socket) => {
+  console.log('Connected to Browser');
+  socket['nickname'] = 'Anon';
+  sockets.push(socket);
+
+  socket.on('message', (message) => {
+    const aMessage = JSON.parse(message)
+    switch (aMessage.type) {
+      case 'new_message':
+        sockets.forEach((aSocket) => {
+          console.log(aSocket.nickname)
+          aSocket.send(`${socket.nickname}: ${aMessage.payload.toString()}`);
+        });
+        break;
+      case 'nickname':
+        console.log(aMessage.payload);
+        socket['nickname'] = aMessage.payload;
+        break;
+
+    }
+  });
+
+
+  socket.on('close', () => console.log('Disconnected from the Browser❌'))
+  socket.send('hello!!');
+});
+
+server.listen(port, handleListen)
+
