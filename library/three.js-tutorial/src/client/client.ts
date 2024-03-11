@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
+import Stats from 'three/examples/jsm/libs/stats.module';
 
 const scene = new THREE.Scene();
 
@@ -16,7 +17,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.addEventListener('change', render)
+// controls.addEventListener('change', render)
 
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshBasicMaterial({
@@ -36,13 +37,23 @@ function onWindowResize() {
   render();
 }
 
+// function animate() {
+//   // 재귀 호출을 통해 1초에 최대 60회까지 호출
+//   window.requestAnimationFrame(animate);
+//
+//   cube.rotation.x += 0.01;
+//   cube.rotation.y += 0.01;
+//
+//   render();
+// }
+
+// 렌더링 관련 통계 데이터 확인 가능 development
+const stats = new Stats();
+document.body.appendChild(stats.dom);
+
 function animate() {
-  // 재귀 호출을 통해 1초에 최대 60회까지 호출
-  window.requestAnimationFrame(animate);
-
-  cube.rotation.x += 0.01;
-  cube.rotation.y += 0.01;
-
+  requestAnimationFrame(animate);
+  stats.update();
   render();
 }
 
