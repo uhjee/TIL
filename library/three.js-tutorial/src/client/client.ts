@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import {OrbitControls} from 'three/examples/jsm/controls/OrbitControls';
 
 const scene = new THREE.Scene();
 
@@ -15,7 +15,8 @@ const renderer = new THREE.WebGL1Renderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-new OrbitControls(camera, renderer.domElement);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.addEventListener('change', render)
 
 const geometry = new THREE.BoxGeometry();
 const material = new THREE.MeshBasicMaterial({
@@ -27,6 +28,7 @@ const cube = new THREE.Mesh(geometry, material);
 scene.add(cube);
 
 window.addEventListener('resize', onWindowResize, false);
+
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
@@ -35,7 +37,8 @@ function onWindowResize() {
 }
 
 function animate() {
-  requestAnimationFrame(animate);
+  // 재귀 호출을 통해 1초에 최대 60회까지 호출
+  window.requestAnimationFrame(animate);
 
   cube.rotation.x += 0.01;
   cube.rotation.y += 0.01;
