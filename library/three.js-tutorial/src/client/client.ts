@@ -4,6 +4,7 @@ import Stats from 'three/examples/jsm/libs/stats.module';
 import {GUI} from 'dat.gui';
 
 const scene = new THREE.Scene();
+scene.add(new THREE.AxesHelper(5)); // 기준선
 
 const camera = new THREE.PerspectiveCamera(
   75,
@@ -45,12 +46,32 @@ document.body.appendChild(stats.dom);
 
 // [Dat.GUI 라이브러리] user interface로 scene 및 object 조작 가능
 const gui = new GUI();
+// Object3D.ratation
 const cubeFolder = gui.addFolder('Cube')
-cubeFolder.add(cube.rotation, 'x', 0, Math.PI * 2);
-cubeFolder.add(cube.rotation, 'y', 0, Math.PI * 2);
-cubeFolder.add(cube.rotation, 'z', 0, Math.PI * 2);
-cubeFolder.open()
-const cameraFolder = gui.addFolder("Camera Folder");
+const cubeRationFolder = cubeFolder.addFolder('Rotation')
+cubeRationFolder.add(cube.rotation, 'x', 0, Math.PI * 2);
+cubeRationFolder.add(cube.rotation, 'y', 0, Math.PI * 2);
+cubeRationFolder.add(cube.rotation, 'z', 0, Math.PI * 2);
+
+// Object3D.position
+const cubePositionFolder = cubeFolder.addFolder('Position')
+cubePositionFolder.add(cube.position, 'x', -10, 10, 0.5);
+cubePositionFolder.add(cube.position, 'y', -10, 10, 0.5);
+cubePositionFolder.add(cube.position, 'z', -10, 10, 0.5);
+
+// Object3D.scale
+const cubeScaleFolder = cubeFolder.addFolder('Scale')
+cubeScaleFolder.add(cube.scale, 'x', -5, 5);
+cubeScaleFolder.add(cube.scale, 'y', -5, 5);
+cubeScaleFolder.add(cube.scale, 'z', -5, 5);
+
+cubeFolder.add(cube, 'visible');
+cubeFolder.open();
+cubeRationFolder.open()
+cubePositionFolder.open()
+cubeScaleFolder.open()
+
+const cameraFolder = gui.addFolder('Camera Folder');
 cameraFolder.add(camera.position, 'z', 0, 20)
 cameraFolder.open();
 
