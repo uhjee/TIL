@@ -20,7 +20,7 @@ const ReactQueryView: FC<IProp> = () => {
       axios.get('http://192.168.143.51:3003/user').then((res) => res.data),
   });
 
-  const mutaion = useMutation({
+  const { mutate } = useMutation({
     mutationFn: (payload: number) =>
       axios.post('http://192.168.143.51:3003/add-age', {
         age: payload,
@@ -31,7 +31,7 @@ const ReactQueryView: FC<IProp> = () => {
   });
 
   const onClickAddAge = () => {
-    mutaion.mutate(10);
+    mutate(10);
   };
 
   if (isPending) return <div>'Loading...'</div>;

@@ -19,7 +19,13 @@ export default {
     todos() {
       return this.$store.state.todos;
     },
-  }
+  },
+  // methods: {
+  //   routeTo(path) {
+  //     this.$router.push('/todo');
+  //     // const id = this.$route.params.id;
+  //   }
+  // }
 
 }
 </script>

@@ -3,7 +3,8 @@ const Sequelize = require('sequelize');
 module.exports = class Todos extends Sequelize.Model {
   // init: table setting
   static init(sequelize) {
-    return super.init({
+    return super.init(
+      {
         title: {
           type: Sequelize.STRING(100),
           allowNull: false,
@@ -12,20 +13,22 @@ module.exports = class Todos extends Sequelize.Model {
           type: Sequelize.TEXT,
           allowNull: false,
         },
-        user_id: {
+        userId: {
           type: Sequelize.INTEGER.UNSIGNED,
           allowNull: false,
-
+          field: 'user_id',
         },
-        is_done: {
+        isDone: {
           type: Sequelize.BOOLEAN,
           defaultValue: false,
           allowNull: false,
+          field: 'is_done',
         },
-        checked_at: {
+        checkedAt: {
           type: Sequelize.DATE,
-          allowNull: true
-        }
+          allowNull: true,
+          field: 'checked_at',
+        },
       },
       {
         sequelize,
@@ -34,7 +37,8 @@ module.exports = class Todos extends Sequelize.Model {
         tableName: 'todos',
         paranoid: false,
         charset: 'utf8mb4',
-        collate: 'utf8mb4_general_ci'
-      })
+        collate: 'utf8mb4_general_ci',
+      },
+    );
   }
-}
+};
