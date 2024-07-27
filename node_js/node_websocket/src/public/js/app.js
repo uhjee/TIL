@@ -1,47 +1,39 @@
-const messageList = document.querySelector('ul');
-const messageFormEl = document.querySelector('#message');
-const nicknameFormEl = document.querySelector('#nickname');
+const socket = io(); // from server
 
+const welcomeEl = document.querySelector('#welcome');
+const formEl = welcomeEl.querySelector('form');
+const roomEl = document.querySelector('#room');
 
-const socket = new WebSocket(`ws://${window.location.host}`)
+roomEl.hidden = true;
 
-socket.addEventListener('open', () => {
-  console.log('Connected to the Server');
-})
+let roomName = null;
 
-socket.addEventListener('message', (message) => {
-  console.log('New message from the Server: ', message.data);
+const addMessage = (message) => {
+  const ulEl = roomEl.querySelector('ul');
+  console.log(ulEl)
   const liEl = document.createElement('li');
-  liEl.innerText = message.data;
-  messageList.appendChild(liEl);
-})
-
-socket.addEventListener('close', () => {
-  console.log('Disconnected from the Server❌');
-});
-
-const makeMessage = (type, payload) => {
-  const msg = {type, payload};
-  return JSON.stringify(msg);
+  liEl.innerText = message;
+  ulEl.appendChild(liEl);
 }
 
-const handleSubmit = (event) => {
-  event.preventDefault();
-  const inputEl = messageFormEl.querySelector('input');
-  socket.send(makeMessage('new_message', inputEl.value));
+const showRoomEl = () => {
+  welcomeEl.hidden = true;
+  roomEl.hidden = false;
+  const h3El = roomEl.querySelector('h3');
+  h3El.innerText = `Room ${roomName}`;
+}
 
-  const liEl = document.createElement('li');
-  liEl.innerText = `You: ${inputEl.value}`;
-  messageList.appendChild(liEl);
+const handleRoomSubmit = (e) => {
+  e.preventDefault();
+  const inputEl = formEl.querySelector('input');
+  roomName = inputEl.value;
+  socket.emit('enter_room', {roomName: inputEl.value}, showRoomEl);
   inputEl.value = '';
 }
 
-const handleNickSubmit = (event) => {
-  event.preventDefault();
-  const inputEl = nicknameFormEl.querySelector('input');
-  socket.send(makeMessage('nickname', inputEl.value));
-  inputEl.value = '';
-}
+formEl.addEventListener('submit', handleRoomSubmit);
 
-messageFormEl.addEventListener('submit', handleSubmit)
-nicknameFormEl.addEventListener('submit', handleNickSubmit);
+socket.on('welcome', () => {
+  console.log('welcome?');
+  addMessage('Someone joined.');
+})

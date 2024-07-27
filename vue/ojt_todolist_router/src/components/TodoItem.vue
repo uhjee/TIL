@@ -1,11 +1,13 @@
 <template>
-  <li @click="routeToDetail(todo.id)" :class="['todo-item', todo.isDone ? 'done': '']">
-    <span>
-      제목: {{ todo.title }}
-    </span>
-    /
-    <span>
-      내용: {{ todo.description }}
+  <li :class="['todo-item', todo.isDone ? 'done': '']">
+    <span @click="routeToDetail(todo.id)">
+      <span>
+        제목: {{ todo.title }}
+      </span>
+      /
+      <span>
+        내용: {{ todo.description }}
+      </span>
     </span>
     <button @click="changeDone(todo.id)">완료하기</button>
   </li>
@@ -38,6 +40,7 @@ export default {
 .todo-item {
   cursor: pointer;
 }
+
 .done {
   text-decoration: line-through;
 }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>{{todo.title}}</h2>
+    <h2>[{{todo.isDone ? '완료됨' : '해야 함'}}] {{todo.title}}</h2>
     <div>{{todo.description}}</div>
   </div>
 </template>
