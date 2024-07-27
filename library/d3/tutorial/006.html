@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3 Bar</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<style>
+</style>
+<body>
+<svg width="500" height="500">
+</svg>
+<script>
+  const sampleData = [100, 10, 30, 50, 10, 70, 200, 90];
+  const sampleData2 = [110, 20, 10, 20, 60, 80, 150, 120];
+  const svg = d3.select('svg');
+  const bandWidth = 30;
+
+  sampleData.forEach((d, i) => {
+    svg.append('rect')
+      .attr('id', `bar-${i}`)
+      .attr('height', d)
+      .attr('width', bandWidth)
+      .attr('x', (bandWidth + 10) * i)
+      .attr('y', 300 - d)
+      .transition() // 변화
+      .duration(3000)
+      .ease(d3.easeLinear)
+      .style('fill', 'red') // attr 이 아닌 style로 지정해야 변경됨
+      .attr('y', 300 - sampleData2[i])
+      .attr('height', sampleData2[i])
+  })
+  d3.select('#bar-0')
+    .transition()
+    .duration(1000)
+    .ease(d3.easeLinear)
+    .style('fill', 'blue')
+    .delay(3000)
+</script>
+</body>
+</html>

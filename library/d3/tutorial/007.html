@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3 scatter</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<style>
+</style>
+<body>
+<!--방법 1: 직접 svg 엘레먼트 선언 밑 사이즈 설정-->
+<!--<svg width="1000" height="1000">-->
+<!--</svg>-->
+
+<div class="canvas"></div>
+<script>
+  // 방법 2: div 엘레먼트 잡은 후 child로 svg 설정 (속성으로 사이즈 설정)
+  const svg = d3.select('.canvas').append('svg').attr('width', 1000).attr('height', 1000);
+
+  const sampleData = [];
+  for (let i = 0; i < 10; i += 1) {
+    sampleData.push({
+      'cx': Math.random() * 700,
+      'cy': Math.random() * 700,
+      'r': Math.random() * 100,
+      // hsl은 색조(hue, 0 ~ 359), 포화(saturation), 밝기(lightness)
+      'color': `hsl(${Math.random() * 360}, 100%, 50%)`,
+    })
+  }
+
+  svg.selectAll('circle')
+    .data(sampleData)
+    .enter() // enter() : data 수 > dom 요소 -> append 대상, update(): 재적용, 화면 갱신, exit(): data 수 < dom 요소 -> remove 대상
+    .append('circle')
+    .attr('r', d => d.r)
+    .attr('cx', d => d.cx + 10)
+    .attr('cy', d => d.cy + 10)
+    .attr('fill', d => d.color)
+</script>
+</body>
+</html>
