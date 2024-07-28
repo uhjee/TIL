@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3 scatter2</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<style>
+</style>
+<body>
+<div class="canvas"></div>
+<script>
+  /**
+   * 002. scaleLinear :: 비율에 맞게 값을 변경해준다. (주로 y axios)
+   */
+  const f1 = d3.scaleLinear().range([0, 100]).domain([0, 500]);
+  console.log(f1(500))
+  console.log(f1(250))
+  console.log(f1(0))
+
+  const crayons = d3.scaleLinear()
+    .domain([-1, 0, 1])
+    .range(["orange", "white", "green"])
+  console.log(crayons(0.3))
+
+  const f = d3.scaleLinear().range([200, 500]).domain([20000000, 50000000])
+  console.log(f(25000000))
+
+</script>
+</body>
+</html>

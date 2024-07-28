@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3 scatter2</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<style>
+</style>
+<body>
+<div class="canvas"></div>
+<script>
+  const canvas = d3.select('.canvas');
+
+  // load csv file
+  d3.csv('/data/data2.csv').then(
+    (data) => {
+      const svg = canvas.append('svg')
+        .attr('width', 2000)
+        .attr('height', 2000);
+
+      data.forEach(i => {
+        svg.append('circle')
+          .attr('cx', (i['위도'] -33.1) * 2000 + 10)
+          .attr('cy', (i['경도'] - 126) * 400 + 10)
+          .attr('r', 5)
+          // .attr('r', i['표고'])
+          .attr('fill', 'red')
+      })
+
+
+    }
+  ).catch(e => {
+    console.error(e)
+  })
+
+</script>
+</body>
+</html>

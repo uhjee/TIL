@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3 scatter2</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<style>
+</style>
+<body>
+<div class="canvas"></div>
+<script>
+  /**
+   * 001. scalePoint :: 간격에 맞게 값을 변경해준다. (x axis)
+   */
+
+  // range는 전체 width
+  // domain의 전체 count를 range 값으로 '동일하게' 분할하여 분배
+
+  // const f1 = d3.scalePoint().range([0, 100]).domain([10, 11, 20, 30, 40]);
+  // console.log(f1(10))
+  // console.log(f1(20))
+  // console.log(f1(30))
+  //
+  // const f2 = d3.scalePoint().range([0, 100]).domain(['a', 'b', 'c', 'd']);
+  // console.log(f2('a'))
+  // console.log(f2('b'))
+  // console.log(f2('c'))
+
+  // padding이 붙었을 경우 각 요소의 간격에 padding을 곱하여 양쪽 여백으로 줌
+  const f3 = d3.scalePoint().range([0, 100]).domain(['a', 'b', 'c', 'd']).padding(0.3);
+  console.log(f3('a'))
+  console.log(f3('b'))
+  console.log(f3('c'))
+</script>
+</body>
+</html>
