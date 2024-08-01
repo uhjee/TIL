@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+    <style>
+        rect:hover {
+            fill: darkorchid;
+        }
+    </style>
+</head>
+
+<style>
+</style>
+<body>
+<h1>확진자수 현황</h1>
+<div class="canvas"></div>
+<script>
+  const svg = d3.select('.canvas').append('svg')
+    .attr('width', 1500)
+    .attr('height', 1500);
+
+  const width = 800;
+  const height = 800;
+  // margin 개념
+  let [mt, mr, mb, ml] = [150, 50, 50, 50];
+
+  const graphWidth = width - mr - ml;
+  const graphHeight = height - mt - mb;
+
+  const graph = svg.append('g')
+    .attr('width', graphWidth)
+    .attr('height', graphHeight)
+    .attr('transform', `translate(${ml}, ${mt})`) // 이동
+
+  const xAxisG = graph.append('g')
+    .attr('transform', `translate(0, ${graphHeight})`) // 이동
+  const yAxisG = graph.append('g');
+
+
+  d3.json('data/data4.json')
+    .then(d => {
+      const [_, ...data] = [...d];
+
+      // coord 구하기
+      const x = d3.scaleBand()
+        .domain(data.map(i => i.지역이름))
+        .range([0, graphWidth])
+        .padding(0.1);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(data, di => di.확진자수)])
+        .range([graphHeight, 0])
+
+      const bars = graph.selectAll('rect')
+        .data(data);
+
+      bars.enter()
+        .append('circle')
+        .attr('fill', 'hotpink')
+        .attr('cx', d => x(d.지역이름) + 50)
+        .attr('cy', d => y(d.확진자수))
+        .attr('r', d => d.확진자수 / 100)
+
+      // text
+      bars.enter()
+        .append('text')
+        .attr('x', d => x(d.지역이름) + 23)
+        .attr('y', d => {
+          if (d.확진자수 >= 6000) {
+            return y(d.확진자수) - 85
+          } else if (d.확진자수 >= 4000) {
+            return y(d.확진자수) - 65
+          } else if (d.확진자수 >= 2000) {
+            return y(d.확진자수) - 45
+          } else if (d.확진자수 >= 1000) {
+            return y(d.확진자수) - 25
+          } else if (d.확진자수 >= 100) {
+            return y(d.확진자수) - 15
+          } else if (d.확진자수 >= 10) {
+            return y(d.확진자수) - 5
+          }
+          return y(d.확진자수)
+        })
+        .text(d => `${d.확진자수}/ ${d.지역이름}`)
+        .style('font-size', '14px')
+        .attr('text-anchor', 'start')
+
+
+      const xAxis = d3.axisBottom(x);
+      const yAxis = d3.axisLeft(y)
+        .ticks(3)
+        .tickFormat(d => d + '명');
+
+      xAxisG.call(xAxis);
+      yAxisG.call(yAxis);
+
+      xAxisG.selectAll('text')
+        .attr('fill', 'red')
+        .attr('transform', 'rotate(-45)')
+        .attr('text-anchor', 'end')
+
+
+    }).catch(e => {
+    console.error(e);
+  });
+
+
+</script>
+</body>
+</html>
