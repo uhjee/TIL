@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+</head>
+<body>
+<div class="canvas">
+</div>
+<script>
+  /**
+   * https://github.com/d3/d3-shape
+   * const f = d3.arc().innerRadius().outerRadius().startAngle().endAngle()의 형태로 선언
+   * f(data)의 형태로 사용
+   */
+
+  const svg = d3.select('.canvas').append('svg').attr('width', 1000).attr('height', 1000);
+
+  // 원의 좌표는 원의 중심이기 때문에 g으로 묶어서 좌표 이동
+  const g = svg.append('g')
+    .attr('transform', `translate( ${100}, ${100})`);
+
+  const data = [50, 350, 200, 500];
+
+  // 데이터 생성기
+  const f = d3.arc()
+    .innerRadius(0) // 안의 원 반지름 (안은 빈 공간)
+    .outerRadius(50) // 바깐 원 반지름
+    // .startAngle(0) // 출발 각 기준 - PI * n
+    // .startAngle(Math.PI * 1.5) // 출발 각 기준 - PI * n
+    // .endAngle(Math.PI * 1.8); // 시작 작 기준 - PI * n
+
+  // 레이아웃
+  const pie = d3.pie() // layout
+    .sort((a, b) => b - a) //desc
+    // .value(d => 1) // 모든 앵글이 같도록
+    .value(d => d) // 데이터에 따라 각도 계산
+
+  console.log(f(data));
+  console.log(pie(data));
+
+  g.selectAll('path')
+    .data(pie(data))
+    .enter()
+    .append('path')
+    .attr('fill', 'pink')
+    .attr('stroke', 'blue')
+    .attr('stroke-width', '2px')
+    .attr('d', f);
+
+
+</script>
+</body>
+</html>

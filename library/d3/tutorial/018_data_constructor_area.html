@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+</head>
+<body>
+<div class="canvas">
+    <svg>
+        <path></path>
+        <path></path>
+        <path></path>
+        <path></path>
+        <path></path>
+        <path></path>
+        <path></path>
+        <path></path>
+    </svg>
+</div>
+<script>
+  /**
+   * https://github.com/d3/d3-shape
+   * const f = d3.area().x().y0().y1().curve()의 형태로 선언
+   * f(data)의 형태로 사용
+   */
+
+  const data = [5, 15, 10, 25, 15, 35, 20, 50];
+
+  // x 좌표를 반환하는 함수
+  const xFunc = (data, index) => index * 10;
+  // y 좌표 처음과 끝을 연결하는 좌표를 반환하는 함수
+  const y0Func = (data, index) => 100 - data;
+
+  // y 축 하단에서 area를 구성할 좌표를 반환하는 함수
+  const y1Func = (data, index) => 100 - data + 20 + index * 30;
+
+  // 데이터 생성기
+  const f = d3.area()
+    .x(xFunc)
+    .y0(y0Func)
+    .y1(y1Func)
+    .curve(d3.curveNatural)
+
+  console.log(f(data));
+
+  const svg = d3.select('svg')
+    .attr('width', 500)
+    .attr('height', 500);
+
+  svg.selectAll('path')
+    .attr('fill', 'none')
+    .attr('stroke', 'blue')
+    .attr('stroke-width', '2px')
+    .attr('d', f(data))
+</script>
+</body>
+</html>
