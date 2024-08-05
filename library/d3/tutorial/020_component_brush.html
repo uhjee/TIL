@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>D3</title>
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+    <style>
+        /*rect:hover {*/
+        /*    fill: darkorchid;*/
+        /*}*/
+    </style>
+</head>
+
+<style>
+</style>
+<body>
+<h1>확진자수 현황</h1>
+<div class="canvas"></div>
+<script>
+  const svg = d3.select('.canvas').append('svg')
+    .attr('width', 800)
+    .attr('height', 800);
+
+  // 브러시 이벤트 핸들러
+  const onBrushed = ({selection}) => {
+    let value = [];
+    if (selection) {
+      const [[x0, y0], [x1, y1]] = selection;
+      value = dot
+        .style("stroke", "gray")
+        .filter(d => x0 <= x(d["Miles_per_Gallon"]) && x(d["Miles_per_Gallon"]) < x1
+          && y0 <= y(d["Horsepower"]) && y(d["Horsepower"]) < y1)
+        .style("stroke", "steelblue")
+        .data();
+    } else {
+      dot.style("stroke", "steelblue");
+    }
+
+    // Inform downstream cells that the selection has changed.
+    svg.property("value", value).dispatch("input");
+  };
+
+  svg.call(d3.brush().on("start brush end", onBrushed));
+
+  const width = 800;
+  const height = 800;
+  // margin 개념
+  let [mt, mr, mb, ml] = [50, 50, 50, 50];
+
+  const graphWidth = width - mr - ml;
+  const graphHeight = height - mt - mb;
+
+  const graph = svg.append('g')
+    .attr('width', graphWidth)
+    .attr('height', graphHeight)
+    .attr('transform', `translate(${ml}, ${mt})`) // 이동
+
+  const xAxisG = graph.append('g')
+    .attr('transform', `translate(0, ${graphHeight})`) // 이동
+  const yAxisG = graph.append('g');
+
+
+  d3.json('data/data4.json')
+    .then(d => {
+      const [_, ...data] = [...d];
+
+      // coord 구하기
+      const x = d3.scaleBand()
+        .domain(data.map(i => i.지역이름))
+        .range([0, graphWidth])
+        .padding(0.1);
+
+      const y = d3.scaleLinear()
+        .domain([0, d3.max(data, di => di.확진자수)])
+        .range([graphHeight, 0])
+
+      const bars = graph.selectAll('rect')
+        .data(data);
+
+      bars.enter()
+        .append('rect')
+        .attr('height', d => graphHeight - y(d.확진자수))
+        .attr('width', x.bandwidth)
+        .attr('x', d => x(d.지역이름))
+        .attr('y', d => y(d.확진자수))
+        .attr('fill', 'hotpink')
+
+      // line 데이터 생성기
+      const line = d3.line()
+        .x(d => x(d.지역이름) + 15)
+        .y(d => y(d.확진자수))
+        .curve(d3.curveBasis)
+
+      bars.enter()
+        .append('path')
+        .attr('fill', 'none')
+        .attr('stroke', 'blue')
+        .attr('stroke-width', '2px')
+        .attr('d', line(data));
+
+      // text
+      bars.enter()
+        .append('text')
+        .attr('x', d => {
+          if (d.확진자수 > 999) {
+            return x(d.지역이름) + 6;
+          } else if (d.확진자수 > 99) {
+            return x(d.지역이름) + 10;
+          } else if (d.확진자수 > 9) {
+            return x(d.지역이름) + 13;
+          } else {
+            return x(d.지역이름) + 18;
+          }
+        })
+        .attr('y', d => y(d.확진자수) - 5)
+        .text(d => d.확진자수)
+        .style('font-size', '14px')
+        .attr('text-anchor', 'start')
+
+
+      const xAxis = d3.axisBottom(x);
+      const yAxis = d3.axisLeft(y)
+        .ticks(3)
+        .tickFormat(d => d + '명');
+
+      xAxisG.call(xAxis);
+      yAxisG.call(yAxis);
+
+      xAxisG.selectAll('text')
+        .attr('fill', 'red')
+        .attr('transform', 'rotate(-45)')
+        .attr('text-anchor', 'end')
+
+
+    }).catch(e => {
+    console.error(e);
+  });
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>d3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+<script>
+  const data = [10, 10, 20, 20, 30, 30, 30, 30, 30, 40, 40, 50, 50, 60, 60, 60, 60, 60, 60, 60]
+  // https://github.com/d3/d3-array/blob/v3.1.6/README.md#bins
+  // histogram 과 bin 같다
+
+  // const hist = d3.histogram();
+  // console.log(hist(data));
+  //
+  // console.log(hist(data)[2].length);
+
+
+  const bin = d3.bin();
+  console.log(bin(data));
+
+  console.log(bin(data)[2].length);
+</script>
+</body>
+</html>
