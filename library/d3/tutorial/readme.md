@@ -57,7 +57,8 @@
   ```
 - pie()
 - histogram(), bin() - 히스토그램 데이터
-- pack() - circle pack 형태 데이터
+- pack() - circle pack 형태 데이터: 계층 구조의 챠트
+  - 계층구조 데이터 가공: hierarchy(), stratify() -> 이렇게 만들어진 node 단위들의 메소드, each(), ancestors(), descendants() 등
 - tree() - tree 형태 데이터
 - stack() - 누적형 데이터
 - cloud() - 워드 클라우드 형태 데이터
