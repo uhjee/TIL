@@ -21,6 +21,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <ReactQueryView />
     </QueryClientProvider>
+
+    // 03. zustand
+    
   );
 }
 

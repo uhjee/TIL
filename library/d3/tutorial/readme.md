@@ -9,13 +9,13 @@
     .outerRadius(50)
     
     g.selectAll('path')
-    .data(pie(data))
+    .data(pie(data)) // 레이아웃
     .enter()
     .append('path')
     .attr('fill', 'pink')
     .attr('stroke', 'blue')
     .attr('stroke-width', '2px')
-    .attr('d', f); // d의 값으로 세팅
+    .attr('d', f); // attribute 'd' 의 값으로 Data gen 세팅
   ```
 
 - line()
@@ -39,8 +39,22 @@
 - axis() - [https://github.com/d3/d3-axis](https://github.com/d3/d3-axis)
 
 ## 3. Layout
-- 데이터를 입력 받아 그래프를 그릴 수 있는 데이터를 생성
+- 데이터를 입력 받아 그래프를 그릴 수 있는 데이터를 생성한 후 반환
   - Raw Data => Layout => 가공 데이터
+    ```js
+    const f = d3.arc()
+    .innerRadius(0)
+    .outerRadius(50)
+    
+    g.selectAll('path')
+    .data(pie(data)) // 레이아웃
+    .enter()
+    .append('path')
+    .attr('fill', 'pink')
+    .attr('stroke', 'blue')
+    .attr('stroke-width', '2px')
+    .attr('d', f); // d의 값으로 세팅
+  ```
 - pie()
 - histogram(), bin() - 히스토그램 데이터
 - pack() - circle pack 형태 데이터
