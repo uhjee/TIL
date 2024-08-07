@@ -54,8 +54,8 @@
 
   const svg = d3.select('.canvas')
     .append('svg')
-    .attr('width', 1200)
-    .attr('height', 1200);
+    .attr('width', 3000)
+    .attr('height', 3000);
 
   let margin = {
     top: 100,
@@ -71,45 +71,81 @@
     .parentId(d => d.parent);
 
   // console.log(stratify(data)); // flat한 array를 계층구조를 가진 자료구조로 변환
-
   const node = stratify(data).sum(d => d.size); // value 라는 property로 하위 요소들의 size sum 값 세팅
 
-  // 데이터에 r, x, y 값 세팅하는 가공
-  const pack = d3.pack()
-    .size([1000, 1000])
-    .padding(10);
+  // 데이터에 height, x, y 값 세팅하는 가공
+  const tree = d3.tree()
+    .size([3000, 3000]);
 
   console.log(node)
-  console.log(pack(node));
-  console.log(pack(node).descendants()); // 하위 요소들을 array로 flat화 해서 반환
+  console.log(tree(node));
+  console.log(tree(node).descendants()); // 하위 요소들을 array로 flat화 해서 반환
 
-  const packData = pack(node).descendants();
+
+
+
+  // 링크 생성
+  const links = g.selectAll('.link')
+    .data(tree(node).links()); // links() 메소드 호출
+
+  links.enter()
+    .append('path')
+    .attr('stroke', '#999')
+    .attr('stroke-width', 1 )
+    .attr('fill', 'none')
+    .attr('d', d3.linkVertical().x(d => d.x / 4).y(d => d.y / 8))
+
+  // 텍스트 박스 생성
+  const treeData = tree(node).descendants();
   const nodes = g.selectAll('g')
-    .data(packData)
+    .data(treeData)
     .enter()
     .append('g')
-    .attr('transform', d => `translate(${d.x}, ${d.y})`);
+    .attr('transform', d => `translate(${d.x / 4}, ${d.y / 8})`);
 
-  const COLORS = ['pink', 'green', 'orange'];
+  const TEXT_BOX_SIZE = {
+    width: 120,
+    height: 30
+  };
+  nodes.filter(d => d.children)
+    .append('rect')
+    .attr('height', TEXT_BOX_SIZE.height)
+    .attr('width', TEXT_BOX_SIZE.width)
+    .attr('stroke', '#000')
+    .attr('stroke-width', 2)
+    .attr('fill', '#000')
+    .attr('x', -1 * TEXT_BOX_SIZE.width / 2)
+    .attr('y', -1 * TEXT_BOX_SIZE.height / 2)
 
-  nodes.append('circle')
-    .attr('r', d => d.r)
-    .attr('stroke', 'black')
-    .attr('stroke-width', 3)
-    .attr('fill', d => COLORS[d.depth]);
-
-  nodes.filter(d => !d.children)
-    .append('text')
-    .attr('fill', 'black')
+  nodes.append('text')
+    .attr('fill', '#fff')
     .attr('text-anchor', 'middle')
-    .attr('dy', d => {
-      return `${d.value * 0.9}px`;
-    })
-    .style('font-size', d => {
-      if (d.value <= 5) return 16;
-      return d.value * 4;
-    })
-    .text(d => d.data.name);
+    .text(d => d.data.name)
+    .filter(d => !d.children)
+    .attr('y', 15)
+    .attr('fill', '#000')
+
+  //
+  // const COLORS = ['pink', 'green', 'orange'];
+  //
+  // nodes.append('circle')
+  //   .attr('r', d => d.r)
+  //   .attr('stroke', 'black')
+  //   .attr('stroke-width', 3)
+  //   .attr('fill', d => COLORS[d.depth]);
+  //
+  // nodes.filter(d => !d.children)
+  //   .append('text')
+  //   .attr('fill', 'black')
+  //   .attr('text-anchor', 'middle')
+  //   .attr('dy', d => {
+  //     return `${d.value * 0.9}px`;
+  //   })
+  //   .style('font-size', d => {
+  //     if (d.value <= 5) return 16;
+  //     return d.value * 4;
+  //   })
+  //   .text(d => d.data.name);
 
 </script>
 </body>
