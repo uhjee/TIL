@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>d3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        .region {
+            fill: #aaa;
+            stroke: #000;
+            stroke-width: 1px;
+        }
+
+        .region:hover {
+            fill: blue;
+        }
+    </style>
+</head>
+<body>
+<div class="canvas"></div>
+</body>
+
+<script>
+  /** ref
+   공식문서 : https://github.com/d3/d3-geo/tree/v3.0.1#projections
+   https://github.com/d3/d3-geo/tree/v3.0.1#paths
+   https://github.com/d3/d3-geo/tree/v3.0.1#azimuthal-projections
+   지리 정보는 22년 4월 data입니다. 면 -> 읍 승격 등 연마다 변하는 data이니 아래 데이터를 확인해주세요.
+   통계청 통계지리정보서비스
+   대한민국 최신 행정구역(SHP) : http://www.gisdeveloper.co.kr/?p=2332
+   대한민국 행정동 경계(geojson) : https://github.com/vuski/admdongkor
+   대한민국 data 및 초기값 : https://myhappyman.tistory.com/97
+   */
+  const initialScale = 5500; //확대시킬 값
+  const initialX = -11900; //초기 위치값 X
+  const initialY = 4050; //초기 위치값 Y
+
+  // 초기값 세팅
+  const projection = d3.geoMercator()
+    .scale(initialScale)
+    .translate([initialX, initialY]);
+
+  const svg = d3.select('.canvas')
+    .append('svg')
+    .attr('width', 1000)
+    .attr('height', 1000)
+
+  const g = svg.append('g');
+
+  d3.json('data/korea.json')
+    .then(json => {
+      console.log(json)
+      // console.log(json.features[0].geometry.coordinates[0][1][0])
+      // console.log(json.features[0].geometry.coordinates[0][1][1])
+
+      g.selectAll('path')
+        .data(json.features)
+        .join('path')
+        .attr('d', d3.geoPath().projection(projection))
+        .attr('class', 'region')
+
+      g.selectAll('text')
+        .data(json.features)
+        .join('text')
+        .attr('transform', d => {
+          const locate = d3.geoPath().projection(projection).centroid(d)
+          return `translate(${locate[0]}, ${locate[1]})`
+        })
+        .text(d => d.properties.name)
+        .attr('text-anchor', 'middle')
+        .attr('fill', '#444')
+        .attr('font-size', '14px')
+    })
+</script>
+</html>

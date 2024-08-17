@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>d3</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+
+    <style>
+        .header-box {
+            display: inline-block;
+            padding: 40px;
+            border: 1px solid #777;
+        }
+
+        .tooltip {
+            position: absolute;;
+            text-align: center;
+            padding: 10px;
+            background: #888;
+            border-radius: 4px;
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div class="canvas"></div>
+
+<script>
+  const svg = d3.select(".canvas")
+    .append("svg")
+    .attr("width", 400)
+    .attr("height", 400)
+
+  // Append a circle
+  svg.append("circle")
+    .attr("cx", 150)
+    .attr("cy", 200)
+    .attr("r", 40)
+    .attr("fill", "#69b3a2")
+    .attr('class', 'header-box')
+
+
+  const onClickH1 = () => {
+    console.log('click!')
+  }
+  const tooltip = d3.select('body').append('div')
+    .text('im')
+
+    .attr('class', 'tooltip');
+
+  const onActiveTooltip = (e) => {
+    tooltip.style('visibility', 'visible')
+    console.log('lala')
+  };
+
+  const onMoveTooltip = (e) => {
+    const [x, y] = d3.pointer(e);
+    tooltip.text(`hello : x ${x}, y: ${y}`)
+      .style('top', `${y}px`)
+      .style('left', `${x + 40}px`)
+  }
+
+  const onInactiveTooltip = (e) => {
+    tooltip.style('visibility', 'hidden')
+  };
+
+  const headerBox = d3.select('.header-box')
+    .on('click', onClickH1)
+    .on('mouseover', onActiveTooltip)
+    .on('mousemove', onMoveTooltip)
+    .on('mouseout', onInactiveTooltip)
+</script>
+</body>
+</html>
