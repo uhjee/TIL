@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Canvas API</title>
+    <style>
+        canvas {
+            background-color: #eee;
+        }
+
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border: 0;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .color-btn[data-color='black'] {
+            background-color: black;
+        }
+
+        .color-btn[data-color='red'] {
+            background-color: red;
+        }
+
+        .color-btn[data-color='blue'] {
+            background-color: blue;
+        }
+
+        .color-btn[data-color='green'] {
+            background-color: green;
+        }
+
+        .image-btn {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border: 0;
+            background: url(./images/404_image.png) no-repeat 50% 50% / cover;
+        }
+
+        .result-image {
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+    </style>
+</head>
+<body>
+<div class="control-bar">
+    <button class="color-btn" data-type="color" data-color="black"></button>
+    <button class="color-btn" data-type="color" data-color="red"></button>
+    <button class="color-btn" data-type="color" data-color="blue"></button>
+    <button class="color-btn" data-type="color" data-color="green"></button>
+    <button class="image-btn" data-type="image"></button>
+</div>
+<div>
+    <button class="save-btn">이미지 저장</button>
+</div>
+<div class="result-image"></div>
+
+<canvas id="canvas" width="900" height="600">
+    이 브라우저는 canvas를 지원하지 않습니다.
+</canvas>
+
+<script>
+  const canvas = document.querySelector('#canvas');
+  const ctx = canvas.getContext('2d');
+  const controlBar = document.querySelector('.control-bar');
+  const saveBtn = document.querySelector('.save-btn');
+  const resultImage = document.querySelector('.result-image');
+
+  let drawingMode = false;
+  let brush = 'color'; // color | image
+
+  const imgElem = new Image();
+  imgElem.src = './images/404_image.png';
+
+  const setColor = (e) => {
+    // console.log(e.target)
+    brush = e.target.getAttribute('data-type');
+    const color = e.target.getAttribute('data-color');
+    ctx.fillStyle = color;
+
+  };
+
+
+  const downHandler = () => {
+    drawingMode = true;
+  };
+  const upHandler = () => {
+    drawingMode = false;
+  };
+
+  const moveHandler = (e) => {
+    if (!drawingMode) return;
+
+    const {offsetX, offsetY, layerX, layerY, x, y} = e;
+    switch (brush) {
+      case 'color':
+        // console.log({e})
+
+        ctx.beginPath();
+        ctx.arc(offsetX, offsetY, 5, 0, Math.PI * 2, false);
+        ctx.fill();
+        break;
+      case 'image':
+        ctx.drawImage(imgElem, offsetX, offsetY, 50, 50)
+        break;
+    }
+
+  };
+
+  const createImage = () => {
+    const url = canvas.toDataURL('image/png');
+    // console.log(url)
+    const imgElem = new Image();
+    imgElem.src = url;
+
+
+    while (resultImage.childNodes.length > 0) {
+      resultImage.removeChild(resultImage.firstChild);
+    }
+
+    resultImage.appendChild(imgElem);
+  };
+
+  canvas.addEventListener('mousedown', downHandler);
+  canvas.addEventListener('mouseup', upHandler);
+  canvas.addEventListener('mousemove', moveHandler);
+
+  controlBar.addEventListener('click', setColor);
+
+  saveBtn.addEventListener('click', createImage)
+</script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Canvas API</title>
+    <style>
+        canvas {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="600" height="600">
+    이 브라우저는 canvas를 지원하지 않습니다.
+</canvas>
+
+<script>
+    const canvas = document.querySelector('#canvas');
+    const ctx = canvas.getContext('2d');
+
+    // 이미지 element 선언 둘 다 상관 없음
+    // const imgElem = document.creㄴateElement('img');
+    const imgElem = new Image();
+    imgElem.src = '../images/404_image.png';
+    imgElem.addEventListener('load', () => {
+      ctx.drawImage(imgElem, 50, 50); // dx, xy
+      ctx.drawImage(imgElem, 300, 200, 70, 120); // dx, dy, width, height;
+      ctx.drawImage(imgElem, 100, 70, 50, 50, 400, 400, 100, 100); // 원본 이미지에서 필요 부분만 잘라오기
+    });
+</script>
+</body>
+</html>
