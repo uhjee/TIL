@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas api</title>
+    <style>
+        #canvas {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas" width="600" height="500">
+
+</canvas>
+
+<script>
+  const canvas = document.querySelector('#canvas');
+  const ctx = canvas.getContext('2d');
+
+
+  const padding = 10;
+  // translate를 활용한 사각형 여러 개 그리기
+  for (let i = 0; i < 3; i++) {
+    for (let j = 0; j < 3; j++) {
+      ctx.save();
+      ctx.fillStyle = `rgb(${51 * i}, ${255 - 51 * i}, 255)`;
+      ctx.translate(padding + j * 50, padding + i * 50); // 각각의 위치로 이동
+      ctx.fillRect(0, 0, 25, 25);
+      ctx.restore();
+    }
+  }
+
+
+  // 퍼지는 사각형 그리기
+  let scaleValue = 1;
+
+  const draw = () => {
+    // 이전 그림 삭제
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.translate(300, 300); // 좌표 이동 (scale 기준 좌표)
+    ctx.scale(scaleValue, scaleValue);
+    scaleValue += 0.01;
+    ctx.strokeRect(-50, -50, 100, 100); // 너비, 높이의 절반만큼 좌표 -;
+
+    ctx.restore();
+    requestAnimationFrame(draw);
+  }
+
+  requestAnimationFrame(draw);
+</script>
+</body>
+</html>
