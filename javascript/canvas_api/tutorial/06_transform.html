@@ -37,19 +37,46 @@
 
   // 퍼지는 사각형 그리기
   let scaleValue = 1;
+  let rotationValue = 0;
+
+  /**
+   * 각도를 radian 값으로 변환하여 반환한다.
+   *  1도 = Math.PI / 180
+   * @param angle
+   * @returns {number}
+   */
+  const toRadian = (angle) => {
+    return angle * Math.PI / 180;
+  }
 
   const draw = () => {
     // 이전 그림 삭제
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // 상태 저장  - 예제에서는 tranlate() 통한 기준 좌표 (0, 0)
     ctx.save();
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.translate(300, 300); // 좌표 이동 (scale 기준 좌표)
-    ctx.scale(scaleValue, scaleValue);
-    scaleValue += 0.01;
-    ctx.strokeRect(-50, -50, 100, 100); // 너비, 높이의 절반만큼 좌표 -;
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // ! '변환' 초기화 - 단위 행렬 값, 변환 전에 버릇처럼 셋
+    ctx.translate(300, 300); // * 1) 이동 : 기준 좌표 이동 (scale 기준 좌표)
+    ctx.scale(scaleValue, scaleValue); // * 2)  크기 :  크기 키우기 (비율?)
+    ctx.rotate(rotationValue); // * 3) 회전
 
+    // * 변환이 끝난 후에 drawing!!
+    ctx.strokeRect(-50, -50, 100, 100); // 그려질 사각형의 기준 좌표(left-top):  너비, 높이의 절반만큼 좌표 마이너스;
+
+
+    scaleValue += 0.005;
+    rotationValue += toRadian(1);
+
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // !이 초기화 주석이 없을 경우, 위의 '변환'(tranlate, scale, rotate)의 영향을 같이 받음
+    ctx.fillRect(50, 50, 30, 30);
+
+    // 상태 불러오기 - 기준 좌표 (0, 0)
     ctx.restore();
+
+    // 좌표가 초기화 되어 (0, 0)에서 그려짐
+    ctx.fillRect(10, 10, 30, 30);
+
     requestAnimationFrame(draw);
   }
 
