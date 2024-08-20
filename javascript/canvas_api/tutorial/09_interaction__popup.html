@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas api</title>
+    <style>
+        #canvas {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Interaction</h1>
+<canvas id="canvas" width="600" height="400"></canvas>
+
+
+<script src="./09_classes/Box.js"></script>
+<script src="./09_classes/Panel.js"></script>
+<script>
+  const canvas = document.querySelector('#canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.font = 'bold 30px sans-serif'
+  let boxes;
+  let mousePos = {x: 0, y: 0};
+  let selectedBox;
+
+  // canvas 중심점
+  let oX = canvas.width * 0.5;
+  let oY = canvas.height * 0.5;
+  let panel;
+  let step; // app의 상태(단계) 저장 (1~4)
+
+
+  const makeRects = (cnt) => {
+    let tempX
+    let tempY;
+
+    const result = [];
+    for (let i = 0; i < cnt; i++) {
+      tempX = Math.random() * canvas.width * 0.8; // 박스가 영역 벗어나지 않도록 배율 조절
+      tempY = Math.random() * canvas.height * 0.8;
+      result.push(new Box(i, tempX, tempY));
+    }
+    return result;
+  }
+
+  const makePanel = () => {
+    return new Panel();
+  }
+
+
+  /**
+   * 초기화 함수
+   */
+  const init = () => {
+    step = 1;
+    boxes = makeRects(10);
+    panel = makePanel();
+    requestAnimationFrame(render);
+  }
+
+  /**
+   * 렌더링 함수
+   */
+  const render = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let box;
+
+    for (let i = 0; i < boxes.length; i++) {
+      box = boxes[i];
+      box.draw();
+    }
+
+    // console.log(step);
+    switch (step) {
+      case 1:
+        // 각 box들의 위치 이동
+        for (let i = 0; i < boxes.length; i++) {
+          box = boxes[i];
+          if (box.x + box.width > canvas.width) {
+            box.direction = 'L';
+          } else if (box.x < 0) {
+            box.direction = 'R';
+          }
+          if (box.direction === 'R') {
+            box.x += box.speed;
+          } else {
+            box.x -= box.speed;
+          }
+        }
+        break;
+      case 2:
+        panel.scale += 0.08;
+        panel.draw();
+        if (panel.scale >= 1) {
+          step = 3;
+        }
+        break;
+      case 3:
+        panel.draw();
+        panel.showContent();
+        break;
+      default:
+        break;
+    }
+    requestAnimationFrame(render);
+  }
+
+
+  canvas.addEventListener('click', e => {
+    // mouse 좌표 세팅
+    mousePos = {
+      x: e.offsetX,
+      y: e.offsetY
+    }
+
+    let maxIndexedBox;
+
+    for (let i = 0; i < boxes.length; i++) {
+      const box = boxes[i];
+
+      if (mousePos.x > box.x
+        && mousePos.x < box.x + box.width
+        && mousePos.y > box.y
+        && mousePos.y < box.y + box.height
+      ) {
+        if (!maxIndexedBox || maxIndexedBox.index < box.index) {
+          maxIndexedBox = box;
+        }
+      }
+
+    }
+    if (step === 1 && maxIndexedBox) {
+      selectedBox = maxIndexedBox;
+      console.log(selectedBox.index);
+      step = 2;
+    } else if (step === 3) {
+      panel.scale = 0;
+      step = 1;
+      selectedBox = null;
+    }
+  });
+
+
+  init();
+</script>
+</body>
+</html>
