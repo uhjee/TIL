@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>canvas api</title>
+    <style>
+        #canvas {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Interaction</h1>
+<canvas id="canvas" width="600" height="400"></canvas>
+
+<script>
+  const canvas = document.querySelector('#canvas');
+  const ctx = canvas.getContext('2d');
+
+  const rectSize = {
+    w: 100,
+    h: 100,
+  }
+
+  const rectCoord = {
+    x: 200,
+    y: 200,
+  };
+
+  ctx.fillRect(rectCoord.x, rectCoord.y, rectSize.w, rectSize.h);
+
+  const clickHandler = (evt) => {
+    const {clientX, clientY, layerX, layerY, offsetX: x, offsetY: y} = evt;
+    // console.log({clientX, clientY});
+    // console.log({layerX, layerY});
+    // console.log({offsetX, offsetY});
+
+    // 직접 클릭 이벤트가 적용될 범위 계산
+    if (x > rectCoord.x && x < rectCoord.x + rectSize.w
+      && y > rectCoord.y && y < rectCoord.y + rectSize.h
+    ) {
+      console.log('c?')
+    }
+  };
+
+  canvas.addEventListener('click', clickHandler);
+</script>
+</body>
+</html>
