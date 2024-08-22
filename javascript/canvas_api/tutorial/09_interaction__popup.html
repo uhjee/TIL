@@ -76,8 +76,11 @@
       box.draw();
     }
 
-    // console.log(step);
+    console.log(step);
     switch (step) {
+      /**
+       * [case 1] 박스들이 좌우로 이동 & 툴팁이 활성화되지 않은 상태
+       */
       case 1:
         // 각 box들의 위치 이동
         for (let i = 0; i < boxes.length; i++) {
@@ -94,13 +97,20 @@
           }
         }
         break;
+      /**
+       * [case 2] 박스들이 좌우로 이동하지 않음 & 툴팁이 활성화되어 커지는 상태
+       */
       case 2:
-        panel.scale += 0.08;
+        panel.scale = panel.scale + (1 - panel.scale) * 0.1; // 가속도
+        // panel.scale += 0.08; // 등속도
         panel.draw();
         if (panel.scale >= 1) {
           step = 3;
         }
         break;
+      /**
+       * [case 2] 박스들이 좌우로 이동하지 않음 & 툴팁이 활성화되어 전체 크기로 커져있는 상태
+       */
       case 3:
         panel.draw();
         panel.showContent();
