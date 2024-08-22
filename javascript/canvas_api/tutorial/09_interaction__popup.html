@@ -24,6 +24,7 @@
 <script>
   const canvas = document.querySelector('#canvas');
   const ctx = canvas.getContext('2d');
+  let rafId = null; // requestAnimationFrame() 반환 값 - id
   ctx.font = 'bold 30px sans-serif'
   let boxes;
   let mousePos = {x: 0, y: 0};
@@ -66,6 +67,7 @@
 
   /**
    * 렌더링 함수
+   * 반복이 될 필요가 없는 기능들은 안에 두지 않도록 주의.
    */
   const render = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -117,12 +119,16 @@
        */
       case 3:
         panel.draw();
-        panel.showContent();
         break;
       default:
         break;
     }
-    requestAnimationFrame(render);
+    rafId = requestAnimationFrame(render);
+
+    if (step === 3) {
+      panel.showContent();
+      cancelAnimationFrame(rafId);
+    }
   }
 
 
@@ -157,6 +163,7 @@
       panel.scale = 0;
       step = 1;
       selectedBox = null;
+      render();
     }
   });
 
