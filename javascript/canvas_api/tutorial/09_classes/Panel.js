@@ -3,6 +3,7 @@ class Panel {
     this.width = 300;
     this.height = 300;
     this.scale = 0;
+    this.angle = 0;
   }
 
   draw() {
@@ -13,7 +14,9 @@ class Panel {
     ctx.resetTransform(); // 00. 변환 초기화
     ctx.translate(oX, oY); // 01. scale 기준점을 위한 기준 좌표 이동
     ctx.scale(this.scale, this.scale); // 02. scale
+    ctx.rotate(canvasUtil.toRadian(this.angle));
     ctx.translate(-oX, -oY); // 03. scale 기준점 초기화
+
 
     // }
     ctx.fillRect(oX - this.width / 2, oY - this.height / 2, this.width, this.height);

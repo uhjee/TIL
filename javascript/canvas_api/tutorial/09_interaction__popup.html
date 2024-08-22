@@ -18,6 +18,7 @@
 <canvas id="canvas" width="600" height="400"></canvas>
 
 
+<script src="./09_classes/Utils.js"></script>
 <script src="./09_classes/Box.js"></script>
 <script src="./09_classes/Panel.js"></script>
 <script>
@@ -101,10 +102,13 @@
        * [case 2] 박스들이 좌우로 이동하지 않음 & 툴팁이 활성화되어 커지는 상태
        */
       case 2:
-        panel.scale = panel.scale + (1 - panel.scale) * 0.1; // 가속도
+        panel.scale += (1 - panel.scale) * 0.1; // 가속도
         // panel.scale += 0.08; // 등속도
+
+        panel.angle = panel.scale * 720
         panel.draw();
-        if (panel.scale >= 1) {
+        if (panel.scale >= 0.999) {
+          panel.scale = 1;
           step = 3;
         }
         break;
