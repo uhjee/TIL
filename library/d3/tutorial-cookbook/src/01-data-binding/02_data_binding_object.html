@@ -20,7 +20,7 @@
 <script type="module">
   import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 
-  var data = [ // <- A
+  const data = [ // <- A
     {width: 10, color: 23}, {width: 15, color: 33},
     {width: 30, color: 40}, {width: 50, color: 60},
     {width: 80, color: 22}, {width: 65, color: 10},
@@ -29,7 +29,7 @@
     {width: 8, color: 10}
   ];
 
-  var colorScale = d3.scaleLinear()
+  const colorScale = d3.scaleLinear()
     .domain([0, 100])
     .range(['#add8e6', 'blue']); // <- B
 

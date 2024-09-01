@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Time Scale</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+</head>
+
+<body>
+
+<div id="time" class="clear">
+    <span>Linear Time Progression<br></span>
+    <span>Mapping [01/01/2013, 12/31/2013] to [0, 1200]<br></span>
+</div>
+
+<script type="module">
+  import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+  var start = new Date(2013, 0, 1), // <-A
+    end = new Date(2013, 11, 31),
+    range = [0, 1200];
+  const max = 12;
+  const data = [];
+
+  // data 생성
+  for (var i = 0; i < max; ++i) { // <-D
+    var date = new Date(start.getTime());
+    date.setMonth(start.getMonth() + i);
+    data.push(date);
+  }
+
+  // time 스케일 생성
+  const time = d3.scaleTime()
+    .domain([start, end]) // <-B; date값들을
+    .rangeRound(range); // <-C; 특정 범위 내의 숫자로 매핑
+
+
+  function render(data, scale, selector) { // <-E
+    d3.select(selector).selectAll('div.fixed-cell')
+      .data(data)
+      .enter()
+      .append('div').classed('fixed-cell', true);
+
+    d3.select(selector).selectAll('div.fixed-cell')
+      .data(data)
+      .exit().remove();
+
+    d3.select(selector).selectAll('div.fixed-cell')
+      .data(data)
+      .style('margin-left', function (d) { // <-F
+        return scale(d) + 'px';
+      })
+      .html(function (d) { // <-G
+        var format = d3.timeFormat('%x'); // <-H
+        return format(d) + '<br>' + scale(d) + 'px';
+      });
+  }
+
+  render(data, time, '#time');
+</script>
+
+</body>
+
+</html>

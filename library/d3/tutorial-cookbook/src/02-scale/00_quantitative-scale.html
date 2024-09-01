@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Quantitative Scales</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+</head>
+
+<body>
+
+<div id="linear" class="clear"><span>n</span>
+    <span>scaleLinear</span>
+</div>
+<div id="linear-capped" class="clear">
+    <span>1 &lt;= a*n + b &lt;= 20</span>
+    <span>scaleLinear</span>
+</div>
+<div id="pow" class="clear"><span>n^2</span>
+    <span>scalePow</span>
+</div>
+<div id="pow-capped" class="clear">
+    <span>1 &lt;= a*n^2 + b &lt;= 10</span>
+    <span>scalePow</span>
+</div>
+<div id="log" class="clear">
+    <span>log(n)</span>
+    <span>scaleLog</span>
+</div>
+<div id="log-capped" class="clear">
+    <span>1 &lt;= a*log(n) + b  &lt;= 10</span>
+    <span>scaleLog</span>
+</div>
+
+<script type="module">
+  import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+  var max = 11, data = [];
+  for (var i = 1; i < max; ++i) data.push(i);
+
+  /**
+   * 01. 선형 스케일
+   * 데이터 집합(domain)과 시각화 집합(range)이 1:1로 매핑되는 경우에 사용
+   * domain: 입력된 데이터 범위
+   * range: 계산된 데이터 범위
+   */
+  var linear = d3.scaleLinear() // <-A
+    .domain([1, 10]) // <-B; 입력된 데이터 범위
+    .range([1, 10]); // <-C; 계산된 데이터 범위
+  var linearCapped = d3.scaleLinear()
+    .domain([1, 10])
+    .range([1, 20]); // <-D
+
+  /**
+   * 02. 거듭제곱 스케일
+   *    - exponent: 거듭제곱 스케일의 지수
+   */
+  var pow = d3.scalePow().exponent(2); // <-E
+  var powCapped = d3.scalePow() // <-F
+    .exponent(2)    // 2의 지수르 갖는 거듭제곱 스케일
+    .domain([1, 10])
+    .rangeRound([1, 1000]); // <-G; 거듭값에 반올림 처리
+
+  /**
+   * 03. 로그 스케일
+   */
+  var log = d3.scaleLog(); // <-H
+  var logCapped = d3.scaleLog() // <-I
+    .domain([1, 10])
+    .rangeRound([1, 10]);
+
+
+  function render(data, scale, selector) {
+    d3.select(selector).selectAll('div.cell')
+      .data(data)
+      .enter().append('div').classed('cell', true);
+
+    d3.select(selector).selectAll('div.cell')
+      .data(data)
+      .exit().remove();
+
+    d3.select(selector).selectAll('div.cell')
+      .data(data)
+      .style('display', 'inline-block')
+      .text(function (d) {
+        return +scale(d).toFixed(2);
+      });
+  }
+
+  render(data, linear, '#linear');
+  render(data, linearCapped, '#linear-capped');
+  render(data, pow, '#pow');
+  render(data, powCapped, '#pow-capped');
+  render(data, log, '#log');
+  render(data, logCapped, '#log-capped');
+</script>
+
+</body>
+
+</html>

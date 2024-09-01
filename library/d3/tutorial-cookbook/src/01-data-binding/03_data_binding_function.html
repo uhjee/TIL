@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Function as Data</title>
-    <link rel="stylesheet" type="text/css" href="../css/styles.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
 
 </head>
 
@@ -13,19 +13,19 @@
 <script type="module">
   import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 
-  var data = []; // <- A
+  const data = []; // <- A
 
-  var next = function (x) { // <- B
+  const next = function (x) { // <- B
     return 15 + x * x;
   };
 
-  var newData = function () { // <- C
+  const newData = function () { // <- C
     data.push(next);
     return data;
   };
 
   function render() {
-    var selection = d3.select('#container')
+    const selection = d3.select('#container')
       .selectAll('div')
       .data(newData); // <- D
 

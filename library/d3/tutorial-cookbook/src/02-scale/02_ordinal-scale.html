@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ordinal Scale</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+</head>
+
+<body>
+
+<div id="alphabet" class="clear">
+    <span>Ordinal Scale with Alphabet<br></span>
+    <span>Mapping [1..10] to ["a".."j"]<br></span>
+</div>
+<div id="category10" class="clear">
+    <span>Ordinal Color Scale Category 10<br></span>
+    <span>Mapping [1..10] to category 10 colors<br></span>
+</div>
+
+<script type="module">
+  import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+  const max = 10, data = [];
+
+  for (var i = 0; i < max; ++i) data.push(i); // <-A
+
+  // 알파벳에 매핑하는 스케일
+  const alphabet = d3.scaleOrdinal() // <-B
+    .domain(data)
+    .range(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+
+
+  // 색상에 매핑하는 스케일
+  const colorSetScale = (data, colorScheme) => {
+    return d3.scaleOrdinal(colorScheme);
+  };
+  const schemeCategory10 = colorSetScale(data, d3.schemeCategory10);
+
+  function render(data, scale, selector) { // <-C
+    d3.select(selector).selectAll('div.cell')
+      .data(data)
+      .enter().append('div').classed('cell', true);
+
+    d3.select(selector).selectAll('div.cell')
+      .data(data)
+      .exit().remove();
+
+    d3.select(selector).selectAll('div.cell')
+      .data(data)
+      .style('display', 'inline-block')
+      .style('background-color', function (d) {  // <-D
+        return scale(d).indexOf('#') >= 0 ? scale(d) : 'white';
+      })
+      .text(function (d) { // <-E
+        return scale(d);
+      });
+  }
+
+  render(data, alphabet, '#alphabet'); // <-F
+  render(data, schemeCategory10, '#category10');
+</script>
+
+</body>
+
+</html>
