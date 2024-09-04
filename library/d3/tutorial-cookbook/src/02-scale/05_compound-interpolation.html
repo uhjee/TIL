@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Compound Object Interpolator</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+</head>
+
+<body>
+
+<div id="compound" class="clear">
+    <span>Compound Interpolation<br></span>
+</div>
+
+<script type="module">
+  import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+  var max = 21, data = [];
+
+  var compoundScale = d3.scalePow()
+    .exponent(2)
+    .domain([0, max])
+    .range([
+      {color: '#add8e6', height: '15px'}, // <-A  // 복합 객체 보간: color, height 둘 다 scale 적용
+      {color: '#4169e1', height: '150px'} // <-B // 복합 객체 보간: color, height 둘 다 scale 적용
+    ]);
+
+  for (var i = 0; i < max; ++i) data.push(i);
+
+  function render(data, scale, selector) { // <-C
+    d3.select(selector).selectAll('div.v-bar')
+      .data(data)
+      .enter().append('div').classed('v-bar', true)
+      .append('span');
+
+    d3.select(selector).selectAll('div.v-bar')
+      .data(data)
+      .exit().remove();
+
+    d3.select(selector).selectAll('div.v-bar')
+      .data(data)
+      .classed('v-bar', true)
+      .style('height', function (d) { // <-D
+        return scale(d).height;
+      })
+      .style('background-color', function (d) { // <-E
+        return scale(d).color;
+      })
+      .select('span')
+      .text(function (d, i) {
+        return d;
+      });
+  }
+
+  render(data, compoundScale, '#compound');
+</script>
+
+</body>
+
+</html>
