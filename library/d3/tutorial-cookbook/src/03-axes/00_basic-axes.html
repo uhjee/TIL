@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Basic Axes</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+</head>
+
+<body>
+
+<div class="control-group">
+    <button onclick="renderAll('bottom')">
+        horizontal bottom
+    </button>
+    <button onclick="renderAll('top')">
+        horizontal top
+    </button>
+    <button onclick="renderAll('left')">
+        vertical left
+    </button>
+    <button onclick="renderAll('right')">
+        vertical right
+    </button>
+</div>
+
+<script type="module">
+  import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+  var height = 500,
+    width = 500,
+    margin = 25,
+    offset = 50,
+    axisWidth = width - 2 * margin,
+    svg;
+
+  /**
+   * Create SVG
+   */
+  function createSvg() { // <-A
+    svg = d3.select('body').append('svg') // <-B
+      .attr('class', 'axis') // <-C
+      .attr('width', width)
+      .attr('height', height);
+  }
+
+  /**
+   * Render axis
+   * @param scale
+   * @param i
+   * @param orient
+   */
+  function renderAxis(scale, i, orient) {
+    let axis;
+    if (orient === 'bottom') {
+      // axis는 scale을 파라미터로 사용
+      axis = d3.axisBottom(scale);
+    } else if (orient === 'top') {
+      axis = d3.axisTop(scale);
+    } else if (orient === 'left') {
+      axis = d3.axisLeft(scale);
+    } else if (orient === 'right') {
+      axis = d3.axisRight(scale);
+    }
+    axis.ticks(5); // 눈금 수
+
+    // axis를 렌더링하기 위해 group으로 묶어서 svg에 추가
+    svg.append('g')
+      .attr('transform', function () { // <-H
+        if (['top', 'bottom'].indexOf(orient) >= 0)
+          return 'translate(' + margin + ',' + i * offset + ')';
+        else
+          return 'translate(' + i * offset + ', ' + margin + ')';
+      })
+      .call(axis); // <-I :: 현재 선택된 요소에 axis 함수 호출
+    /**
+     * 쉽게 풀어 말하면 아래와 같이 수행
+     * 파라미터와 함수 호출 주체를 바꿔줌
+     * function axis(selection)  {
+     *     ...
+     * }
+     */
+  }
+
+  window.renderAll = (orient) => {
+    if (svg) svg.remove();
+
+    createSvg();
+
+    renderAxis(d3.scaleLinear()
+      .domain([0, 1000])
+      .range([0, axisWidth]), 1, orient);
+    renderAxis(d3.scalePow()
+      .exponent(2)
+      .domain([0, 1000])
+      .range([0, axisWidth]), 2, orient);
+    renderAxis(d3.scaleTime()
+      .domain([new Date(2022, 0, 1), new Date()])
+      .range([0, axisWidth]), 3, orient);
+  }
+</script>
+
+</body>
+
+</html>
