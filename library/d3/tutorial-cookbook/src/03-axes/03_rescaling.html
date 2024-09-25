@@ -11,11 +11,6 @@
 <script type="module">
   import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
 
-
-  /**
-   * 동적으로 축의 스케일 조절
-   */
-
   var height = 500,
     width = 500,
     margin = 25,
@@ -29,12 +24,14 @@
   function renderXAxis() {
     xAxisLength = width - 2 * margin;
 
-    var scale = d3.scaleLinear()
+    var scale = d3.scale.linear()
       .domain([0, 100])
       .range([0, xAxisLength]);
 
-    xAxis = d3.axisBottom(scale)
-    // .tickSubdivide(1);
+    xAxis = d3.svg.axis()
+      .scale(scale)
+      .tickSubdivide(1)
+      .orient('bottom');
 
     svg.append('g')
       .attr('class', 'x-axis')
@@ -47,12 +44,14 @@
   function renderYAxis() {
     yAxisLength = height - 2 * margin;
 
-    var scale = d3.scaleLinear()
-      .domain([100, 0])
+    var scale = d3.scale.linear()
+      .domain([0, 100])
       .range([0, yAxisLength]);
 
-    yAxis = d3.axisLeft(scale)
-    // .tickSubdivide(1)
+    yAxis = d3.svg.axis()
+      .scale(scale)
+      .tickSubdivide(1)
+      .orient('left');
 
     svg.append('g')
       .attr('class', 'y-axis')
@@ -62,7 +61,7 @@
       .call(yAxis);
   }
 
-  window.rescale = function rescale() { // <-A
+  function rescale() { // <-A
     var max = Math.round(Math.random() * 100);
 
     xAxis.scale().domain([0, max]); // <-B
@@ -70,7 +69,7 @@
       .transition()
       .call(xAxis); // <-C
 
-    yAxis.scale().domain([max, 0]);
+    yAxis.scale().domain([0, max]);
     svg.select('g.y-axis')
       .transition()
       .call(yAxis);
@@ -80,14 +79,17 @@
   }
 
   function renderXGridlines() {
+    // 제거
     var lines = d3.selectAll('g.x-axis g.tick')
       .select('line.grid-line')
       .remove(); // <-D
 
+    // 추가
     lines = d3.selectAll('g.x-axis g.tick')
       .append('line')
       .classed('grid-line', true)
 
+    // 속성 수정
     lines.attr('x1', 0)
       .attr('y1', 0)
       .attr('x2', 0)
