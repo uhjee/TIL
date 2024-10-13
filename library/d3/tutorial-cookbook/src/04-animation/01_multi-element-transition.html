@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Multi-Element Transition</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css" />
+  </head>
+
+  <body>
+    <script type="module">
+      import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+      /**
+       * 여러 요소에 대한 transition
+       *
+       */
+
+      var id = 0,
+        data = [],
+        duration = 500,
+        chartHeight = 100,
+        chartWidth = 680;
+
+      // 초기 데이터 생성
+      for (var i = 0; i < 20; i++) push(data);
+
+      /**
+       * 렌더링 함수
+       * @param data
+       */
+      function render(data) {
+        var selection = d3
+          .select('body')
+          .selectAll('div.v-bar')
+          .data(data, function (d) {
+            return d.id;
+          }); // 데이터 바인딩: 고유 ID를 사용하여 요소의 일관성 유지
+
+        // enter: 새로운 요소 추가
+        selection
+          .enter()
+          .append('div')
+          .attr('class', 'v-bar')
+          .style('position', 'fixed')
+          .style('top', chartHeight + 'px')
+          .style('left', function (d, i) {
+            return barLeft(i + 1) + 'px'; // 새 요소를 오른쪽 끝에 배치
+          })
+          .style('height', '0px') // 초기 높이를 0으로 설정하여 아래에서 위로 자라나는 효과 준비
+          .append('span');
+
+        // update: 기존 요소 업데이트
+        selection
+          .transition() // transition 시작
+          .duration(duration) // transition 지속 시간 설정
+          .style('top', function (d) {
+            return chartHeight - barHeight(d) + 'px'; // 높이에 따라 top 위치 조정
+          })
+          .style('left', function (d, i) {
+            return barLeft(i) + 'px'; // 왼쪽으로 한 칸씩 이동
+          })
+          .style('height', function (d) {
+            return barHeight(d) + 'px'; // 높이 변경
+          })
+          .select('span')
+          .text(function (d) {
+            return d.value; // 텍스트 업데이트
+          });
+
+        // exit: 제거될 요소 처리
+        selection
+          .exit()
+          .transition() // 제거될 요소에 대한 transition 시작
+          .duration(duration) // transition 지속 시간 설정
+          .style('left', function (d, i) {
+            return barLeft(-1) + 'px'; // 왼쪽 밖으로 이동하는 효과
+          })
+          .remove(); // transition 완료 후 요소 제거
+      }
+
+      function push(data) {
+        data.push({
+          id: ++id,
+          value: Math.round(Math.random() * chartHeight),
+        });
+      }
+
+      function barLeft(i) {
+        return i * (30 + 2);
+      }
+
+      function barHeight(d) {
+        return d.value;
+      }
+
+      setInterval(function () {
+        data.shift(); // 첫 번째 요소 삭제  
+        push(data); // 새 요소 추가
+        render(data); // 데이터 변경에 따른 차트 업데이트
+      }, 2000);
+
+      render(data);
+
+      d3.select('body')
+        .append('div')
+        .attr('class', 'baseline')
+        .style('position', 'fixed')
+        .style('top', chartHeight + 'px')
+        .style('left', '0px')
+        .style('width', chartWidth + 'px');
+    </script>
+  </body>
+</html>

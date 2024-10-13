@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Single Element Transition</title>
+    <link rel="stylesheet" type="text/css" href="../../css/styles.css"/>
+</head>
+
+<body>
+
+<script type="module">
+  import * as d3 from 'https://cdn.jsdelivr.net/npm/d3@7/+esm';
+
+  /**
+   * D3는 보간 기반 애니메이션을 지원한다.
+   *   - 보간: 두 개의 값을 중간값으로 채워주는 것
+   *   - 따라서 우리는 전환 전, 후의 값을 입력하면 그 사이의 값들에 대해서는 D3 내부적으로 계산
+   */
+
+  var body = d3.select('body'),
+    duration = 5000;
+
+  body.append('div') // <-A
+    .classed('box', true)
+    .style('background-color', '#e9967a') // <-B
+    .transition() // <-C: transition-binding selection을 반환
+        .duration(duration) // <-D: 전환의 지속시간 설정 후, transition-binding selection을 반환
+        .style('background-color', '#add8e6') // <-E
+        .style('margin-left', '600px') // <-F
+        .style('width', '100px')
+        .style('height', '100px');
+</script>
+
+</body>
+
+</html>
