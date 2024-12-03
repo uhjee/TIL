@@ -1,0 +1,23 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    /* 
+        viewport의 전체 너비와 높이를 사용하도록 설정
+        width: 100%;
+        height: 100%; 
+        
+        스크롤바가 생기지 않도록 overflow 숨김 처리
+        three.js canvas가 전체 화면을 차지하기 위함
+    */
+    overflow: hidden;
+}
+
+canvas.webgl {
+    position: fixed;
+    top: 0;
+    left: 0;
+    outline: none;
+}
