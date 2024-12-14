@@ -36,6 +36,10 @@ const scene = new THREE.Scene();
 // geometry.setAttribute('position', positionsAttribute);
 
 // ! 삼각형 50개 만들기
+// BufferGeometry: Three.js에서 가장 효율적인 지오메트리 클래스
+// - 정점(vertices), 법선(normals), UV 등의 속성을 TypedArray로 직접 저장
+// - 메모리 사용량이 적고 렌더링 성능이 좋음
+// - 저수준 제어가 가능하여 커스텀 지오메트리 생성에 적합
 const geometry = new THREE.BufferGeometry();
 const count = 50; // 50개의 삼각형 만들기
 const positionsArray = new Float32Array(count * 3 * 3); // 50개의 정점, 각 정점은 3개의 좌표(x, y, z)를 가짐
