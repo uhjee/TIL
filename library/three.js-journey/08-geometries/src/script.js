@@ -44,7 +44,7 @@ for (let i = 0; i < count * 3 * 3; i++) {
   positionsArray[i] = Math.random();
 }
 
-const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3);
+const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3); // 3은 하나의 정점당 사용되는 값의 개수(x,y,z)
 geometry.setAttribute('position', positionsAttribute);
 
 const material = new THREE.MeshBasicMaterial({
