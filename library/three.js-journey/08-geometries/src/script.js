@@ -40,6 +40,7 @@ const geometry = new THREE.BufferGeometry();
 const count = 50; // 50개의 삼각형 만들기
 const positionsArray = new Float32Array(count * 3 * 3); // 50개의 정점, 각 정점은 3개의 좌표(x, y, z)를 가짐
 
+// 랜덤한 값을 넣어줌
 for (let i = 0; i < count * 3 * 3; i++) {
   positionsArray[i] = Math.random();
 }
