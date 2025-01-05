@@ -52,8 +52,8 @@ const textureLoader = new THREE.TextureLoader(loadingManager);
 // );
 
 // 텍스쳐 로딩
-const colorTexture = textureLoader.load('/textures/door/color.jpg');
-colorTexture.colorSpace = THREE.SRGBColorSpace;
+// const colorTexture = textureLoader.load('/textures/door/color.jpg');
+// colorTexture.colorSpace = THREE.SRGBColorSpace;
 
 const alphaTexture = textureLoader.load('/textures/door/alpha.jpg');
 const heightTexture = textureLoader.load('/textures/door/height.jpg');
@@ -64,19 +64,28 @@ const ambientOcclusionTexture = textureLoader.load(
 const metalnessTexture = textureLoader.load('/textures/door/metalness.jpg');
 const roughnessTexture = textureLoader.load('/textures/door/roughness.jpg');
 
+// minificationfilter: 텍스처 축소 시 사용되는 필터 알고리즘
+// 모아레 패턴: 아래와 같은 패턴은 피하는 것이 좋음
+// const colorTexture = textureLoader.load('/textures/checkerboard-1024x1024.png')
+
+// magnificationfilter: 텍스처 확대 시 사용되는 필터 알고리즘
+const colorTexture = textureLoader.load('/textures/minecraft.png')
+colorTexture.colorSpace = THREE.SRGBColorSpace;
+
+
 // 텍스처 반복 설정
 // - repeat: 텍스처의 반복 횟수를 설정하는 Vector2 객체
 // - x: 가로 방향 반복 횟수 (2번)
 // - y: 세로 방향 반복 횟수 (3번)
-colorTexture.repeat.x = 2;
-colorTexture.repeat.y = 3;
+// colorTexture.repeat.x = 2;
+// colorTexture.repeat.y = 3;
 
 // 텍스처 래핑(반복) 모드 설정 - 설정하지 않으면 repeat 설정을 하더라도 텍스처가 반복되지 않음
 // - wrapS: 가로(S) 방향의 텍스처 래핑 모드
 // - wrapT: 세로(T) 방향의 텍스처 래핑 모드
 // - THREE.RepeatWrapping: 텍스처를 반복해서 표시
-colorTexture.wrapS = THREE.RepeatWrapping;
-colorTexture.wrapT = THREE.RepeatWrapping;
+// colorTexture.wrapS = THREE.RepeatWrapping;
+// colorTexture.wrapT = THREE.RepeatWrapping;
 
 // 텍스처 오프셋 설정
 // - offset: 텍스처의 오프셋을 설정하는 Vector2 객체
@@ -89,14 +98,23 @@ colorTexture.wrapT = THREE.RepeatWrapping;
 // - rotation: 텍스처의 회전 각도를 설정하는 숫자
 // - 파라미터는 라디언 값,  Math.PI * 0.25: 텍스처를 45도 회전
 // - 텍스터 회전의 기본 축은 UV 좌표의 (0, 0) 좌표 (좌측 하단)
-colorTexture.rotation = Math.PI * 0.25;
+// colorTexture.rotation = Math.PI * 0.25;
 
 // 텍스처 중심 설정
 // - center: 텍스처의 중심을 설정하는 Vector2 객체
 // - x: 가로 방향 중심 (0.5)
 // - y: 세로 방향 중심 (0.5)
-colorTexture.center.x = 0.5;
-colorTexture.center.y = 0.5;
+// colorTexture.center.x = 0.5;
+// colorTexture.center.y = 0.5;
+
+// 텍스처 필터 minification(축소화) 설정
+// mipmap 생성 여부 - minFilter를 직접 세팅해줄 경우 false로 설정
+colorTexture.generateMipmaps = false; 
+colorTexture.minFilter = THREE.NearestFilter;
+
+// 텍스터 필터 magnification(확대화) 설정
+colorTexture.magFilter = THREE.NearestFilter; // 텍스처 확대 시 사용되는 필터 알고리즘
+
 
 /**
  * Base
