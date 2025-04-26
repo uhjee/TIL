@@ -193,3 +193,161 @@ console.log(reversedIterator.next()); // { value: 4, done: false }
 console.log(reversedIterator.next()); // { value: 3, done: false }
 console.log(reversedIterator.next()); // { value: 2, done: false }
 console.log(reversedIterator.next()); // { value: 1, done: false }
+
+console.log('------------이터레이션 프로토콜--------------------');
+
+/**
+ * IterableIterator을 생성하는 함수
+ * @param end 종료 값
+ * @returns 이터레이터
+ */
+function naturals2(end = Infinity): IterableIterator<number> {
+  let n = 1;
+  return {
+    next(): IteratorResult<number> {
+      return n <= end
+        ? { value: n++, done: false } // IteratorYieldResult<number>
+        : { value: undefined, done: true }; // IteratorReturnResult<number>
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  };
+}
+
+const iter5 = naturals2(3);
+// iter5가 이터러블이기 때문에 for of 문에 사용 가능
+for (const num of iter5) {
+  console.log(num);
+}
+
+console.log('----------JS 내장 이터러블------------');
+
+const array3 = [1, 2, 3];
+const array3Iterator = array3[Symbol.iterator]();
+
+console.log(array3Iterator.next()); // { value: 1, done: false }
+console.log(array3Iterator.next()); // { value: 2, done: false }
+console.log(array3Iterator.next()); // { value: 3, done: false }
+console.log(array3Iterator.next()); // { value: undefined, done: true }
+
+// for of 내부에서 새로운 iterator를 생성해 순회
+for (const i of array3) {
+  console.log(i);
+}
+
+console.log('--------------------------------');
+
+const set = new Set(['a', 'b', 'c']);
+const setIterator = set[Symbol.iterator]();
+
+console.log(setIterator.next()); // { value: 'a', done: false }
+console.log(setIterator.next()); // { value: 'b', done: false }
+console.log(setIterator.next()); // { value: 'c', done: false }
+console.log(setIterator.next()); // { value: undefined, done: true }
+
+for (const i of set) {
+  console.log(i);
+}
+
+console.log('--------------------------------');
+
+const map1 = new Map([
+  ['a', 1],
+  ['b', 2],
+  ['c', 3],
+]);
+
+const map1Iterator = map1[Symbol.iterator]();
+
+console.log(map1Iterator.next()); // { value: ['a', 1], done: false }
+console.log(map1Iterator.next()); // { value: ['b', 2], done: false }
+console.log(map1Iterator.next()); // { value: ['c', 3], done: false }
+console.log(map1Iterator.next()); // { value: undefined, done: true }
+
+for (const [key, value] of map1) {
+  console.log(key, value);
+}
+
+console.log('--------------------------------');
+
+const map1Entries = map1.entries();
+
+console.log(map1Entries.next()); // { value: ['a', 1], done: false }
+console.log(map1Entries.next()); // { value: ['b', 2], done: false }
+console.log(map1Entries.next()); // { value: ['c', 3], done: false }
+console.log(map1Entries.next()); // { value: undefined, done: true }
+for (const [key, value] of map1Entries) {
+  console.log(key, value);
+}
+
+const map1Values = map1.values();
+
+console.log(map1Values.next()); // { value: 1, done: false }
+console.log(map1Values.next()); // { value: 2, done: false }
+console.log(map1Values.next()); // { value: 3, done: false }
+console.log(map1Values.next()); // { value: undefined, done: true }
+
+const map1Keys = map1.keys();
+
+console.log(map1Keys.next()); // { value: 'a', done: false }
+console.log(map1Keys.next()); // { value: 'b', done: false }
+console.log(map1Keys.next()); // { value: 'c', done: false }
+
+console.log('--------------------------------');
+
+const string = 'abc';
+const stringIterator = string[Symbol.iterator]();
+
+console.log(stringIterator.next()); // { value: 'a', done: false }
+console.log(stringIterator.next()); // { value: 'b', done: false }
+console.log(stringIterator.next()); // { value: 'c', done: false }
+
+console.log('--------------------------------');
+
+// 가변 인자 함수
+const numbers = [1, 2, 3, 4, 5];
+function sum(...nums: number[]): number {
+  return nums.reduce((acc, cur) => acc + cur, 0);
+}
+
+console.log(sum(1, 2, 3, 4, 5)); // 15
+console.log(sum(...numbers)); // 15
+
+console.log('--------------------------------');
+
+// 구조분해 할당
+const [head, ...rest] = numbers;
+
+console.log(head); // 1
+console.log(rest); // [2, 3, 4, 5]
+
+console.log('--------------------------------');
+
+function* map2<A, B>(
+  f: (value: A) => B,
+  iterable: Iterable<A>,
+): IterableIterator<B> {
+  for (const value of iterable) {
+    yield f(value); // 지연평가
+  }
+}
+
+const mapped: IterableIterator<number> = map2<number, number>(
+  (x) => x * x,
+  [1, 2, 3, 4, 5],
+);
+const map2Iterator = mapped[Symbol.iterator]();
+
+console.log(mapped.next()); // { value: 1, done: false }
+console.log(map2Iterator.next()); // { value: 4, done: false }
+console.log([...map2Iterator]); // [9, 16, 25]
+
+let acc = 0;
+for (const n of map2((x) => x * x, [1, 2, 3, 4, 5])) {
+  acc += n;
+}
+
+console.log(acc); // 55
+
+console.log('--------------------------------');

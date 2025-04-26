@@ -6,6 +6,7 @@
 ## 반복자 패턴
 
 - 반복자 패턴은 컬렉션의 요소를 순회하는 방법을 정의하는 패턴
+- 컬렉션 내부 구조를 직접 노출하는 대신 `next()`와 같은 public 메소드를 통해 내부 요소에 접근할 수 있도록 설계
 - 이 패턴은 컬렉션의 내부 구조를 노출하지 않고, 컬렉션의 요소를 안전하게 순회할 수 있도록 해줌
 - 반복자 패턴의 지연성은 지연 평가가 가능한 객체를 생성할 수 있게 해주고, 일급 함수는 고차 함수를 정의할 수 있게 해줌
 
@@ -34,35 +35,35 @@ interface Iterator<T> {
 - 불필요한 연산 및 메모리 사용량을 줄일 수 있음
 - 원본 배열을 변형하지 않고 활용
 
-```ts
-/**
- * 유사배열을 반복자로 변환
- * @param arrayLike 유사배열
- * @returns 반복자
- */
-function reverse<T>(arrayLike: ArrayLike<T>): Iterator<T> {
-  let idx = arrayLike.length;
-  return {
-    next: () => {
-      if (idx === 0) {
-        return { done: true, value: undefined };
-      }
-      return {
-        done: false,
-        value: arrayLike[--idx],
-      };
-    },
-  };
-}
+  ```ts
+  /**
+   * 유사배열을 반복자로 변환
+   * @param arrayLike 유사배열
+   * @returns 반복자
+   */
+  function reverse<T>(arrayLike: ArrayLike<T>): Iterator<T> {
+    let idx = arrayLike.length;
+    return {
+      next: () => {
+        if (idx === 0) {
+          return { done: true, value: undefined };
+        }
+        return {
+          done: false,
+          value: arrayLike[--idx],
+        };
+      },
+    };
+  }
 
-const array = ['a', 'b', 'c'];
-const reverseArray = reverse(array);
+  const array = ['a', 'b', 'c'];
+  const reverseArray = reverse(array);
 
-console.log(reverseArray.next()); // { done: false, value: 'c' }
-console.log(reverseArray.next()); // { done: false, value: 'b' }
-console.log(reverseArray.next()); // { done: false, value: 'a' }
-console.log(reverseArray.next()); // { done: true, value: undefined }
-```
+  console.log(reverseArray.next()); // { done: false, value: 'c' }
+  console.log(reverseArray.next()); // { done: false, value: 'b' }
+  console.log(reverseArray.next()); // { done: false, value: 'a' }
+  console.log(reverseArray.next()); // { done: true, value: undefined }
+  ```
 
 ## 지연평가되는 map 함수
 
@@ -73,37 +74,37 @@ console.log(reverseArray.next()); // { done: true, value: undefined }
   - 하나 이상의 함수를 인자로 받거나 반환하는 함수
 - map, filter, take, reduce 등의 지연평가를 활용하거나, 지연 평가된 리스트를 다루는 고도화된 리스트 프로세싱 함수 구현 가능
 
-```ts
-/**
- * 반복자를 수정하여 값을 변환
- * @param transform 변환 함수
- * @param iterator 반복자
- * @returns 변환된 반복자
- */
-function map<A, B>(
-  transform: (value: A) => B,
-  iterator: Iterator<A>,
-): Iterator<B> {
-  return {
-    next: (): IteratorResult<B> => {
-      const { done, value } = iterator.next();
-      return done ? { value, done } : { value: transform(value), done };
-    },
-  };
-}
+  ```ts
+  /**
+   * 반복자를 수정하여 값을 변환
+   * @param transform 변환 함수
+   * @param iterator 반복자
+   * @returns 변환된 반복자
+   */
+  function map<A, B>(
+    transform: (value: A) => B,
+    iterator: Iterator<A>,
+  ): Iterator<B> {
+    return {
+      next: (): IteratorResult<B> => {
+        const { done, value } = iterator.next();
+        return done ? { value, done } : { value: transform(value), done };
+      },
+    };
+  }
 
-const array2 = ['a', 'b', 'c', 'd', 'e'];
+  const array2 = ['a', 'b', 'c', 'd', 'e'];
 
-// 지연 평가를 통해 필요할 때, 특정 요소에 대해 1. 순서 변경/ 2. 값 변환 가능
-const mapIterator = map((x) => x + x.toUpperCase(), reverse(array2));
+  // 지연 평가를 통해 필요할 때, 특정 요소에 대해 1. 순서 변경/ 2. 값 변환 가능
+  const mapIterator = map((x) => x + x.toUpperCase(), reverse(array2));
 
-console.log(mapIterator.next()); // { done: false, value: 'eE' }
-console.log(mapIterator.next()); // { done: false, value: 'dD' }
-console.log(mapIterator.next()); // { done: false, value: 'cC' }
-console.log(mapIterator.next()); // { done: false, value: 'bB' }
-console.log(mapIterator.next()); // { done: false, value: 'aA' }
-console.log(mapIterator.next()); // { done: true, value: undefined }
-```
+  console.log(mapIterator.next()); // { done: false, value: 'eE' }
+  console.log(mapIterator.next()); // { done: false, value: 'dD' }
+  console.log(mapIterator.next()); // { done: false, value: 'cC' }
+  console.log(mapIterator.next()); // { done: false, value: 'bB' }
+  console.log(mapIterator.next()); // { done: false, value: 'aA' }
+  console.log(mapIterator.next()); // { done: true, value: undefined }
+  ```
 
 ## 제네레이터
 
@@ -111,51 +112,52 @@ console.log(mapIterator.next()); // { done: true, value: undefined }
 - `function*` 키워드로 정의되며, 호출 시 곧바로 실행되지 않고, 이터레이터 객체를 반환
 - 이 객체를 통해 함수의 실행 흐름을 외부에서 제어할 수 있음
 
-```ts
-/**
- * 제네레이터
- * @returns 이터레이터
- */
-function* generator() {
-  yield 'a';
-  console.log('before b');
-  yield 'b';
-  yield 'c';
-}
+  ```ts
+  /**
+   * 제네레이터
+   * @returns 이터레이터
+   */
+  function* generator() {
+    yield 'a';
+    console.log('before b');
+    yield 'b';
+    yield 'c';
+  }
 
-const iter = generator();
+  const iter = generator();
 
-console.log(iter.next()); // { value: 'a', done: false }
-console.log(iter.next()); // { value: 'b', done: false }
-console.log(iter.next()); // { value: 'c', done: false }
-console.log(iter.next()); // { value: undefined, done: true }
-```
+  console.log(iter.next()); // { value: 'a', done: false }
+  console.log(iter.next()); // { value: 'b', done: false }
+  console.log(iter.next()); // { value: 'c', done: false }
+  console.log(iter.next()); // { value: undefined, done: true }
+  ```
 
 ### yeild\* 키워드
 
 - `yield*` 키워드는 제네레이터 함수 안에서 이터러블을 순회하며 해당 이터러블이 제공하는 요소들을 순차적으로 반환하도록 함
 - `Iterable`: 반복을 지원하는 객체
+
   - javascript에서 배열은 `Iterable로` 간주되기 때문에 `for...of` , 전개 연산자, `yield*`를 통해 순회가능
 
-```ts
-/**
- * yield* 키워드를 사용하여 내부 이터러블을 순회하며 반환
- * @returns 이터레이터
- */
-function* generator2() {
-  yield 'a';
-  yield* [2, 3];
-  yield 'b';
-}
+  ```ts
+  /**
+   * yield* 키워드를 사용하여 내부 이터러블을 순회하며 반환
+   * @returns 이터레이터
+   */
+  function* generator2() {
+    yield 'a';
+    yield* [2, 3];
+    yield 'b';
+  }
 
-const iter3 = generator2();
+  const iter3 = generator2();
 
-console.log(iter3.next()); // { value: 'a', done: false }
-console.log(iter3.next()); // { value: 2, done: false }
-console.log(iter3.next()); // { value: 3, done: false }
-console.log(iter3.next()); // { value: 'b', done: false }
-console.log(iter3.next()); // { value: undefined, done: true }
-```
+  console.log(iter3.next()); // { value: 'a', done: false }
+  console.log(iter3.next()); // { value: 2, done: false }
+  console.log(iter3.next()); // { value: 3, done: false }
+  console.log(iter3.next()); // { value: 'b', done: false }
+  console.log(iter3.next()); // { value: undefined, done: true }
+  ```
 
 ### 제네레이터를 활용한 reverse 함수
 
@@ -207,4 +209,194 @@ function reverse<T>(arrayLike: ArrayLike<T>): Iterator<T> {
     },
   };
 }
+```
+
+## 이터레이션 프로토콜
+
+ES6에 도입된 이터레이션 프로토콜은 어떤 객체가 이터러블인지 여부를 나타내는 규칙과 해당 규칙을 따르는 문법들을 제공하는 규칙
+
+- Iterator 이터레이터
+
+  - next() 함수를 가지며, 데이터 컬렉션을 순회하기 위한 객체
+
+- Iterable 이터러블
+
+  - Iterator를 반환하는 `[Symbol.iterator]() {return {next(){...}};}` 메소드를 갖고 있는 객체
+    - `[Symbol.iterator]` : 이터레이터를 반환하는 함수
+  - `for...of`, `전개 연산자`, `구조분해` 등 다양한 기능 사용 가능
+  - 이터러블 객체는 자신이 가진 요소들을 이터레이터를 통해 순회할 수 있도록하며, 반복자 패턴의 특징을 모두 갖고 있음
+  - Array, Map, Set 등
+
+- IterableIteraor
+
+  - Iterator의 속성과 Iterable의 속성을 모두 갖는 객체
+
+  ```ts
+  /**
+   * IterableIterator을 생성하는 함수
+   * @param end 종료 값
+   * @returns 이터레이터
+   */
+  function naturals2(end = Infinity): IterableIterator<number> {
+    let n = 1;
+    return {
+      next(): IteratorResult<number> {
+        return n <= end
+          ? { value: n++, done: false } // IteratorYieldResult<number>
+          : { value: undefined, done: true }; // IteratorReturnResult<number>
+      },
+      [Symbol.iterator]() {
+        return this;
+      },
+    };
+  }
+
+  const iter5 = naturals2(3);
+  // iter5가 이터러블이기 때문에 for of 문에 사용 가능
+  for (const num of iter5) {
+    console.log(num);
+  }
+  ```
+
+### JS 내장 이터러블
+
+- Array, Set, Map, Map.entries(), Map.values(), Map.keys(), String 등
+
+- Array 객체
+
+  ```ts
+  const array3 = [1, 2, 3];
+  const array3Iterator = array3[Symbol.iterator]();
+
+  // for of 내부에서 새로운 iterator를 생성해 순회
+  for (const i of array3) {
+    console.log(i);
+  }
+  ```
+
+- Set 객체
+
+  ```ts
+  const set = new Set(['a', 'b', 'c']);
+  const setIterator = set[Symbol.iterator]();
+
+  for (const i of set) {
+    console.log(i);
+  }
+  ```
+
+- Map 객체
+
+  ```ts
+  const map1 = new Map([
+    ['a', 1],
+    ['b', 2],
+    ['c', 3],
+  ]);
+
+  const map1Iterator = map1[Symbol.iterator]();
+
+  for (const [key, value] of map1) {
+    console.log(key, value);
+  }
+  ```
+
+- Map.entries(), Map.values()
+
+  ```ts
+  // Map.entreis()
+  const map1Entries = map1.entries();
+
+  console.log(map1Entries.next()); // { value: ['a', 1], done: false }
+  console.log(map1Entries.next()); // { value: ['b', 2], done: false }
+  console.log(map1Entries.next()); // { value: ['c', 3], done: false }
+  console.log(map1Entries.next()); // { value: undefined, done: true }
+  for (const [key, value] of map1Entries) {
+    console.log(key, value);
+  }
+
+  // Map.keys()
+  const map1Keys = map1.keys();
+
+  console.log(map1Keys.next()); // { value: 'a', done: false }
+  console.log(map1Keys.next()); // { value: 'b', done: false }
+  console.log(map1Keys.next()); // { value: 'c', done: false }
+
+  // Map.values()
+  const map1Values = map1.values();
+
+  console.log(map1Values.next()); // { value: 1, done: false }
+  console.log(map1Values.next()); // { value: 2, done: false }
+  console.log(map1Values.next()); // { value: 3, done: false }
+  console.log(map1Values.next()); // { value: undefined, done: true }
+  ```
+
+- String
+
+  ```ts
+  const string = 'abc';
+  const stringIterator = string[Symbol.iterator]();
+
+  console.log(stringIterator.next()); // { value: 'a', done: false }
+  console.log(stringIterator.next()); // { value: 'b', done: false }
+  console.log(stringIterator.next()); // { value: 'c', done: false }
+  ```
+
+## 이터러블 활용
+
+### 전개연산자
+
+- array 병합, Set 객체를 Array 객체로 변환, 가변 인자 함수 구현 등
+
+- 가변 인자 함수
+
+  ```ts
+  // 가변 인자 함수
+  const numbers = [1, 2, 3, 4, 5];
+  function sum(...nums: number[]): number {
+    return nums.reduce((acc, cur) => acc + cur, 0);
+  }
+
+  console.log(sum(1, 2, 3, 4, 5)); // 15
+  console.log(sum(...numbers)); // 15
+  ```
+
+### 구조분해 할당
+
+```ts
+// 구조분해 할당
+const [head, ...rest] = numbers;
+
+console.log(head); // 1
+console.log(rest); // [2, 3, 4, 5]
+```
+
+### 제네레이터로 만든 map 함수
+
+```ts
+function* map2<A, B>(
+  f: (value: A) => B,
+  iterable: Iterable<A>,
+): IterableIterator<B> {
+  for (const value of iterable) {
+    yield f(value); // 지연평가
+  }
+}
+
+const mapped: IterableIterator<number> = map2<number, number>(
+  (x) => x * x,
+  [1, 2, 3, 4, 5],
+);
+const map2Iterator = mapped[Symbol.iterator](); // Iterable의 특징 - [Symbol.iterator] 를 프로퍼티로 갖는다.
+
+console.log(mapped.next()); // { value: 1, done: false }
+console.log(map2Iterator.next()); // { value: 4, done: false }
+console.log([...map2Iterator]); // [9, 16, 25]
+
+let acc = 0;
+for (const n of map2((x) => x * x, [1, 2, 3, 4, 5])) {
+  acc += n;
+}
+
+console.log(acc); // 55
 ```
