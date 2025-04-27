@@ -217,19 +217,25 @@ ES6에 도입된 이터레이션 프로토콜은 어떤 객체가 이터러블�
 
 - Iterator 이터레이터
 
+  - 값을 순차적으로 접근하는 방법 제공
   - next() 함수를 가지며, 데이터 컬렉션을 순회하기 위한 객체
 
 - Iterable 이터러블
 
+  - 이터러블 객체는 자신이 가진 요소들을 이터레이터를 통해 순회할 수 있도록 함 (반복 가능한 객체)
   - Iterator를 반환하는 `[Symbol.iterator]() {return {next(){...}};}` 메소드를 갖고 있는 객체
     - `[Symbol.iterator]` : 이터레이터를 반환하는 함수
   - `for...of`, `전개 연산자`, `구조분해` 등 다양한 기능 사용 가능
-  - 이터러블 객체는 자신이 가진 요소들을 이터레이터를 통해 순회할 수 있도록하며, 반복자 패턴의 특징을 모두 갖고 있음
+  - 반복자 패턴의 특징을 모두 갖고 있음
   - Array, Map, Set 등
 
 - IterableIteraor
 
   - Iterator의 속성과 Iterable의 속성을 모두 갖는 객체
+
+- Generator
+
+  - 이터레이터를 쉽게 만들기 위한 함수
 
   ```ts
   /**
@@ -400,3 +406,180 @@ for (const n of map2((x) => x * x, [1, 2, 3, 4, 5])) {
 
 console.log(acc); // 55
 ```
+
+---
+
+## 이터러블을 다루는 함수형 프로그래밍
+
+### forEach 함수
+
+함수와 이터러블을 순회하면서 각 요소에 인자로 받은 함수를 적용하는 고차함수
+
+1. for...of문을 활용해 순회
+
+   ```ts
+   function forEach<A>(f: (item: A) => void, iterable: Iterable<A>) {
+     for (const value of iterable) {
+       // for...of 를 활용해 이터러블 순회
+       f(value);
+     }
+   }
+
+   const array4 = [1, 2, 3];
+   forEach((x) => console.log(x), array4);
+   ```
+
+2. 이터레이터 직접 조작
+
+   ```ts
+   // while문 활용
+   function forEach2<A>(f: (item: A) => void, iterable: Iterable<A>) {
+     const iterator = iterable[Symbol.iterator](); // 이터레이터 생성
+     let result = iterator.next(); // 첫 번째 요소 추출
+     while (!result.done) {
+       // 모든 요소를 순회할 때까지
+       f(result.value); // 요소에 함수 적용
+       result = iterator.next(); // 다음 요소 추출
+     }
+   }
+
+   const set1 = new Set([1, 2, 3]);
+   forEach2((x) => console.log(x), set1);
+   ```
+
+### map 함수
+
+1. for...of문 활용
+
+   ```ts
+   function* map3<A, B>(f: (item: A) => B, iterable: Iterable<A>) {
+     for (const value of iterable) {
+       yield f(value);
+     }
+   }
+
+   // 이터레이터 반환
+   const mapped2: IterableIterator<number> = map3<number, number>(
+     (x) => x * x,
+     [1, 2, 3, 4, 5],
+   );
+
+   // 이터레이터를 배열로 변환 - 전개연산자는 이터러블을 소비
+   console.log([...mapped2]);
+
+   const mapped3 = map3((x) => x * 3, naturals2(3));
+   forEach(console.log, mapped3);
+   ```
+
+2. while문 활용
+
+   ```ts
+   // while문 활용
+   function* map4<A, B>(f: (item: A) => B, iterable: Iterable<A>) {
+     const iterator = iterable[Symbol.iterator](); // 이터레이터 생성
+     while (true) {
+       const { done, value } = iterator.next();
+       if (done) break;
+       yield f(value); // 요소에 함수 적용
+     }
+   }
+
+   const mapped4 = map4(
+     ([k, v]) => `${k}: ${v}`,
+     new Map([
+       ['a', 1],
+       ['b', 2],
+     ]),
+   );
+   forEach(console.log, mapped4);
+   ```
+
+3. IterableIterator를 직접 만들어 반환
+
+   ```ts
+   // 이터레이터 반환
+   function map5<A, B>(f: (item: A) => B, iterable: Iterable<A>) {
+     const iterator = iterable[Symbol.iterator]();
+     return {
+       // next() 메소드 직접 구현
+       next(): IteratorResult<B> {
+         const { done, value } = iterator.next();
+         return { value: done ? value : f(value), done };
+       },
+       [Symbol.iterator]() {
+         return this;
+       },
+     };
+   }
+
+   const iterator5 = (function* () {
+     yield 1;
+     yield 2;
+     yield 3;
+   })();
+
+   const mapped5 = map5((x: number) => x * 10, iterator5);
+   console.log([...mapped5]);
+   ```
+
+### filter 함수
+
+1. for...of 활용
+
+   ```ts
+   function* filter<A>(f: (item: A) => boolean, iterable: Iterable<A>) {
+     for (const value of iterable) {
+       if (f(value)) {
+         yield value; // 필요한 요소만 yield를 통해 반환
+       }
+     }
+   }
+
+   const filtered = filter((x) => x % 2 === 0, [1, 2, 3, 4, 5]);
+   console.log([...filtered]);
+   ```
+
+2. while문 활용
+
+   ```ts
+   function* filter2<A>(f: (item: A) => boolean, iterable: Iterable<A>) {
+     const iterator = iterable[Symbol.iterator]();
+     while (true) {
+       const { done, value } = iterator.next();
+       if (done) break;
+       if (f(value)) yield value;
+     }
+   }
+
+   const array5 = [1, 2, 3, 4, 5];
+   const filtered2 = filter2((x) => x % 2 === 0, array5);
+   console.log([...filtered2]);
+   ```
+
+3. 이터레이터 반환
+
+   ```ts
+   // 이터레이터 반환
+   function filter3<A>(f: (item: A) => boolean, iterable: Iterable<A>) {
+     const iterator = iterable[Symbol.iterator]();
+     return {
+       next(): IteratorResult<A> {
+         const { done, value } = iterator.next();
+         if (done) return { done, value };
+         if (f(value)) return { done, value };
+         return this.next(); // 필요한 요소가 아니면 재귀호출 (꼬리 호출 최적화)
+       },
+       [Symbol.iterator]() {
+         return this;
+       },
+     };
+   }
+
+   console.log([...filter3((x) => x % 2 === 1, [1, 2, 3, 4, 5])]);
+   ```
+
+- 재귀호출로 순회 구현하여 매우 간결
+- 꼬리 호출 최적화(Tail Call Optimization) 가능
+  - 꼬리 호출 최적화(Tail Call Optimization): 함수형 프로그래밍에서 재귀함수를 효율적으로 실행할 수 있는 최적화 기법
+  - 호출 스택에 새로운 스택 프레임을 추가하지 않고 기존스택 프레임을 재사용하는 최적화 기법
+  - 꼬리 호출 최적화 적용 조건: 함수가 반환될 때, 마지막으로 호출되는 함수가 재귀 호출이어야 함

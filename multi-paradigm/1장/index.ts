@@ -351,3 +351,149 @@ for (const n of map2((x) => x * x, [1, 2, 3, 4, 5])) {
 console.log(acc); // 55
 
 console.log('--------------------------------');
+
+/**
+ * 1.4 forEach 함수
+ */
+
+function forEach<A>(f: (item: A) => void, iterable: Iterable<A>) {
+  for (const value of iterable) {
+    // for...of 를 활용해 이터러블 순회
+    f(value);
+  }
+}
+
+const array4 = [1, 2, 3];
+forEach((x) => console.log(x), array4);
+
+// while문 활용
+function forEach2<A>(f: (item: A) => void, iterable: Iterable<A>) {
+  const iterator = iterable[Symbol.iterator](); // 이터레이터 생성
+  let result = iterator.next(); // 첫 번째 요소 추출
+  while (!result.done) {
+    // 모든 요소를 순회할 때까지
+    f(result.value); // 요소에 함수 적용
+    result = iterator.next(); // 다음 요소 추출
+  }
+}
+
+const set1 = new Set([1, 2, 3]);
+forEach2((x) => console.log(x), set1);
+
+console.log('--------------------------------');
+
+/**
+ * map 함수
+ */
+
+function* map3<A, B>(f: (item: A) => B, iterable: Iterable<A>) {
+  for (const value of iterable) {
+    yield f(value);
+  }
+}
+
+// 이터레이터 반환
+const mapped2: IterableIterator<number> = map3<number, number>(
+  (x) => x * x,
+  [1, 2, 3, 4, 5],
+);
+
+// 이터레이터를 배열로 변환 - 전개연산자는 이터러블을 소비 (순회)
+console.log([...mapped2]);
+
+const mapped3 = map3((x) => x * 3, naturals2(3));
+forEach(console.log, mapped3); // for...of로 이터러블 소비
+
+// while문 활용
+function* map4<A, B>(f: (item: A) => B, iterable: Iterable<A>) {
+  const iterator = iterable[Symbol.iterator](); // 이터레이터 생성
+  while (true) {
+    const { done, value } = iterator.next();
+    if (done) break;
+    yield f(value); // 요소에 함수 적용
+  }
+}
+
+const mapped4 = map4(
+  ([k, v]) => `${k}: ${v}`,
+  new Map([
+    ['a', 1],
+    ['b', 2],
+  ]),
+);
+forEach(console.log, mapped4);
+
+// 이터레이터 반환
+function map5<A, B>(f: (item: A) => B, iterable: Iterable<A>) {
+  const iterator = iterable[Symbol.iterator]();
+  return {
+    // next() 메소드 직접 구현
+    next(): IteratorResult<B> {
+      const { done, value } = iterator.next();
+      return { value: done ? value : f(value), done };
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  };
+}
+
+const iterator5 = (function* () {
+  yield 1;
+  yield 2;
+  yield 3;
+})();
+
+const mapped5 = map5((x: number) => x * 10, iterator5);
+console.log([...mapped5]);
+
+console.log('--------------------------------');
+
+/**
+ * filter 함수
+ */
+
+// for...of 활용
+function* filter<A>(f: (item: A) => boolean, iterable: Iterable<A>) {
+  for (const value of iterable) {
+    if (f(value)) {
+      yield value; // 필요한 요소만 yield를 통해 반환
+    }
+  }
+}
+
+const filtered = filter((x) => x % 2 === 0, [1, 2, 3, 4, 5]);
+console.log([...filtered]);
+
+function* filter2<A>(f: (item: A) => boolean, iterable: Iterable<A>) {
+  const iterator = iterable[Symbol.iterator]();
+  while (true) {
+    const { done, value } = iterator.next();
+    if (done) break;
+    if (f(value)) yield value;
+  }
+}
+
+const array5 = [1, 2, 3, 4, 5];
+const filtered2 = filter2((x) => x % 2 === 0, array5);
+console.log([...filtered2]);
+
+// 이터레이터 반환
+function filter3<A>(f: (item: A) => boolean, iterable: Iterable<A>) {
+  const iterator = iterable[Symbol.iterator]();
+  return {
+    next(): IteratorResult<A> {
+      const { done, value } = iterator.next();
+      if (done) return { done, value };
+      if (f(value)) return { done, value };
+      return this.next(); // 필요한 요소가 아니면 재귀호출 (꼬리 호출 최적화)
+    },
+    [Symbol.iterator]() {
+      return this;
+    },
+  };
+}
+
+console.log([...filter3((x) => x % 2 === 1, [1, 2, 3, 4, 5])]);
+
+console.log('--------------------------------');
