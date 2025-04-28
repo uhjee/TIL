@@ -497,3 +497,15 @@ function filter3<A>(f: (item: A) => boolean, iterable: Iterable<A>) {
 console.log([...filter3((x) => x % 2 === 1, [1, 2, 3, 4, 5])]);
 
 console.log('--------------------------------');
+
+/**
+ *고차함수 조합하기
+ */
+
+forEach(
+  console.log,
+  map2(
+    (x) => x * 10,
+    filter((x) => x % 2 === 1, naturals2(10)),
+  ),
+);
