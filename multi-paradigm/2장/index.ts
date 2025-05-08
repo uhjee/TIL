@@ -7,6 +7,9 @@ function identity<T>(arg: T): T {
   return arg;
 }
 
+console.log(identity(1)); // 1
+console.log(identity('a')); // a
+
 console.log('--------------------------------');
 
 /**
