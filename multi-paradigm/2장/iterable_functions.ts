@@ -1,59 +1,3 @@
-# 2장 함수형 프로그래밍과 타입 시스템 그리고 LISP
-
-## 타입스크립트의 타입 추론과 함수 타입
-
-- 타입스크립트는 타입추론 기능으로 명시적인 타입 선언 없이도 안전한 코드 작성 가능
-- itentity 함수: 제네릭 타입 T를 받아서 그대로 반환하는 항등 함수
-
-  ```ts
-  /**
-   * 제네릭 타입 T를 받아서 그대로 반환하는 항등 함수
-   * @param arg 입력받은 제네릭 타입 T의 값
-   * @returns 입력받은 arg와 동일한 값을 반환한다
-   */
-  function identity<T>(arg: T): T {
-    return arg;
-  }
-
-  console.log(identity(1)); // 1
-  console.log(identity('a')); // a
-  ```
-
-- constant 함수: 제네릭 타입 T를 받아서 항등 함수를 반환하는 함수
-
-  ```ts
-  /**
-   * 제네릭 타입 T를 받아서 항등 함수를 반환하는 함수
-   * @param arg 입력받은 제네릭 타입 T의 값
-   * @returns 항등 함수를 반환한다
-   */
-  function constant<T>(arg: T): () => T {
-    return () => arg;
-  }
-
-  const f = constant(1);
-  console.log(f()); // 1
-  const getHello = constant('hello');
-  console.log(getHello() + getHello()); // hellohello
-  ```
-
-## 변수와 상수의 타입 추론
-
-- 변수와 상수를 초기화할 때 타입스크립트는 해당 **값**으로부터 타입을 추론
-
-  ```ts
-  // type을 true라는 리터럴 타입으로 추론(재할당 불가하기 때문)
-  const selected = true;
-
-  // type을 boolean 타입으로 추론
-  let checked = true;
-  ```
-
-## 멀티파러다임 언어에서의 함수형 타입 시스템
-
-### forEach
-
-```ts
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -64,13 +8,9 @@ function forEach<T>(f: (a: T) => void, iterable: Iterable<T>): void {
     f(a);
   }
 }
-```
+const arr = [1, 2, 3, 4];
+// forEach((a) => console.log(a), arr);
 
-### map
-
-- 제네레이터 사용: 새로운 이터러블이터레이터를 생성해 반환
-
-```ts
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -84,13 +24,12 @@ function* map<A, B>(
     yield f(a);
   }
 }
-```
 
-### filter
+// forEach(
+//   console.log,
+//   map((a) => a * 2, arr),
+// );
 
-- 제네레이터 사용: 새로운 이터러블이터레이터를 생성해 반환
-
-```ts
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -106,15 +45,12 @@ function* filter<T>(
     }
   }
 }
-```
 
-### reduce - function overload
-함수 오버로드
-- 초기값이 있을 경우, 세 개의 인자
-- 초기값을 생략하고자 하는경우, f, iterable만을 인자로 받음 (iterable 첫 번째 요소가 초기값으로 세팅)
-- 초기값을 생략하고, 빈 배열일 전달될 경우, 누적할 수 없기에 타입 에러 발생
+// forEach(
+//   console.log,
+//   filter((a) => a % 2 === 0, arr),
+// );
 
-```ts
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -136,12 +72,15 @@ function baseReduce<A, Acc>(
 }
 
 // reduce 함수 오버로드
+// 초기값이 있는 경우
 function reduce<A, Acc>(
   f: (acc: Acc, a: A) => Acc,
   acc: Acc,
   iterable: Iterable<A>,
 ): Acc;
+// 초기값이 없는 경우
 function reduce<A, Acc>(f: (a: A, b: A) => Acc, iterable: Iterable<A>): Acc;
+
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -164,4 +103,29 @@ function reduce<A, Acc>(
     return baseReduce(f, accOrIterable as Acc, iterable[Symbol.iterator]());
   }
 }
-```
+
+// const totalSum = reduce((acc, a) => acc + a, 0, arr);
+// console.log(totalSum);
+
+// const abc = reduce((acc, a) => `${acc}${a}`, []);
+// console.log(abc);
+
+function* naturals(end = Infinity): IterableIterator<number> {
+  let num = 1;
+  while (true) {
+    if (num > end) return;
+    yield num++;
+  }
+}
+
+const naturalsIterable = naturals(10);
+
+console.log(
+  reduce(
+    (acc, a) => (acc += a),
+    map(
+      (a) => a * a,
+      filter((a) => a % 2 === 1, naturalsIterable),
+    ),
+  ),
+);
