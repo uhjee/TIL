@@ -109,7 +109,9 @@ function* filter<T>(
 ```
 
 ### reduce - function overload
+
 함수 오버로드
+
 - 초기값이 있을 경우, 세 개의 인자
 - 초기값을 생략하고자 하는경우, f, iterable만을 인자로 받음 (iterable 첫 번째 요소가 초기값으로 세팅)
 - 초기값을 생략하고, 빈 배열일 전달될 경우, 누적할 수 없기에 타입 에러 발생
@@ -163,5 +165,79 @@ function reduce<A, Acc>(
   } else {
     return baseReduce(f, accOrIterable as Acc, iterable[Symbol.iterator]());
   }
+}
+```
+
+## 클래스, 고차함수, 반복자, 타입시스템 조합
+
+### 제네릭 클래스로 Iterable 확장
+
+- FxIterable 클래스를 통해 클래스, 고차함수, 이터러블을 결합해 높은 표현력을 가진 추상화 구현
+
+```ts
+/**
+ * 이터레이터 프록시
+ * 제네릭 클래스로 Iterable 확장
+ */
+class FxIterable<A> {
+  constructor(private iterable: Iterable<A>) {}
+
+  [Symbol.iterator](): Iterator<A> {
+    return this.iterable[Symbol.iterator]();
+  }
+
+  map<B>(f: (a: A) => B): FxIterable<B> {
+    return fx(map(f, this));
+  }
+
+  filter(f: (a: A) => boolean): FxIterable<A> {
+    return fx(filter(f, this));
+  }
+
+  reject(f: (a: A) => boolean): FxIterable<A> {
+    return this.filter((a) => !f(a));
+  }
+
+  forEach(f: (a: A) => void): void {
+    return forEach(f, this);
+  }
+
+  reduce<Acc>(f: (acc: Acc, a: A) => Acc, acc: Acc): Acc; // 초깃값 있는 경우
+  reduce<Acc>(f: (a: A, b: A) => Acc): Acc; // 초깃값 없는 경우
+  reduce<Acc>(f: (a: Acc | A, b: A) => Acc, acc?: Acc) {
+    return acc === undefined ? reduce(f, this) : reduce(f, acc, this);
+  }
+
+  toArray(): A[] {
+    return [...this];
+  }
+
+  to<R>(converter: (iterable: this) => R): R {
+    return converter(this);
+  }
+
+  /**
+   * 이터레이터 프록시를 이터러블로 변환하는 함수를 인자로받아 이터레이터 프록시로 변환해 반환
+   * @param f 이터레이터 프록시를 이터러블로 변환하는 함수
+   * @returns 이터레이터 프록시
+   */
+  chain<B>(f: (iterable: this) => Iterable<B>): FxIterable<B> {
+    return fx(f(this));
+  }
+}
+```
+
+### 이터러블 헬퍼 함수
+
+- 이터러블을 중심으로 고차함수를 구성
+
+```ts
+/**
+ * 이터레이터 프록시 팩토리 (헬퍼 함수)
+ * @param iterable 이터레이터
+ * @returns 이터레이터 프록시
+ */
+function fx<A>(iterable: Iterable<A>): FxIterable<A> {
+  return new FxIterable(iterable);
 }
 ```
