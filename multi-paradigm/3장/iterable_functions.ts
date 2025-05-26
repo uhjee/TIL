@@ -8,9 +8,6 @@ function forEach<T>(f: (a: T) => void, iterable: Iterable<T>): void {
     f(a);
   }
 }
-const arr = [1, 2, 3, 4];
-// forEach((a) => console.log(a), arr);
-
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -24,12 +21,6 @@ function* map<A, B>(
     yield f(a);
   }
 }
-
-// forEach(
-//   console.log,
-//   map((a) => a * 2, arr),
-// );
-
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -45,12 +36,6 @@ function* filter<T>(
     }
   }
 }
-
-// forEach(
-//   console.log,
-//   filter((a) => a % 2 === 0, arr),
-// );
-
 /**
  * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
  * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
@@ -104,11 +89,106 @@ function reduce<A, Acc>(
   }
 }
 
-// const totalSum = reduce((acc, a) => acc + a, 0, arr);
-// console.log(totalSum);
+/**
+ * 이터레이터의 첫 limit개의 요소를 반환하는 함수
+ * @param limit 반환할 요소의 개수
+ * @param iterable 이터레이터
+ * @returns 이터레이터의 첫 n개의 요소
+ */
+function* take<A>(limit: number, iterable: Iterable<A>): IterableIterator<A> {
+  const iterator = iterable[Symbol.iterator]();
+  while (true) {
+    const { value, done } = iterator.next();
+    if (done) break;
+    yield value;
+    if (--limit === 0) break;
+  }
+}
 
-// const abc = reduce((acc, a) => `${acc}${a}`, []);
-// console.log(abc);
+/**
+ * 반복 가능한 객체의 첫 요소를 반환하는 함수
+ * @param iterable 반복 가능한 객체
+ * @returns 반복 가능한 객체의 첫 요소
+ */
+const head = <A>(iterable: Iterable<A>): A | undefined =>
+  iterable[Symbol.iterator]().next().value;
+
+/**
+ * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수
+ * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
+ * @param iterable 반복 가능한 객체
+ * @returns 반복 가능한 객체의 각 요소에 대해 함수를 실행한 결과
+ */
+function find<A>(f: (a: A) => boolean, iterable: Iterable<A>): A | undefined {
+  return head(filter(f, iterable));
+}
+
+/**
+ * 반복 가능한 객체의 각 요소에 대해 함수를 실행하는 함수 (some, every 공통 로직 추상화)
+ * @param accumulator 누적 값을 계산하는 함수
+ * @param acc 초기값
+ * @param taking 조건을 만족하는지 확인하는 함수
+ * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
+ * @param iterable 반복 가능한 객체
+ * @returns 반복 가능한 객체의 각 요소에 대해 함수를 실행한 결과
+ */
+function accumlateWith<A>(
+  accumulator: (a: boolean, b: boolean) => boolean,
+  acc: boolean,
+  taking: (a: boolean) => boolean,
+  f: (a: A) => boolean,
+  iterable: Iterable<A>,
+): boolean {
+  return fx(iterable).map(f).filter(taking).take(1).reduce(accumulator, acc);
+}
+
+/**
+ * 반복 가능한 객체의 모든 요소가 조건을 만족하는지 확인하는 함수
+ * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
+ * @param iterable 반복 가능한 객체
+ * @returns 반복 가능한 객체의 모든 요소가 조건을 만족하는지 여부
+ */
+function every<A>(f: (a: A) => boolean, iterable: Iterable<A>): boolean {
+  // return fx(iterable)
+  //   .map(f)
+  //   .filter((a) => !a)
+  //   .take(1)
+  //   .reduce((a, b) => a && b, true);
+  return accumlateWith(
+    (a, b) => a && b,
+    true,
+    (a) => !a,
+    f,
+    iterable,
+  );
+}
+
+/**
+ * 반복 가능한 객체의 일부 요소가 조건을 만족하는지 확인하는 함수
+ * @param f 반복 가능한 객체의 각 요소에 대해 실행할 함수
+ * @param iterable 반복 가능한 객체
+ * @returns 반복 가능한 객체의 일부 요소가 조건을 만족하는지 여부
+ */
+function some<A>(f: (a: A) => boolean, iterable: Iterable<A>): boolean {
+  return accumlateWith(
+    (a, b) => a || b,
+    false,
+    (a) => a,
+    f,
+    iterable,
+  );
+}
+
+/**
+ * 여러 반복 가능한 객체를 하나로 합치는 함수
+ * @param iterables 반복 가능한 객체들
+ * @returns 합쳐진 반복 가능한 객체
+ */
+function* concat<T>(...iterables: Iterable<T>[]): IterableIterator<T> {
+  for (const iterable of iterables) {
+    yield* iterable; // yield* 연산자는 반복 가능한 객체의 각 요소를 순회하며 반환하는 연산자
+  }
+}
 
 /**
  * 자연수 이터레이터
@@ -122,18 +202,6 @@ function* naturals(end = Infinity): IterableIterator<number> {
     yield num++;
   }
 }
-
-// const naturalsIterable = naturals(10);
-
-// console.log(
-//   reduce(
-//     (acc, a) => (acc += a),
-//     map(
-//       (a) => a * a,
-//       filter((a) => a % 2 === 1, naturalsIterable),
-//     ),
-//   ),
-// );
 
 /**
  * 이터레이터 프록시
@@ -168,6 +236,10 @@ class FxIterable<A> {
     return acc === undefined ? reduce(f, this) : reduce(f, acc, this);
   }
 
+  take(limit: number): FxIterable<A> {
+    return fx(take(limit, this));
+  }
+
   toArray(): A[] {
     return [...this];
   }
@@ -194,32 +266,17 @@ function fx<A>(iterable: Iterable<A>): FxIterable<A> {
   return new FxIterable(iterable);
 }
 
-// fx(['a', 'b'])
-//   .map((i) => i.toUpperCase())
-//   .filter((i) => i.includes('A'))
-//   .forEach((i) => console.log(i));
-
-// const num = fx(naturals(5))
-//   .filter((n) => n % 2 === 1)
-//   .map((n) => n * 10)
-//   .reduce((a, b) => a + b, 100);
-
-// console.log(num);
-
-const sorted = fx([5, 2, 3, 1, 4, 5, 3])
-  .filter((a) => a % 2 === 1)
-  .map((a) => a * 10)
-  .to((iterable) => [...iterable])
-  .sort((a, b) => a - b);
-
-console.log(sorted);
-
-const set2 = fx([5, 2, 3, 1, 4, 5, 3])
-  .filter((a) => a % 2 === 1)
-  .map((a) => a * 10)
-  .chain((iterable) => new Set(iterable))
-  .reduce((a, b) => a + b);
-console.log(set2);
-
 // 이 파일을 모듈로 만들어 전역 스코프 충돌을 방지
-export {};
+export {
+  fx,
+  FxIterable,
+  filter,
+  map,
+  reduce,
+  forEach,
+  take,
+  head,
+  find,
+  every,
+  some,
+};
