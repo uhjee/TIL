@@ -204,6 +204,51 @@ function* naturals(end = Infinity): IterableIterator<number> {
 }
 
 /**
+ * 비동기 작업을 지연시키는 함수
+ * @param time 지연 시간
+ * @param value 반환할 값
+ * @returns 지연된 값을 반환하는 Promise
+ */
+function delay<T>(time: number, value: T): Promise<T> {
+  return new Promise((resolve) => setTimeout(resolve, time, value));
+}
+
+/**
+ * 반복 가능한 객체를 지정된 크기의 배열로 나누는 함수
+ * @param size 배열의 크기
+ * @param iterable 반복 가능한 객체
+ * @returns 배열의 크기만큼 반복 가능한 객체의 요소를 배열로 반환하는 이터레이터
+ */
+function* chunk<T>(size: number, iterable: Iterable<T>): IterableIterator<T[]> {
+  const iterator = iterable[Symbol.iterator](); // 이터러블을 이터레이터로 변환
+  while (true) {
+    const arr = [
+      ...take(size, {
+        [Symbol.iterator]: () => iterator,
+      }),
+    ];
+    if (arr.length) yield arr; // 배열의 길이가 0이 아니면 배열을 반환
+    if (arr.length < size) break;
+  }
+}
+
+/**
+ * 비동기 이터러블로부터 새로운 배열 인스턴스를 생성해 반환하는 함수
+ * @param iterable 비동기 이터러블
+ * @returns 비동기 이터러블의 요소를 배열로 변환한 인스턴스
+ */
+async function fromAsync<T>(
+  iterable: Iterable<Promise<T>> | AsyncIterable<T>,
+): Promise<T[]> {
+  const arr: T[] = [];
+  for await (const a of iterable) {
+    // 이터레이터 소비
+    arr.push(a);
+  }
+  return arr;
+}
+
+/**
  * 이터레이터 프록시
  * 제네릭 클래스로 Iterable 확장
  */
@@ -256,6 +301,10 @@ class FxIterable<A> {
   chain<B>(f: (iterable: this) => Iterable<B>): FxIterable<B> {
     return fx(f(this));
   }
+
+  chunk(size: number): FxIterable<A[]> {
+    return fx(chunk(size, this));
+  }
 }
 /**
  * 이터레이터 프록시 팩토리 (헬퍼 함수)
@@ -279,4 +328,7 @@ export {
   find,
   every,
   some,
+  delay,
+  chunk,
+  fromAsync,
 };

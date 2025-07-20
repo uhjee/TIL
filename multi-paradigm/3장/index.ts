@@ -7,7 +7,7 @@ import {
   reduce,
   some,
   take,
-} from './iterable_functions';
+} from '../iterable_functions.js';
 
 /**
  * [명령형] n개의 홀수를 제곱하여 모두 더하는 함수
